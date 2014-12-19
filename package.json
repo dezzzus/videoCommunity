@@ -14,5 +14,9 @@
     "vizzit"
   ],
   "author": "",
-  "license": "Private"
+  "license": "Private",
+  "dependencies": {
+    "ejs": "^1.0.0",
+    "express": "^4.10.6"
+  }
 }
