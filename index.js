@@ -7,6 +7,7 @@ var ObjectID = mongodb.ObjectID;
 var app = express();
 app.collection = {};
 app.use(bodyParser.urlencoded({'extended': true}));
+app.use(express.static(__dirname + '/static'));
 
 app.set('view engine', 'ejs');
 
