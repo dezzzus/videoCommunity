@@ -15,6 +15,10 @@ app.get('/', function (req, res) {
     res.render('index');
 });
 
+app.get('/contactus', function (req, res) {
+    res.render('contactus');
+});
+
 app.get('/tour', function (req, res) {
     app.collection.tour.find({}).toArray(
         function (err, tours) {
