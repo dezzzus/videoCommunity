@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head></head>
+<body>
+<div id="player1"></div>
+<div id="player2"></div>
+<script src="http://cdn.pubnub.com/pubnub.min.js"></script>
+<script src="https://rawgit.com/lw7360/videosync/gh-pages/videosync.js"></script>
+<script>
+    var tag = document.createElement('script');
+
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    var playerVars = {
+        modestbranding: 1,
+        theme: 'light',
+        showinfo: 0,
+        rel: 0,
+        fs: 0
+    };
+
+
+    var vidSync1 = new VideoSync("SyncVideo345");
+    var player1;
+
+
+    function onYouTubeIframeAPIReady() {
+
+        player1 = new YT.Player('player1', {
+            height: '200',
+            width: '200',
+            videoId: 'A9HV5O8Un6k',
+            playerVars: playerVars,
+            events: {
+                'onReady': vidSync1.onPlayerReady,
+                'onStateChange': vidSync1.onPlayerStateChange
+            }
+        });
+    }
+</script>
+</body>
+</html>
