@@ -4,6 +4,9 @@
   "description": "vizzit web-site",
   "main": "index.js",
   "private": true,
+  "engines": {
+    "node": "0.10.33"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
