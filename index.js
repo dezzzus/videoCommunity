@@ -3,6 +3,7 @@ var mongodb = require('mongodb');
 var bodyParser = require('body-parser');
 var MongoClient = mongodb.MongoClient;
 var ObjectID = mongodb.ObjectID;
+var auth = require('http-auth');
 
 var app = express();
 app.collection = {};
@@ -32,7 +33,15 @@ app.get('/contactus', function (req, res) {
     res.render('contactus');
 });
 
-app.get('/tour', function (req, res) {
+var basic = auth.basic({
+        realm: "Web."
+    }, function (username, password, callback) { // Custom authentication method.
+        callback(username === "vizzit" && password === "T00rL00k");
+    }
+);
+
+
+app.get('/tour', auth.connect(basic), function (req, res) {
     app.collection.tour.find({}).toArray(
         function (err, tours) {
             res.render('tour', {
