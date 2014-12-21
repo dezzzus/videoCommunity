@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head></head>
+<body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+<script src="//f.vimeocdn.com/js/froogaloop2.min.js"></script>
+<iframe id="player1" src="//player.vimeo.com/video/76979871?api=1&player_id=player1" width="630" height="354" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+
+<script src="http://cdn.pubnub.com/pubnub.min.js"></script>
+<script src="./js/vimeo_vsync.js"></script>
+<script>
+$(function() {
+    var iframe = $('#player1')[0];
+    var player = $f(iframe);
+
+    var vidSync1 = new VideoSync("SyncVideo345", Math.random().toString(), player);
+	
+});
+</script>
+</body>
+</html>
