@@ -1,7 +1,9 @@
 <% include head.ejs %>
 <div class="container" style="padding:50px 0;">
     <h1>Video tour</h1>
-    <iframe src="<%= tour.videoUrl %>" width="800" height="450" frameborder="0" webkitallowfullscreen
+    <iframe src="<%= tour.videoUrl %>?api=1" width="800" height="450" frameborder="0" webkitallowfullscreen
             mozallowfullscreen allowfullscreen></iframe>
 </div>
+
+<script type="application/javascript" src="//f.vimeocdn.com/js/froogaloop2.min.js"></script>
 <% include foot.ejs %>
