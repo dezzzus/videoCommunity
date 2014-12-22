@@ -1,9 +1,22 @@
 <% include head.ejs %>
 <div class="container" style="padding:50px 0;">
     <h1>Video tour</h1>
-    <iframe src="<%= tour.videoUrl %>?api=1" width="800" height="450" frameborder="0" webkitallowfullscreen
+    <iframe id="tour_player" src="<%= tour.videoUrl %>?api=1&player_id=tour_player" width="800" height="450" frameborder="0" webkitallowfullscreen
             mozallowfullscreen allowfullscreen></iframe>
 </div>
 
 <script type="application/javascript" src="//f.vimeocdn.com/js/froogaloop2.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="http://cdn.pubnub.com/pubnub.min.js"></script>
+<script src="/js/vimeo_vsync.js"></script>
+
+<script>
+$(function() {
+    var iframe = $('#tour_player')[0];
+    var player = $f(iframe);
+    var vidSync = new VideoSync("SyncVideo"+"<%= tour._id %>", Math.random().toString(), player);
+	
+});
+</script>
+
 <% include foot.ejs %>
