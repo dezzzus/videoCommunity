@@ -67,9 +67,13 @@ app.post('/tour', function (req, res) {
 app.get('/tour/:tid', function (req, res) {
     var tid = req.param('tid');
     app.collection.tour.findOne({'_id': ObjectID(tid)}, function (err, tour) {
-        res.render('tour_details', {
-            tour: tour
-        });
+    	app.collection.property.findOne({'_id': ObjectID(tour.property)}, function (err, property){
+            res.render('tour_details', {
+                tour: tour,
+                property : property
+            });
+    	});
+
     });
 });
 
@@ -80,6 +84,7 @@ MongoClient.connect(mongoURI, function (dbErr, db) {
     if (dbErr) throw dbErr;
 
     app.collection.tour = db.collection('tour');
+    app.collection.property = db.collection('property');
 
     app.listen(port, function () {
         console.log('Vizzit app listening at port:%s', port)

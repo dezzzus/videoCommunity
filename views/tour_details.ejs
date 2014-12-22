@@ -1,6 +1,8 @@
 <% include head.ejs %>
 <div class="container" style="padding:50px 0;">
     <h1>Video tour</h1>
+    <div> Property: <%= property.address %> </div>
+    <div> Agent: <%= property.broker %> </div>
     <iframe id="tour_player" src="<%= tour.videoUrl %>?api=1&player_id=tour_player" width="800" height="450" frameborder="0" webkitallowfullscreen
             mozallowfullscreen allowfullscreen></iframe>
 </div>
