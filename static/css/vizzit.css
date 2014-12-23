@@ -167,3 +167,23 @@ footer {
 p.copyright {
     margin: 15px 0 0;
 }
+
+.agent_photo img {
+    max-width: 200px;
+    max-height: 200px;
+    margin-top: 15px;
+}
+
+.agent_name{
+    margin-top: 15px;
+}
+
+.property_map{
+    width: 300px;
+    height: 300px;
+    margin-top: 30px;
+}
+
+.property_address{
+    margin-top: 15px;
+}
