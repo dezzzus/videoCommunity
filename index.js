@@ -72,6 +72,7 @@ app.get('/tour/:tid', function (req, res) {
                 res.render('tour_details', {
                     tour: tour,
                     property : property,
+                    mapQuery: property.address.replace(' ','+'),
                     agent : agent
                 });
 

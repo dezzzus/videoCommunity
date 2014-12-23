@@ -1,11 +1,31 @@
 <% include head.ejs %>
-<div class="container" style="padding:50px 0;">
-    <h1>Video tour</h1>
-    <div> Property: <%= property.address %> </div>
-    <div> Agent: <%= agent.name %> </div>
-    <div> <img alt="<%= agent.name %>" src="<%= agent.photoURL %>" style="max-width:200px;max-height:200px"> </div>
-    <iframe id="tour_player" src="<%= tour.videoUrl %>?api=1&player_id=tour_player" width="800" height="450" frameborder="0" webkitallowfullscreen
-            mozallowfullscreen allowfullscreen></iframe>
+<div class="container">
+    <h1><%= agent.agency || 'Video tour' %></h1>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="agent_photo">
+                <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
+            </div>
+            <div class="agent_name">
+                <%= agent.name %>
+            </div>
+            <iframe
+                    class="property_map"
+                    frameborder="0"
+                    src="https://www.google.com/maps/embed/v1/place?key=AIzaSyAEYY3qtKKd89MjKVea6ysS4OsJyscK2XE&q=<%= mapQuery %>">
+            </iframe>
+            <div class="property_address">
+                <%= property.address %>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <iframe id="tour_player" src="<%= tour.videoUrl %>?api=1&player_id=tour_player" width="800" height="450"
+                    frameborder="0" webkitallowfullscreen
+                    mozallowfullscreen allowfullscreen></iframe>
+        </div>
+    </div>
+
 </div>
 
 <script type="application/javascript" src="//f.vimeocdn.com/js/froogaloop2.min.js"></script>
@@ -13,12 +33,12 @@
 <script src="/js/vimeo_vsync.js"></script>
 
 <script>
-$(function() {
-    var iframe = $('#tour_player')[0];
-    var player = $f(iframe);
-    var vidSync = new VideoSync("SyncVideo"+"<%= tour._id %>", Math.random().toString(), player);
-	
-});
+    $(function () {
+        var iframe = $('#tour_player')[0];
+        var player = $f(iframe);
+        var vidSync = new VideoSync("SyncVideo" + "<%= tour._id %>", Math.random().toString(), player);
+
+    });
 </script>
 
 <% include foot.ejs %>
