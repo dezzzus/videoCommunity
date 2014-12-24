@@ -103,7 +103,38 @@ app.get('/signup', function (req, res) {
     res.render('signup');
 });
 
-passport.use(new LocalStrategy(
+app.post('/signup', function (req, res) {
+    app.collection.agent.findOne({email: req.body['email']}, function (err, user) {
+        if (err) {
+            throw err;
+        }
+        if (user) {
+            res.redirect('/signup');
+        }
+        else {
+            var salt = bcrypt.genSaltSync(10);
+            var hash = bcrypt.hashSync(req.body['password'], salt);
+            app.collection.agent.insert({
+                email: req.body['email'],
+                name: req.body['name'],
+                agency: req.body['agency'],
+                photo: req.body['photo'],
+                passwordHash: hash
+            }, function (err, agent) {
+                if (err) {
+                    throw err;
+                }
+
+                res.redirect('/login');
+            });
+        }
+
+    });
+});
+
+passport.use(new LocalStrategy({
+        usernameField: 'email'
+    },
     function (email, password, done) {
         app.collection.agent.findOne({email: email}, function (err, user) {
             if (err) {
@@ -139,6 +170,16 @@ MongoClient.connect(mongoURI, function (dbErr, db) {
         })
     }));
     app.use(passport.session());
+
+    passport.serializeUser(function (user, done) {
+        done(null, user._id.toHexString());
+    });
+
+    passport.deserializeUser(function (id, done) {
+        app.collection.agent.findOne({'_id': ObjectID(id)}, function (err, user) {
+            done(err, user);
+        });
+    });
 
     app.listen(port, function () {
         console.log('Vizzit app listening at port:%s', port)
