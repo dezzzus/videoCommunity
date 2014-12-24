@@ -16,6 +16,7 @@ function VideoSync(roomId, userId, player) {
     var pubnub = PUBNUB.init({
         publish_key: 'pub-c-4dd374dc-c46a-40ee-9bbf-488f4f7449ef',
         subscribe_key: 'sub-c-170d058e-8726-11e4-a400-02ee2ddab7fe',
+        origin: 'pubsub.pubnub.com',
         uuid: userId
     });
 
@@ -28,6 +29,7 @@ function VideoSync(roomId, userId, player) {
     // A helper function that publishes state-change messages.
     var pub = function (type, time) {
         if (lastMsg !== "" + type + time) {
+        	console.log("sent event: ", type, " ", time);
             pubnub.publish({
                 channel: roomId,
                 message: {
@@ -42,12 +44,13 @@ function VideoSync(roomId, userId, player) {
 
     var dontPublishNext = false;
     
-    // The function that keeps the video in sync.
+    // Hack to keep secondary events from echoing
     var callPlayer = function(player, arg1, arg2, arg3) {
     	dontPublishNext = true;
     	player.api(arg1, arg2, arg3);
     };
     
+    // The function that keeps the video in sync.
     var keepSync = function (playerIn) {
         linkStart = true;
 
@@ -60,6 +63,7 @@ function VideoSync(roomId, userId, player) {
             pubnub.subscribe({
                 channel: roomId,
                 callback: function (m) {
+                	console.log("received event: ", m.type);
                     lastMsg = m.recipient + m.type + m.time;
                     if ((m.recipient === userId || m.recipient === "") && m.sender !== userId) {
                         if (m.type === "updateRequest") {
@@ -94,12 +98,12 @@ function VideoSync(roomId, userId, player) {
             var z = setInterval(function () {
                 player.api('getCurrentTime', function(curTime) {
                     if (Math.abs(curTime - time) > 1) {
-                    	player.api('paused', function(paused){
+                    	callPlayer(player, 'paused', function(paused){
                             if (paused) {
                                 pub("pause", curTime);
-                                player.api('pause');
+                                callPlayer(player, 'pause');
                             } else if (!paused) {
-                                player.api('pause');
+                            	callPlayer(player, 'pause');
                             }
                     	});
                     }
@@ -112,8 +116,8 @@ function VideoSync(roomId, userId, player) {
     };
 
     var onPlayerReady =  function (playerIn) {
-            playerIn.api('play');
-            playerIn.api('pause');
+            //callPlayer(playerIn, 'play');
+            //callPlayer(playerIn, 'pause');
             keepSync(playerIn);
         };
         
@@ -142,8 +146,8 @@ function VideoSync(roomId, userId, player) {
         
         // Useful constants
         var PLAY = 1;
-        var     PAUSE = 2;
-        var   SEEK = 3;
+        var PAUSE = 2;
+        var SEEK = 3;
         
     var onPause = function(id) {
         onPlayerStateChange(player, PAUSE);
