@@ -192,3 +192,9 @@ p.copyright {
     max-height: 205px;
     padding-top: 15px;
 }
+
+.signup_formbox {
+    margin-top: 30px;
+    padding: 15px;
+    border: 1px solid #e7e7e7;
+}
