@@ -3,16 +3,18 @@ var mongodb = require('mongodb');
 var bodyParser = require('body-parser');
 var MongoClient = mongodb.MongoClient;
 var ObjectID = mongodb.ObjectID;
-var auth = require('http-auth');
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var bcrypt = require('bcrypt');
+var cookieParser = require('cookie-parser');
+
+var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
+var port = process.env.PORT || 3000;
 
 var app = express();
 app.collection = {};
-app.use(bodyParser.urlencoded({'extended': true}));
 
 function wwwRedirect(req, res, next) {
     if (req.headers.host.slice(0, 4) === 'www.') {
@@ -25,110 +27,26 @@ function wwwRedirect(req, res, next) {
 app.set('trust proxy', true);
 app.use(wwwRedirect);
 
-app.use(passport.initialize());
-app.use(express.static(__dirname + '/static'));
-
-
-app.set('view engine', 'ejs');
-
-app.get('/', function (req, res) {
-    res.render('index');
-});
-
-app.get('/contactus', function (req, res) {
-    res.render('contactus');
-});
-
-var basic = auth.basic({
-        realm: "Web."
-    }, function (username, password, callback) { // Custom authentication method.
-        callback(username === "vizzit" && password === "T00rL00k");
-    }
-);
-
-
-app.get('/tour', auth.connect(basic), function (req, res) {
-    app.collection.tour.find({}).toArray(
-        function (err, tours) {
-            res.render('tour', {
-                tours: tours
-            });
-        }
-    );
-});
-
-app.post('/tour', function (req, res) {
-    var videoUrl = req.body['videoUrl'];
-    var newTour = {
-        videoUrl: videoUrl
-    };
-    app.collection.tour.insert(newTour, function (err, dbTour) {
-        if (err) {
-            console.log('DB err' + err);
-        }
-    });
-    res.redirect('/tour');
-});
-
-app.get('/tour/:tid', function (req, res) {
-    var tid = req.param('tid');
-    app.collection.tour.findOne({'_id': ObjectID(tid)}, function (err, tour) {
-        app.collection.property.findOne({'_id': ObjectID(tour.property)}, function (err, property) {
-            app.collection.agent.findOne({'_id': ObjectID(property.agent)}, function (err, agent) {
-                res.render('tour_details', {
-                    tour: tour,
-                    property: property,
-                    mapQuery: property.address.replace(' ', '+'),
-                    agent: agent
-                });
-
-            });
-        });
-
-    });
-});
-
-app.get('/login', function (req, res) {
-    res.render('login');
-});
-
-app.post('/login',
-    passport.authenticate('local', {
-        successRedirect: '/',
-        failureRedirect: '/login'
+app.use(bodyParser.urlencoded({'extended': true}));
+app.use(cookieParser());
+app.use(session({
+    secret: 'VizzitSessionSecret',
+    resave: false,
+    saveUninitialized: false,
+    store: new MongoStore({
+        url: mongoURI
     })
-);
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
-app.get('/signup', function (req, res) {
-    res.render('signup');
+passport.serializeUser(function (user, done) {
+    done(null, user._id.toHexString());
 });
 
-app.post('/signup', function (req, res) {
-    app.collection.agent.findOne({email: req.body['email']}, function (err, user) {
-        if (err) {
-            throw err;
-        }
-        if (user) {
-            res.redirect('/signup');
-        }
-        else {
-            var salt = bcrypt.genSaltSync(10);
-            var hash = bcrypt.hashSync(req.body['password'], salt);
-            app.collection.agent.insert({
-                email: req.body['email'],
-                name: req.body['name'],
-                agency: req.body['agency'],
-                photo: req.body['photo'],
-                passwordHash: hash
-            }, function (err, agent) {
-                if (err) {
-                    throw err;
-                }
-
-                res.redirect('/login');
-            });
-        }
-
+passport.deserializeUser(function (id, done) {
+    app.collection.agent.findOne({'_id': ObjectID(id)}, function (err, user) {
+        done(err, user);
     });
 });
 
@@ -151,35 +69,113 @@ passport.use(new LocalStrategy({
     }
 ));
 
-var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
-var port = process.env.PORT || 3000;
+
+app.use(express.static(__dirname + '/static'));
+
+
+app.set('view engine', 'ejs');
+
+app.get('/', function (req, res) {
+    res.render('index');
+});
+
+app.get('/contactus', function (req, res) {
+    res.render('contactus');
+});
+
+function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/login');
+}
+
+
+app.get('/tour', ensureAuthenticated, function (req, res) {
+    app.collection.property.find({'agent': req.user._id.toHexString()}).toArray(
+        function (err, tours) {
+            res.render('tour', {
+                tours: tours
+            });
+        }
+    );
+});
+
+app.post('/tour', ensureAuthenticated, function (req, res) {
+    var newProperty = {
+        videoURL: req.body['videoURL'],
+        address: req.body['address'],
+        agent: req.user._id.toHexString()
+    };
+    app.collection.property.insert(newProperty, function (err, dbProp) {
+        if (err) {
+            console.log('DB err' + err);
+        }
+    });
+    res.redirect('/tour');
+});
+
+app.get('/tour/:pid', function (req, res) {
+    var pid = req.param('pid');
+    app.collection.property.findOne({'_id': ObjectID(pid)}, function (err, property) {
+        app.collection.agent.findOne({'_id': ObjectID(property.agent)}, function (err, agent) {
+            res.render('tour_details', {
+                property: property,
+                mapQuery: property.address.split(' ').join('+'),
+                agent: agent
+            });
+
+        });
+    });
+});
+
+app.get('/login', function (req, res) {
+    res.render('login');
+});
+
+app.post('/login', passport.authenticate('local', {
+    successRedirect: '/tour',
+    failureRedirect: '/login'
+}));
+
+app.get('/signup', function (req, res) {
+    res.render('signup');
+});
+
+app.post('/signup', function (req, res) {
+    app.collection.agent.findOne({email: req.body['email']}, function (err, user) {
+        if (err) {
+            throw err;
+        }
+        if (user) {
+            res.redirect('/signup');
+        }
+        else {
+            var salt = bcrypt.genSaltSync(10);
+            var hash = bcrypt.hashSync(req.body['password'], salt);
+            app.collection.agent.insert({
+                email: req.body['email'],
+                name: req.body['name'],
+                agency: req.body['agency'],
+                photoURL: req.body['photoURL'],
+                passwordHash: hash
+            }, function (err, agent) {
+                if (err) {
+                    throw err;
+                }
+
+                res.redirect('/login');
+            });
+        }
+
+    });
+});
 
 MongoClient.connect(mongoURI, function (dbErr, db) {
     if (dbErr) throw dbErr;
 
-    app.collection.tour = db.collection('tour');
     app.collection.property = db.collection('property');
     app.collection.agent = db.collection('agent');
-
-    app.use(session({
-        secret: 'VizzitSessionSecret',
-        resave: false,
-        saveUninitialized: false,
-        store: new MongoStore({
-            db: db
-        })
-    }));
-    app.use(passport.session());
-
-    passport.serializeUser(function (user, done) {
-        done(null, user._id.toHexString());
-    });
-
-    passport.deserializeUser(function (id, done) {
-        app.collection.agent.findOne({'_id': ObjectID(id)}, function (err, user) {
-            done(err, user);
-        });
-    });
 
     app.listen(port, function () {
         console.log('Vizzit app listening at port:%s', port)

@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="col-md-8">
-            <iframe id="tour_player" src="<%= tour.videoUrl %>?api=1&player_id=tour_player" width="800" height="450"
+            <iframe id="tour_player" src="<%= property.videoURL %>?api=1&player_id=tour_player" width="800" height="450"
                     frameborder="0" webkitallowfullscreen
                     mozallowfullscreen allowfullscreen></iframe>
         </div>
@@ -36,7 +36,7 @@
     $(function () {
         var iframe = $('#tour_player')[0];
         var player = $f(iframe);
-        var vidSync = new VideoSync("SyncVideo" + "<%= tour._id %>", Math.random().toString(), player);
+        var vidSync = new VideoSync("SyncVideo" + "<%= property._id %>", Math.random().toString(), player);
 
     });
 </script>
