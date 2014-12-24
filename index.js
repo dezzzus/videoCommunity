@@ -25,7 +25,7 @@ function wwwRedirect(req, res, next) {
 app.set('trust proxy', true);
 app.use(wwwRedirect);
 
-
+app.use(passport.initialize());
 app.use(express.static(__dirname + '/static'));
 
 
@@ -88,12 +88,20 @@ app.get('/tour/:tid', function (req, res) {
     });
 });
 
+app.get('/login', function (req, res) {
+    res.render('login');
+});
+
 app.post('/login',
     passport.authenticate('local', {
         successRedirect: '/',
         failureRedirect: '/login'
     })
 );
+
+app.get('/signup', function (req, res) {
+    res.render('signup');
+});
 
 passport.use(new LocalStrategy(
     function (email, password, done) {
