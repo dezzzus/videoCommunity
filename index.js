@@ -115,7 +115,7 @@ app.post('/tour', ensureAuthenticated, function (req, res) {
     res.redirect('/tour');
 });
 
-app.get('/tour/:pid', function (req, res) {
+app.get('/tour/:pid', ensureAuthenticated, function (req, res) {
     var pid = req.param('pid');
     app.collection.property.findOne({'_id': ObjectID(pid)}, function (err, property) {
         app.collection.agent.findOne({'_id': ObjectID(property.agent)}, function (err, agent) {

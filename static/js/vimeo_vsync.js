@@ -6,11 +6,17 @@
 // roomId is the name of the channel you want to use.
 // userId is an optional variable that will identify individual users of VideoSync.
 
-function VideoSync(roomId, userId, player) {
+function VideoSync(roomId, userId, player, debug) {
     // If no userId is provided, generate a simple random one with Math.random.
     if (userId === undefined) {
         userId = Math.random().toString();
     }
+    
+    var debugOut = function() {
+    	if (debug) {
+    		console.log.apply(console, arguments);
+    	}
+    };
 
     // Initializing PubNub with demo keys and our userId.
     var pubnub = PUBNUB.init({
@@ -29,7 +35,7 @@ function VideoSync(roomId, userId, player) {
     // A helper function that publishes state-change messages.
     var pub = function (type, time) {
         if (lastMsg !== "" + type + time) {
-        	console.log("sent event: ", type, " ", time);
+        	debugOut("sent event: ", type, " ", time);
             pubnub.publish({
                 channel: roomId,
                 message: {
@@ -42,11 +48,18 @@ function VideoSync(roomId, userId, player) {
         }
     };
 
-    var dontPublishNext = false;
+    var isStateChangeEvent = function(event) {
+    	return event === "play" || event === "pause" || event === "seekTo";
+    };
+     
+    var pubIncomingEventQueue = [];
     
     // Hack to keep secondary events from echoing
     var callPlayer = function(player, arg1, arg2, arg3) {
-    	dontPublishNext = true;
+    	if (isStateChangeEvent(arg1)) {
+    		pubIncomingEventQueue.push(arg1);
+        }
+    	
     	player.api(arg1, arg2, arg3);
     };
     
@@ -55,17 +68,22 @@ function VideoSync(roomId, userId, player) {
         linkStart = true;
 
         var player = playerIn;
+        var time;
         
         // The initial starting time of the current video.
         player.api('getCurrentTime',
-            function(time) {
+            function(playerTime) {
+        	
+        	time = playerTime;
+        	
             // Subscribing to our PubNub channel.
             pubnub.subscribe({
                 channel: roomId,
                 callback: function (m) {
-                	console.log("received event: ", m.type);
                     lastMsg = m.recipient + m.type + m.time;
                     if ((m.recipient === userId || m.recipient === "") && m.sender !== userId) {
+                    	debugOut("received event: ", m.type);
+
                         if (m.type === "updateRequest") {
                             var curTime =  player.api('getCurrentTime');
                             pubnub.publish({
@@ -76,17 +94,12 @@ function VideoSync(roomId, userId, player) {
                                     recipient: m.sender
                                 }
                             });
-                        } else if (m.type === "pause" || m.type === "seek") {
-                        	callPlayer(player, 'seekTo', m.time);
-                            time = m.time;
-                            if (m.type === "pause") {
-                            	callPlayer(player, 'pause');
-                            }
+                        } else if (m.type === "pause") {
+                            callPlayer(player, 'pause');
                         } else if (m.type === "play") {
-                            if (m.time !== null) {
-                            	callPlayer(player, 'seekTo', m.time);
-                            }
                             callPlayer(player, 'play');
+                        } else if (m.type === 'seek') {
+                        	callPlayer(player, 'seekTo', m.time);
                         }
                     }
                 },
@@ -95,9 +108,10 @@ function VideoSync(roomId, userId, player) {
 
             // Intermittently checks whether the video player has jumped ahead or
             // behind the current time.
+            var syncAsWeGo = false;
             var z = setInterval(function () {
                 player.api('getCurrentTime', function(curTime) {
-                    if (Math.abs(curTime - time) > 1) {
+                    if (syncAsWeGo && Math.abs(curTime - time) > 1) {
                     	callPlayer(player, 'paused', function(paused){
                             if (paused) {
                                 pub("pause", curTime);
@@ -121,12 +135,14 @@ function VideoSync(roomId, userId, player) {
             keepSync(playerIn);
         };
         
-        // Should be bound to the Vimeo player `onStateChange` event.
+    // Should be bound to the Vimeo player `onStateChange` event.
     var onPlayerStateChange = function (player, state) {
-        	if (dontPublishNext) {
-        		dontPublishNext = false;
-        		return;
-        	}
+    	    //var oldestPubEvent = pubIncomingEventQueue.size() > 0 ? pubIncomingEventQueue.get(0) : null;
+    	    var oldestPubEvent = pubIncomingEventQueue.shift();
+    	    if (oldestPubEvent) {
+    	    	debugOut("In processing " + state + ", found pub event: " + oldestPubEvent + ", so not publishing.");
+    	    	return;
+    	    }
             if (linkStart) {
                 // Play event.
                 if (state == PLAY) {
@@ -180,3 +196,4 @@ function VideoSync(roomId, userId, player) {
     });
     
 }
+

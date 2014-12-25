@@ -30,13 +30,15 @@
 
 <script type="application/javascript" src="//f.vimeocdn.com/js/froogaloop2.min.js"></script>
 <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
+<script src="/js/utils.js"></script>
 <script src="/js/vimeo_vsync.js"></script>
 
 <script>
     $(function () {
         var iframe = $('#tour_player')[0];
         var player = $f(iframe);
-        var vidSync = new VideoSync("SyncVideo" + "<%= property._id %>", Math.random().toString(), player);
+        var vidSync = new VideoSync("SyncVideo" + "<%= property._id %>", Math.random().toString(), 
+                                    player, getUrlParameter('debugoutput'));
 
     });
 </script>
