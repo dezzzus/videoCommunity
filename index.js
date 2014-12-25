@@ -90,6 +90,11 @@ function ensureAuthenticated(req, res, next) {
     res.redirect('/login');
 }
 
+app.get('/logout', function(req, res){
+	  req.logout();
+	  res.redirect('/');
+	});
+
 
 app.get('/tour', ensureAuthenticated, function (req, res) {
     app.collection.property.find({'agent': req.user._id.toHexString()}).toArray(
@@ -122,7 +127,8 @@ app.get('/tour/:pid', function (req, res) {
             res.render('tour_details', {
                 property: property,
                 mapQuery: property.address.split(' ').join('+'),
-                agent: agent
+                agent: agent,
+                isPresenting: req.isAuthenticated()
             });
 
         });

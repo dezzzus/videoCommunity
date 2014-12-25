@@ -20,6 +20,9 @@
             </div>
         </div>
         <div class="col-md-8">
+        <%if (isPresenting) { %>
+            <div><%= agent.name %>, you are the presenter.  </div> <br>
+        <% } %>
             <iframe id="tour_player" src="<%= property.videoURL %>?api=1&player_id=tour_player" width="800" height="450"
                     frameborder="0" webkitallowfullscreen
                     mozallowfullscreen allowfullscreen></iframe>
@@ -38,7 +41,7 @@
         var iframe = $('#tour_player')[0];
         var player = $f(iframe);
         var vidSync = new VideoSync("SyncVideo" + "<%= property._id %>", Math.random().toString(), 
-                                    player, false, getUrlParameter('debugoutput'));
+                                    player, false, <%= isPresenting %>, getUrlParameter('debugoutput'));
 
     });
 </script>
