@@ -42,11 +42,16 @@ function VideoSync(roomId, userId, player) {
         }
     };
 
-    var dontPublishNext = false;
+    var isStateChangeEvent = function(event) {
+    	return event === "play" || event === "pause" || event === "seekTo";
+    };
+     
+    var pubIncomingEventQueue = [];
     
     // Hack to keep secondary events from echoing
     var callPlayer = function(player, arg1, arg2, arg3) {
-    	dontPublishNext = true;
+    	if (isStateChangeEvent(arg1))
+    	pubIncomingEventQueue.push(arg1);
     	player.api(arg1, arg2, arg3);
     };
     
@@ -55,17 +60,22 @@ function VideoSync(roomId, userId, player) {
         linkStart = true;
 
         var player = playerIn;
+        var time;
         
         // The initial starting time of the current video.
         player.api('getCurrentTime',
-            function(time) {
+            function(playerTime) {
+        	
+        	time = playerTime;
+        	
             // Subscribing to our PubNub channel.
             pubnub.subscribe({
                 channel: roomId,
                 callback: function (m) {
-                	console.log("received event: ", m.type);
                     lastMsg = m.recipient + m.type + m.time;
                     if ((m.recipient === userId || m.recipient === "") && m.sender !== userId) {
+                    	console.log("received event: ", m.type);
+
                         if (m.type === "updateRequest") {
                             var curTime =  player.api('getCurrentTime');
                             pubnub.publish({
@@ -121,12 +131,14 @@ function VideoSync(roomId, userId, player) {
             keepSync(playerIn);
         };
         
-        // Should be bound to the Vimeo player `onStateChange` event.
+    // Should be bound to the Vimeo player `onStateChange` event.
     var onPlayerStateChange = function (player, state) {
-        	if (dontPublishNext) {
-        		dontPublishNext = false;
-        		return;
-        	}
+    	    //var oldestPubEvent = pubIncomingEventQueue.size() > 0 ? pubIncomingEventQueue.get(0) : null;
+    	    var oldestPubEvent = pubIncomingEventQueue.shift();
+    	    if (oldestPubEvent) {
+    	    	console.log("In processing " + state + ", found pub event: " + oldestPubEvent + ", so not publishing.");
+    	    	return;
+    	    }
             if (linkStart) {
                 // Play event.
                 if (state == PLAY) {
