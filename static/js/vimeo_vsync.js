@@ -6,7 +6,7 @@
 // roomId is the name of the channel you want to use.
 // userId is an optional variable that will identify individual users of VideoSync.
 
-function VideoSync(roomId, userId, player, syncAsWeGo, debug) {
+function VideoSync(roomId, userId, player, syncAsWeGo, isPresenter, debug) {
     // If no userId is provided, generate a simple random one with Math.random.
     if (userId === undefined) {
         userId = Math.random().toString();
@@ -17,6 +17,8 @@ function VideoSync(roomId, userId, player, syncAsWeGo, debug) {
     		console.log.apply(console, arguments);
     	}
     };
+    
+    debugOut("PresenterMode: " + isPresenter);
 
     // Initializing PubNub with demo keys and our userId.
     var pubnub = PUBNUB.init({
