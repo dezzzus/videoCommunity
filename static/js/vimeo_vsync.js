@@ -6,7 +6,7 @@
 // roomId is the name of the channel you want to use.
 // userId is an optional variable that will identify individual users of VideoSync.
 
-function VideoSync(roomId, userId, player, debug) {
+function VideoSync(roomId, userId, player, syncAsWeGo, debug) {
     // If no userId is provided, generate a simple random one with Math.random.
     if (userId === undefined) {
         userId = Math.random().toString();
@@ -108,25 +108,38 @@ function VideoSync(roomId, userId, player, debug) {
 
             // Intermittently checks whether the video player has jumped ahead or
             // behind the current time.
-            var syncAsWeGo = false;
-            var z = setInterval(function () {
-                player.api('getCurrentTime', function(curTime) {
-                    if (syncAsWeGo && Math.abs(curTime - time) > 1) {
-                    	callPlayer(player, 'paused', function(paused){
-                            if (paused) {
-                                pub("pause", curTime);
-                                callPlayer(player, 'pause');
-                            } else if (!paused) {
-                            	callPlayer(player, 'pause');
-                            }
-                    	});
-                    }
-                    time = curTime;
-                });
-            }, 500);
-
+            // At the moment, this is not recommended to use (and in fact syncAsWeGo is false when called from tour_details.ejs, 
+            // because it's not working well with Vimeo, especially under slow network.
+            // Other known problems:
+            // - is that Vimeo "eats" certain events, e.g. when user performs them, API is not notified.
+            // - Vimeo sends event notifications out of order (!)
+            // 
+            // The only hope we might have is, after all, to differentiate presenter and viewer.
+            // This is not yet implemented, but we can do something like this:
+            //  - Presenter starts play
+            //  - Viewer checks in from time to time
+            //  - If Viewer is ahead, it pauses.  If Viewer is behind, then Presenter is notified and it pauses
+            //  - Viewer can pause and ask questions
+            //  - If Viewer seeks, then both viewer and presenter must stop
+            //  - If Presenter seeks and keeps playing, Viewer keeps playing            
+            if (syncAsWeGo) {
+                var z = setInterval(function () {
+                    player.api('getCurrentTime', function(curTime) {
+                        if (Math.abs(curTime - time) > 1) {
+                        	callPlayer(player, 'paused', function(paused){
+                                if (paused) {
+                                    pub("pause", curTime);
+                                    callPlayer(player, 'pause');
+                                } else if (!paused) {
+                                	callPlayer(player, 'pause');
+                                }
+                        	});
+                        }
+                        time = curTime;
+                    });
+                }, 500);
+            }
         });
-
     };
 
     var onPlayerReady =  function (playerIn) {

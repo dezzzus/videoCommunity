@@ -38,7 +38,7 @@
         var iframe = $('#tour_player')[0];
         var player = $f(iframe);
         var vidSync = new VideoSync("SyncVideo" + "<%= property._id %>", Math.random().toString(), 
-                                    player, getUrlParameter('debugoutput'));
+                                    player, false, getUrlParameter('debugoutput'));
 
     });
 </script>
