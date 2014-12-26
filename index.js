@@ -102,21 +102,22 @@ app.get('/logout', function (req, res) {
 
 
 app.get('/tour', ensureAuthenticated, function (req, res) {
-	app.collection.agent.findOne({'_id': ObjectID(req.user._id.toHexString())}, function (err, agent) {
-	    app.collection.property.find({'agent': req.user._id.toHexString()}).toArray(
-	            function (err, tours) {
-	                res.render('tour', {
-	                    tours: tours,
-	                    agent: agent
-	                });
-	            }
+    app.collection.agent.findOne({'_id': ObjectID(req.user._id.toHexString())}, function (err, agent) {
+        app.collection.property.find({'agent': req.user._id.toHexString()}).toArray(
+            function (err, tours) {
+                res.render('tour', {
+                    tours: tours,
+                    agent: agent
+                });
+            }
         );
-	});
+    });
 });
 
 app.post('/tour', ensureAuthenticated, function (req, res) {
     var newProperty = {
-        videoURL: req.body['videoURL'],
+        palyerType: req.body['palyerType'],
+        videoID: req.body['videoID'],
         address: req.body['address'],
         agent: req.user._id.toHexString()
     };
