@@ -105,10 +105,16 @@ app.get('/tour', ensureAuthenticated, function (req, res) {
     app.collection.agent.findOne({'_id': ObjectID(req.user._id.toHexString())}, function (err, agent) {
         app.collection.property.find({'agent': req.user._id.toHexString()}).toArray(
             function (err, tours) {
-                res.render('tour', {
-                    tours: tours,
-                    agent: agent
-                });
+                // A little wasteful to find all if it turns out that the current can only see itself
+                app.collection.agent.find().toArray(
+                    function(err, agents){
+                        res.render('tour', {
+                            tours: tours,
+                            agent: agent,
+                            agents: agent.superuser ? agents : [agent]
+                        });
+                    }
+                );
             }
         );
     });
@@ -119,7 +125,7 @@ app.post('/tour', ensureAuthenticated, function (req, res) {
         playerType: req.body['playerType'],
         videoID: req.body['videoID'],
         address: req.body['address'],
-        agent: req.user._id.toHexString()
+        agent: req.body['agent']
     };
     app.collection.property.insert(newProperty, function (err, dbProp) {
         if (err) {
