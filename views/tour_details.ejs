@@ -25,18 +25,32 @@
             <br>
             <% } %>
             <% if(property.playerType == 'vimeo'){ %>
-            <iframe id="tour_player" src="//player.vimeo.com/video/<%= property.videoID %>?api=1&player_id=tour_player" width="800" height="450"
+            <iframe id="tour_player" src="//player.vimeo.com/video/<%= property.videoID %>?api=1&player_id=tour_player"
+                    width="800" height="450"
                     frameborder="0" webkitallowfullscreen
                     mozallowfullscreen allowfullscreen></iframe>
+            <% } %>
+
+            <% if(property.playerType == 'flowplayer'){ %>
+            <div class="flowplayer" data-rtmp="rtmp://rtmp.flowplayer.org/cfx/st/" data-ratio="0.5555555555555556">
+                <video>
+                    <source type="video/webm" src="http://drive.flowplayer.org/<%= property.videoID %>.webm">
+                    <source type="video/mp4" src="http://drive.flowplayer.org/<%= property.videoID %>.mp4">
+                    <source type="video/flash" src="mp4:<%= property.videoID %>.mp4">
+                </video>
+            </div>
             <% } %>
         </div>
     </div>
 
 </div>
 
-<script type="application/javascript" src="//f.vimeocdn.com/js/froogaloop2.min.js"></script>
+
 <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
 <script src="/js/vimeo_vsync.js"></script>
+
+<% if(property.playerType == 'vimeo'){ %>
+<script type="application/javascript" src="//f.vimeocdn.com/js/froogaloop2.min.js"></script>
 
 <script>
     $(function () {
@@ -46,5 +60,10 @@
 
     });
 </script>
-
+<% } %>
+<% if(property.playerType == 'flowplayer'){ %>
+<script src="//releases.flowplayer.org/5.5.2/flowplayer.min.js"></script>
+<!-- Include lines below to support multiple resolutions via quality selector plugin -->
+<script src="//flowplayer.org/drive/quality-selector.js"></script>
+<% } %>
 <% include foot.ejs %>
