@@ -30,8 +30,7 @@ function videoSync(roomId, player) {
 
     var playerEventCounter = {
         play: 0,
-        pause: 0,
-        seekTo: 0
+        pause: 0
     };
 
     var callPlayer = function (player, state, time) {
@@ -50,9 +49,6 @@ function videoSync(roomId, player) {
                     if (m.type === 'play') {
                         callPlayer(player, 'play');
                     }
-                    if (m.type === 'seekTo') {
-                        callPlayer(player, 'seekTo', m.time);
-                    }
                 }
             }
         });
@@ -62,17 +58,12 @@ function videoSync(roomId, player) {
         pub('pause');
     };
 
-    var onSeek = function (position) {
-        pub('seekTo', position.seconds);
-    };
-
     var onPlay = function (id) {
         pub('play');
     };
 
     player.addEvent('ready', function () {
         player.addEvent('pause', onPause);
-        player.addEvent('seek', onSeek);
         player.addEvent('play', onPlay);
         onPlayerReady();
     });
