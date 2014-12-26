@@ -1,26 +1,35 @@
 <% include head.ejs %>
 <div class="container">
-    <h1>Add tour:</h1>
+	<br>
+	<div>
+		Agent: <%= agent.name %>
+	</div>
 
-    <div class="row">
-        <div class="col-md-4">
-            <div class="formbox">
-                <form action="/tour" method="post">
-                    <div class="form-group">
-                        <label for="videourl_input">Video url:</label>
-                        <input type="text" class="form-control" id="videourl_input" name="videoURL"/>
-                    </div>
-                    <div class="form-group">
-                        <label for="address_input">Address:</label>
-                        <input type="text" class="form-control" id="address_input" name="address"/>
-                    </div>
-                    <div class="form-group">
-                        <input type="submit" class="btn btn-success">
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    <% if (agent.superuser) { %>
+
+	    <h1>Add tour:</h1>
+	
+	    <div class="row">
+	        <div class="col-md-4">
+	            <div class="formbox">
+	                <form action="/tour" method="post">
+	                    <div class="form-group">
+	                        <label for="videourl_input">Video url:</label>
+	                        <input type="text" class="form-control" id="videourl_input" name="videoURL"/>
+	                    </div>
+	                    <div class="form-group">
+	                        <label for="address_input">Address:</label>
+	                        <input type="text" class="form-control" id="address_input" name="address"/>
+	                    </div>
+	                    <div class="form-group">
+	                        <input type="submit" class="btn btn-success">
+	                    </div>
+	                </form>
+	            </div>
+	        </div>
+	    </div>
+    
+    <% } %>
 
     <h1>All tours:</h1>
 
