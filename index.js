@@ -116,7 +116,7 @@ app.get('/tour', ensureAuthenticated, function (req, res) {
 
 app.post('/tour', ensureAuthenticated, function (req, res) {
     var newProperty = {
-        palyerType: req.body['palyerType'],
+        playerType: req.body['playerType'],
         videoID: req.body['videoID'],
         address: req.body['address'],
         agent: req.user._id.toHexString()

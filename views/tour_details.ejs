@@ -24,9 +24,11 @@
             <div><%= agent.name %>, you are the presenter.</div>
             <br>
             <% } %>
-            <iframe id="tour_player" src="<%= property.videoURL %>?api=1&player_id=tour_player" width="800" height="450"
+            <% if(property.playerType == 'vimeo'){ %>
+            <iframe id="tour_player" src="//player.vimeo.com/video/<%= property.videoID %>?api=1&player_id=tour_player" width="800" height="450"
                     frameborder="0" webkitallowfullscreen
                     mozallowfullscreen allowfullscreen></iframe>
+            <% } %>
         </div>
     </div>
 
