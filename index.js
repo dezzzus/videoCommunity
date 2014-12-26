@@ -102,13 +102,16 @@ app.get('/logout', function (req, res) {
 
 
 app.get('/tour', ensureAuthenticated, function (req, res) {
-    app.collection.property.find({'agent': req.user._id.toHexString()}).toArray(
-        function (err, tours) {
-            res.render('tour', {
-                tours: tours
-            });
-        }
-    );
+	app.collection.agent.findOne({'_id': ObjectID(req.user._id.toHexString())}, function (err, agent) {
+	    app.collection.property.find({'agent': req.user._id.toHexString()}).toArray(
+	            function (err, tours) {
+	                res.render('tour', {
+	                    tours: tours,
+	                    agent: agent
+	                });
+	            }
+        );
+	});
 });
 
 app.post('/tour', ensureAuthenticated, function (req, res) {
@@ -170,7 +173,8 @@ app.post('/signup', function (req, res) {
                     name: req.body['name'],
                     agency: req.body['agency'],
                     photoURL: req.body['photoURL'],
-                    passwordHash: hash
+                    passwordHash: hash,
+                    superuser: false // for now, every new user is NOT a super user unless manually changed in DB
                 }, function (err, agent) {
                     if (err) {
                         throw err;
@@ -179,7 +183,6 @@ app.post('/signup', function (req, res) {
                     res.redirect('/login');
                 });
             }
-
         });
     }
     else {
