@@ -1,34 +1,42 @@
 <% include head.ejs %>
 <div class="container">
-	<br>
-	<div>
-		Agent: <%= agent.name %>
-	</div>
+    <br>
+
+    <div>
+        Agent: <%= agent.name %>
+    </div>
 
     <% if (agent.superuser) { %>
 
-	    <h1>Add tour:</h1>
-	
-	    <div class="row">
-	        <div class="col-md-4">
-	            <div class="formbox">
-	                <form action="/tour" method="post">
-	                    <div class="form-group">
-	                        <label for="videourl_input">Video url:</label>
-	                        <input type="text" class="form-control" id="videourl_input" name="videoURL"/>
-	                    </div>
-	                    <div class="form-group">
-	                        <label for="address_input">Address:</label>
-	                        <input type="text" class="form-control" id="address_input" name="address"/>
-	                    </div>
-	                    <div class="form-group">
-	                        <input type="submit" class="btn btn-success">
-	                    </div>
-	                </form>
-	            </div>
-	        </div>
-	    </div>
-    
+    <h1>Add tour:</h1>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="formbox">
+                <form action="/tour" method="post">
+                    <div class="form-group">
+                        <label for="playertype_select">Player type:</label>
+                        <select class="form-control" id="playertype_select" name="playerType">
+                            <option value="vimeo">Vimeo</option>
+                            <option value="flowplayer">flowplayer</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="videoid_input">Video id:</label>
+                        <input type="text" class="form-control" id="videoid_input" name="videoID"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="address_input">Address:</label>
+                        <input type="text" class="form-control" id="address_input" name="address"/>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" class="btn btn-success">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <% } %>
 
     <h1>All tours:</h1>
@@ -37,7 +45,8 @@
         <thead>
         <tr>
             <td>Tour id</td>
-            <td>Video url</td>
+            <td>Video id</td>
+            <td>Player type</td>
             <td>Address</td>
         </tr>
         </thead>
@@ -45,7 +54,8 @@
         <% for (var i = 0; i < tours.length;i++){ %>
         <tr>
             <td><a href="/tour/<%= tours[i]._id %>"><%= tours[i]._id %></a></td>
-            <td><%= tours[i].videoURL %></td>
+            <td><%= tours[i].videoID %></td>
+            <td><%= tours[i].playerType %></td>
             <td><%= tours[i].address %></td>
         </tr>
         <% } %>
