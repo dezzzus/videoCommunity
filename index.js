@@ -83,6 +83,11 @@ app.get('/contactus', function (req, res) {
     res.render('contactus');
 });
 
+app.get('/useterms', function (req, res) {
+    res.render('useterms');
+});
+
+
 function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
@@ -90,10 +95,10 @@ function ensureAuthenticated(req, res, next) {
     res.redirect('/login');
 }
 
-app.get('/logout', function(req, res){
-	  req.logout();
-	  res.redirect('/');
-	});
+app.get('/logout', function (req, res) {
+    req.logout();
+    res.redirect('/');
+});
 
 
 app.get('/tour', ensureAuthenticated, function (req, res) {
@@ -152,33 +157,37 @@ app.get('/signup', function (req, res) {
 });
 
 app.post('/signup', function (req, res) {
-    app.collection.agent.findOne({email: req.body['email']}, function (err, user) {
-        if (err) {
-            throw err;
-        }
-        if (user) {
-            res.redirect('/signup');
-        }
-        else {
-            var salt = bcrypt.genSaltSync(10);
-            var hash = bcrypt.hashSync(req.body['password'], salt);
-            app.collection.agent.insert({
-                email: req.body['email'],
-                name: req.body['name'],
-                agency: req.body['agency'],
-                photoURL: req.body['photoURL'],
-                passwordHash: hash,
-                superuser: false // for now, every new user is NOT a super user unless manually changed in DB
-            }, function (err, agent) {
-                if (err) {
-                    throw err;
-                }
+    if (req.body['terms']) {
+        app.collection.agent.findOne({email: req.body['email']}, function (err, user) {
+            if (err) {
+                throw err;
+            }
+            if (user) {
+                res.redirect('/signup');
+            }
+            else {
+                var salt = bcrypt.genSaltSync(10);
+                var hash = bcrypt.hashSync(req.body['password'], salt);
+                app.collection.agent.insert({
+                    email: req.body['email'],
+                    name: req.body['name'],
+                    agency: req.body['agency'],
+                    photoURL: req.body['photoURL'],
+                    passwordHash: hash,
+                    superuser: false // for now, every new user is NOT a super user unless manually changed in DB
+                }, function (err, agent) {
+                    if (err) {
+                        throw err;
+                    }
 
-                res.redirect('/login');
-            });
-        }
-
-    });
+                    res.redirect('/login');
+                });
+            }
+        });
+    }
+    else {
+        res.redirect('/signup');
+    }
 });
 
 MongoClient.connect(mongoURI, function (dbErr, db) {
