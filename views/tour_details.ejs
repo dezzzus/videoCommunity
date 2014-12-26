@@ -20,9 +20,10 @@
             </div>
         </div>
         <div class="col-md-8">
-        <%if (isPresenting) { %>
-            <div><%= agent.name %>, you are the presenter.  </div> <br>
-        <% } %>
+            <% if (isPresenting) { %>
+            <div><%= agent.name %>, you are the presenter.</div>
+            <br>
+            <% } %>
             <iframe id="tour_player" src="<%= property.videoURL %>?api=1&player_id=tour_player" width="800" height="450"
                     frameborder="0" webkitallowfullscreen
                     mozallowfullscreen allowfullscreen></iframe>
@@ -33,15 +34,13 @@
 
 <script type="application/javascript" src="//f.vimeocdn.com/js/froogaloop2.min.js"></script>
 <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
-<script src="/js/utils.js"></script>
 <script src="/js/vimeo_vsync.js"></script>
 
 <script>
     $(function () {
         var iframe = $('#tour_player')[0];
         var player = $f(iframe);
-        var vidSync = new VideoSync("SyncVideo" + "<%= property._id %>", Math.random().toString(), 
-                                    player, false, <%= isPresenting %>, getUrlParameter('debugoutput'));
+        videoSync("SyncVideo" + "<%= property._id %>", player);
 
     });
 </script>
