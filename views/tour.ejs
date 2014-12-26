@@ -30,6 +30,14 @@
                         <input type="text" class="form-control" id="address_input" name="address"/>
                     </div>
                     <div class="form-group">
+                        <label for="agent_select">Agent:</label>
+                        <select class="form-control" id="agent_select" name="agent">
+                        <% for (var i = 0; i < agents.length;i++) { %>
+                            <option value = "<%= agents[i]._id %>"> <%= agents[i].name %> </option>
+                        <% } %>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <input type="submit" class="btn btn-success">
                     </div>
                 </form>
