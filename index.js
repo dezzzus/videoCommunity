@@ -83,6 +83,11 @@ app.get('/contactus', function (req, res) {
     res.render('contactus');
 });
 
+app.get('/useterms', function (req, res) {
+    res.render('useterms');
+});
+
+
 function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
@@ -90,10 +95,10 @@ function ensureAuthenticated(req, res, next) {
     res.redirect('/login');
 }
 
-app.get('/logout', function(req, res){
-	  req.logout();
-	  res.redirect('/');
-	});
+app.get('/logout', function (req, res) {
+    req.logout();
+    res.redirect('/');
+});
 
 
 app.get('/tour', ensureAuthenticated, function (req, res) {
