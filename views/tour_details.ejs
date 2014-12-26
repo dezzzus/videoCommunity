@@ -40,7 +40,7 @@
     $(function () {
         var iframe = $('#tour_player')[0];
         var player = $f(iframe);
-        videoSync("SyncVideo" + "<%= property._id %>", player);
+        videoSync("SyncVideo" + "<%= property._id %>", player, <%= isPresenting %>);
 
     });
 </script>
