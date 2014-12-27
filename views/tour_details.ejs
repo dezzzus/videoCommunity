@@ -42,6 +42,9 @@
             <% if (isPresenting) { %>
             <div><%= agent.name %>, you are the presenter.</div>
             <br>
+            <% } else { %>
+            <div> <%= agent.name %> is controlling the playback, please ask them to pause or rewind if necessary.  Thank you.</div>
+            <br>
             <% } %>
             <% if(property.playerType == 'vimeo'){ %>
             <iframe id="tour_player" src="//player.vimeo.com/video/<%= property.videoID %>?api=1&player_id=tour_player"
@@ -66,7 +69,7 @@
 
 
 <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
-<script src="/js/vimeo_vsync.js"></script>
+<script src="/js/video_sync.js"></script>
 
 <% if(property.playerType == 'vimeo'){ %>
 <script type="application/javascript" src="//f.vimeocdn.com/js/froogaloop2.min.js"></script>
