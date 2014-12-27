@@ -4,7 +4,7 @@
  * For now, both viewer and presenter modes implementations are in one place.
  * In a way, it's easier to comprehend it that way, to see both sides in one place.
  * In the future, when it all works well, we can separate into common code and two subclasses.
- * 
+ *
  * @param roomId
  * @param player
  * @param isPresenter
@@ -18,43 +18,43 @@ function videoSync(roomId, player, isPresenter) {
         uuid: userId
     });
 
-    var pubnubPublish = function(message) {
-    	message.sender = userId;
-    	message.recipient = '';
+    var pubnubPublish = function (message) {
+        message.sender = userId;
+        message.recipient = '';
         pubnub.publish({
             channel: roomId,
             message: message
-        });    	
+        });
     };
-    
-    var gaTrackPlayerEvent = function(event) {
+
+    var gaTrackPlayerEvent = function (event) {
         _gaq.push(['_trackEvent',
-                   'player',
-                   event,
-                   String(isPresenter)
-                ]);
+            'player',
+            event,
+            String(isPresenter)
+        ]);
     };
-    
+
     /**
      * If this is a presenter instance, and the event was user generated, publishes the event.
      * returns whether this was a user event.
      */
     var publishIfUserEvent = function (type) {
-    	var wasUserEvent = false;
-    	
+        var wasUserEvent = false;
+
         if (playerEventCounter[type] == 0) {
-        	if (isPresenter) {
-        		pubnubPublish({
+            if (isPresenter) {
+                pubnubPublish({
                     type: type
                 });
-        	}
+            }
             wasUserEvent = true;
         }
         else {
             playerEventCounter[type] -= 1;
             wasUserEvent = false;
         }
-        
+
         return wasUserEvent;
     };
 
@@ -63,7 +63,7 @@ function videoSync(roomId, player, isPresenter) {
         pause: 0,
         seekTo: 0
     };
-    
+
     var lastKnownMyPosition = 0;
     var lastKnownMyPaused = false;
     var lastKnownPresenterPosition = 0;
@@ -86,31 +86,31 @@ function videoSync(roomId, player, isPresenter) {
                         callPlayer(player, 'play');
                     }
                     else if (m.type === 'presenterHeartbeat') {
-                    	// First sync the clock if off by more than 1 second
-                    	if (Math.abs(lastKnownMyPosition - m.position) > 1) {
-                    		callPlayer(player, 'seekTo', m.position);
-                    	}
-                    	
-                    	// Now sync the state
-                		player.api('paused', function(isPaused) {
-                        	if (!isPaused && !m.isPlaying) {
-                        		callPlayer(player, 'pause');
-                        	}
-                        	else if (isPaused && m.isPlaying) {
-                        		callPlayer(player, 'play');
-                        	}                    	
-                		});	
+                        // First sync the clock if off by more than 1 second
+                        if (Math.abs(lastKnownMyPosition - m.position) > 1) {
+                            callPlayer(player, 'seekTo', m.position);
+                        }
+
+                        // Now sync the state
+                        player.api('paused', function (isPaused) {
+                            if (!isPaused && !m.isPlaying) {
+                                callPlayer(player, 'pause');
+                            }
+                            else if (isPaused && m.isPlaying) {
+                                callPlayer(player, 'play');
+                            }
+                        });
                     }
                     else if (m.type === 'seek') {
-                    	// Not supporting seek at the moment. 
-                    	// Relying on the heartbeat instead.  It is simpler that way, at least for now.
+                        // Not supporting seek at the moment.
+                        // Relying on the heartbeat instead.  It is simpler that way, at least for now.
                     }
                 }
             }
         });
     };
 
-    var publishWithProcessing = function(event, processFuncIfUser) {
+    var publishWithProcessing = function (event, processFuncIfUser) {
         gaTrackPlayerEvent(event);
         if (publishIfUserEvent(event)) {
             if (processFuncIfUser) {
@@ -118,9 +118,9 @@ function videoSync(roomId, player, isPresenter) {
             }
         }
     };
-    
+
     var onPause = function (id) {
-        publishWithProcessing('pause', function() {
+        publishWithProcessing('pause', function () {
             // was a user event, but not a presenter, so counter-act the user action.
             if (!isPresenter) {
                 callPlayer(player, 'play');
@@ -129,16 +129,16 @@ function videoSync(roomId, player, isPresenter) {
     };
 
     var onPlay = function (id) {
-        publishWithProcessing('play', function() {
+        publishWithProcessing('play', function () {
             // was a user event, but not a presenter, so counter-act the user action.
             if (!isPresenter) {
                 callPlayer(player, 'pause');
             }
         });
     };
-    
+
     var onSeek = function (id) {
-        publishWithProcessing('seek', function() {
+        publishWithProcessing('seek', function () {
             // was a user event, but not a presenter, so counter-act the user action.
             if (!isPresenter) {
                 callPlayer(player, 'seekTo', lastKnownPresenterPosition);
@@ -147,36 +147,36 @@ function videoSync(roomId, player, isPresenter) {
             }
         });
     };
-                
+
     player.addEvent('ready', function () {
         player.addEvent('pause', onPause);
         player.addEvent('play', onPlay);
         player.addEvent('seek', onSeek);
         onPlayerReady();
     });
-    
+
     /**
-     * 
+     *
      * Publish presenter heartbeat every second or so, if anything changes
      * In addition, this also serves important function of maintaining my own position record, whether I am presenter or viewer
      */
     var z = setInterval(function () {
-    	player.api('getCurrentTime', function(curPos) {
-    		player.api('paused', function(isPaused) {
-    			// If this is the presenter, and either enough position changed or state changed, publish!
-    	    	if (isPresenter && 
-    	    			(Math.abs(curPos - lastKnownPresenterPosition) > .5 || isPaused != lastKnownMyPaused)) {
-            		pubnubPublish({
+        player.api('getCurrentTime', function (curPos) {
+            player.api('paused', function (isPaused) {
+                // If this is the presenter, and either enough position changed or state changed, publish!
+                if (isPresenter &&
+                    (Math.abs(curPos - lastKnownPresenterPosition) > .5 || isPaused != lastKnownMyPaused)) {
+                    pubnubPublish({
                         type: 'presenterHeartbeat',
                         position: curPos,
                         isPlaying: !isPaused
                     });
-    	    	}
-    	    	lastKnownMyPaused = isPaused;
-    	    	lastKnownPresenterPosition = curPos;
-    		});	
-    		lastKnownMyPosition = curPos;
-    	});
+                }
+                lastKnownMyPaused = isPaused;
+                lastKnownPresenterPosition = curPos;
+            });
+            lastKnownMyPosition = curPos;
+        });
     }, 1000);
 
 }

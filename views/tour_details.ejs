@@ -1,23 +1,26 @@
 <% include head.ejs %>
+<script src="http://cdn.pubnub.com/pubnub.min.js"></script>
+<script src="/js/video_sync.js"></script>
+
 <script>
- _gaq.push(['_setCustomVar',
-      1,                   
-      'IsPresenter', 
-      '<%= isPresenting %>',
-      3 // page level
-   ]);
-  _gaq.push(['_setCustomVar',
-      2,                   
-      'AgentId', 
-      '<%= agent._id %>',
-      3 // page level
-   ]);
- _gaq.push(['_trackEvent',
-      'tour', // category of activity
-      'pageview', // Action
-   ]);
- </script>
- 
+    _gaq.push(['_setCustomVar',
+        1,
+        'IsPresenter',
+        '<%= isPresenting %>',
+        3 // page level
+    ]);
+    _gaq.push(['_setCustomVar',
+        2,
+        'AgentId',
+        '<%= agent._id %>',
+        3 // page level
+    ]);
+    _gaq.push(['_trackEvent',
+        'tour', // category of activity
+        'pageview', // Action
+    ]);
+</script>
+
 <div class="container">
     <h1><%= agent.agency || 'Video tour' %></h1>
 
@@ -43,49 +46,21 @@
             <div><%= agent.name %>, you are the presenter.</div>
             <br>
             <% } else { %>
-            <div> <%= agent.name %> is controlling the playback, please ask them to pause or rewind if necessary.  Thank you.</div>
+            <div> <%= agent.name %> is controlling the playback, please ask them to pause or rewind if necessary. Thank
+                you.
+            </div>
             <br>
             <% } %>
             <% if(property.playerType == 'vimeo'){ %>
-            <iframe id="tour_player" src="//player.vimeo.com/video/<%= property.videoID %>?api=1&player_id=tour_player"
-                    width="800" height="450"
-                    frameborder="0" webkitallowfullscreen
-                    mozallowfullscreen allowfullscreen></iframe>
+            <% include player/vimeo.ejs %>
             <% } %>
 
             <% if(property.playerType == 'flowplayer'){ %>
-            <div class="flowplayer" data-rtmp="rtmp://rtmp.flowplayer.org/cfx/st/" data-ratio="0.5555555555555556">
-                <video>
-                    <source type="video/webm" src="http://drive.flowplayer.org/<%= property.videoID %>.webm">
-                    <source type="video/mp4" src="http://drive.flowplayer.org/<%= property.videoID %>.mp4">
-                    <source type="video/flash" src="mp4:<%= property.videoID %>.mp4">
-                </video>
-            </div>
+            <% include player/flowplayer.ejs %>
             <% } %>
         </div>
     </div>
 
 </div>
 
-
-<script src="http://cdn.pubnub.com/pubnub.min.js"></script>
-<script src="/js/video_sync.js"></script>
-
-<% if(property.playerType == 'vimeo'){ %>
-<script type="application/javascript" src="//f.vimeocdn.com/js/froogaloop2.min.js"></script>
-
-<script>
-    $(function () {
-        var iframe = $('#tour_player')[0];
-        var player = $f(iframe);
-        videoSync("SyncVideo" + "<%= property._id %>", player, <%= isPresenting %>);
-
-    });
-</script>
-<% } %>
-<% if(property.playerType == 'flowplayer'){ %>
-<script src="//releases.flowplayer.org/5.5.2/flowplayer.min.js"></script>
-<!-- Include lines below to support multiple resolutions via quality selector plugin -->
-<script src="//flowplayer.org/drive/quality-selector.js"></script>
-<% } %>
 <% include foot.ejs %>
