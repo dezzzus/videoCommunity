@@ -1,4 +1,22 @@
 <% include head.ejs %>
+<script>
+ _gaq.push(['_setCustomVar',
+      1,                   
+      'IsSuperuser', 
+      '<%= agent.superuser %>',
+      3 // page level
+   ]);
+  _gaq.push(['_setCustomVar',
+      2,                   
+      'AgentId', 
+      '<%= agent._id %>',
+      3 // page level
+   ]);
+ _gaq.push(['_trackEvent',
+      'tour', // category of activity
+      'pageview', // Action
+   ]);
+ </script>
 <div class="container">
     <br>
 
