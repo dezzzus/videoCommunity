@@ -1,0 +1,24 @@
+<div class="flowplayer" data-rtmp="rtmp://rtmp.flowplayer.org/cfx/st/" data-ratio="0.5555555555555556">
+    <video>
+        <source type="video/webm" src="http://drive.flowplayer.org/<%= property.videoID %>.webm">
+        <source type="video/mp4" src="http://drive.flowplayer.org/<%= property.videoID %>.mp4">
+        <source type="video/flash" src="mp4:<%= property.videoID %>.mp4">
+    </video>
+</div>
+
+<script src="//releases.flowplayer.org/5.5.2/flowplayer.min.js"></script>
+<!-- Include lines below to support multiple resolutions via quality selector plugin -->
+<script src="//flowplayer.org/drive/quality-selector.js"></script>
+<script src="/js/flowplayer_wrapper.js"></script>
+
+<script type="application/javascript">
+    $(function () {
+        var jqDiv = $(".flowplayer");
+        var flplayer = flowplayer(jqDiv);
+        <% if(!isPresenting){%>
+        jqDiv.find('.fp-controls').hide();
+        <%}%>
+        var wrapper = new SyncWrapper(flplayer);
+        videoSync("SyncVideo" + "<%= property._id %>", wrapper, <%= isPresenting %>);
+    });
+</script>
