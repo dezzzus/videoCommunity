@@ -27,6 +27,14 @@ function videoSync(roomId, player, isPresenter) {
         });    	
     };
     
+    var gaTrackPlayerEvent = function(event) {
+        _gaq.push(['_trackEvent',
+                   'player',
+                   event,
+                   String(isPresenter)
+                ]);
+    };
+    
     /**
      * If this is a presenter instance, and the event was user generated, publishes the event.
      * returns whether this was a user event.
@@ -102,33 +110,42 @@ function videoSync(roomId, player, isPresenter) {
         });
     };
 
-    var onPause = function (id) {
-        if (publishIfUserEvent('pause')) {
-        	// was a user event, but not a presenter, so counter-act the user action.
-        	if (!isPresenter) {
-            	callPlayer(player, 'play');
-        	}
-        }
-    };
-
-    var onPlay = function (id) {
-        if (publishIfUserEvent('play')) {
-        	// was a user event, but not a presenter, so counter-act the user action.
-        	if (!isPresenter) {
-            	callPlayer(player, 'pause');
-        	}
+    var publishWithProcessing = function(event, processFuncIfUser) {
+        gaTrackPlayerEvent(event);
+        if (publishIfUserEvent(event)) {
+            if (processFuncIfUser) {
+                processFuncIfUser();
+            }
         }
     };
     
+    var onPause = function (id) {
+        publishWithProcessing('pause', function() {
+            // was a user event, but not a presenter, so counter-act the user action.
+            if (!isPresenter) {
+                callPlayer(player, 'play');
+            }
+        });
+    };
+
+    var onPlay = function (id) {
+        publishWithProcessing('play', function() {
+            // was a user event, but not a presenter, so counter-act the user action.
+            if (!isPresenter) {
+                callPlayer(player, 'pause');
+            }
+        });
+    };
+    
     var onSeek = function (id) {
-        if (publishIfUserEvent('seek')) {
-        	// was a user event, but not a presenter, so counter-act the user action.
-        	if (!isPresenter) {
-            	callPlayer(player, 'seekTo', lastKnownPresenterPosition);
-            	// make sure keeps playing or pausing
-            	callPlayer(player, lastKnownPresenterWasPlaying ? 'play' : 'pause');
-        	}
-        }
+        publishWithProcessing('seek', function() {
+            // was a user event, but not a presenter, so counter-act the user action.
+            if (!isPresenter) {
+                callPlayer(player, 'seekTo', lastKnownPresenterPosition);
+                // make sure keeps playing or pausing
+                callPlayer(player, lastKnownPresenterWasPlaying ? 'play' : 'pause');
+            }
+        });
     };
                 
     player.addEvent('ready', function () {
