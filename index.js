@@ -138,8 +138,7 @@ app.get('/tour', ensureAuthenticated, function (req, res) {
 
 app.post('/tour', ensureAuthenticated, function (req, res) {
     var newProperty = {
-        playerType: req.body['playerType'],
-        videoID: req.body['videoID'],
+        playerType: 'flowplayer',
         address: req.body['address'],
         agent: req.body['agent']
     };

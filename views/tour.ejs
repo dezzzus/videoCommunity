@@ -1,22 +1,22 @@
 <% include head.ejs %>
 <script>
- _gaq.push(['_setCustomVar',
-      1,                   
-      'IsSuperuser', 
-      '<%= agent.superuser %>',
-      3 // page level
-   ]);
-  _gaq.push(['_setCustomVar',
-      2,                   
-      'AgentId', 
-      '<%= agent._id %>',
-      3 // page level
-   ]);
- _gaq.push(['_trackEvent',
-      'tour', // category of activity
-      'pageview', // Action
-   ]);
- </script>
+    _gaq.push(['_setCustomVar',
+        1,
+        'IsSuperuser',
+        '<%= agent.superuser %>',
+        3 // page level
+    ]);
+    _gaq.push(['_setCustomVar',
+        2,
+        'AgentId',
+        '<%= agent._id %>',
+        3 // page level
+    ]);
+    _gaq.push(['_trackEvent',
+        'tour', // category of activity
+        'pageview', // Action
+    ]);
+</script>
 <div class="container">
     <br>
 
@@ -33,17 +33,6 @@
             <div class="formbox">
                 <form action="/tour" method="post" enctype="multipart/form-data">
                     <div class="form-group">
-                        <label for="playertype_select">Player type:</label>
-                        <select class="form-control" id="playertype_select" name="playerType">
-                            <option value="vimeo">Vimeo</option>
-                            <option value="flowplayer">flowplayer</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="videoid_input">Video id:</label>
-                        <input type="text" class="form-control" id="videoid_input" name="videoID"/>
-                    </div>
-                    <div class="form-group">
                         <label for="videofile_input">Video file:</label>
                         <input type="file" class="form-control" id="videofile_input" name="videoFile"/>
                     </div>
@@ -54,9 +43,9 @@
                     <div class="form-group">
                         <label for="agent_select">Agent:</label>
                         <select class="form-control" id="agent_select" name="agent">
-                        <% for (var i = 0; i < agents.length;i++) { %>
-                            <option value = "<%= agents[i]._id %>"> <%= agents[i].name %> </option>
-                        <% } %>
+                            <% for (var i = 0; i < agents.length;i++) { %>
+                            <option value="<%= agents[i]._id %>"> <%= agents[i].name %> </option>
+                            <% } %>
                         </select>
                     </div>
                     <div class="form-group">
@@ -75,7 +64,6 @@
         <thead>
         <tr>
             <td>Tour id</td>
-            <td>Video id</td>
             <td>Player type</td>
             <td>Address</td>
         </tr>
@@ -84,7 +72,6 @@
         <% for (var i = 0; i < tours.length;i++){ %>
         <tr>
             <td><a href="/tour/<%= tours[i]._id %>"><%= tours[i]._id %></a></td>
-            <td><%= tours[i].videoID %></td>
             <td><%= tours[i].playerType %></td>
             <td><%= tours[i].address %></td>
         </tr>
