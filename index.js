@@ -9,6 +9,9 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var bcrypt = require('bcrypt');
 var cookieParser = require('cookie-parser');
+var fs = require('fs');
+var path = require('path');
+var multer = require('multer')
 
 var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
 var port = process.env.PORT || 3000;
@@ -72,6 +75,14 @@ passport.use(new LocalStrategy({
 
 app.use(express.static(__dirname + '/static'));
 
+if (process.env.TEMP_DIR) {
+    app.use(multer({dest: process.env.TEMP_DIR}));
+}
+
+if (process.env.CLOUD_DIR) {
+    app.use(express.static(process.env.CLOUD_DIR));
+}
+
 
 app.set('view engine', 'ejs');
 
@@ -107,7 +118,7 @@ app.get('/tour', ensureAuthenticated, function (req, res) {
             function (err, tours) {
                 // A little wasteful to find all if it turns out that the current can only see itself
                 app.collection.agent.find().toArray(
-                    function(err, agents){
+                    function (err, agents) {
                         res.render('tour', {
                             tours: tours,
                             agent: agent,
@@ -130,6 +141,15 @@ app.post('/tour', ensureAuthenticated, function (req, res) {
     app.collection.property.insert(newProperty, function (err, dbProp) {
         if (err) {
             console.log('DB err' + err);
+        }
+
+        if (req.files.videoFile) {
+            fs.readFile(req.files.videoFile.path, function (err, data) {
+                var newPath = path.join(process.env.CLOUD_DIR, dbProp[0]._id.toHexString() + '.mp4');
+                fs.writeFile(newPath, data, function (err) {
+                    console.log(err);
+                });
+            });
         }
     });
     res.redirect('/tour');
