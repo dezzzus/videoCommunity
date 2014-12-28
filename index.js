@@ -12,9 +12,12 @@ var cookieParser = require('cookie-parser');
 var fs = require('fs');
 var path = require('path');
 var multer = require('multer')
+var AWS = require('aws-sdk');
 
 var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
 var port = process.env.PORT || 3000;
+
+AWS.config.update({ accessKeyId: 'AKIAJZUHGBIVMAN6BKSA', secretAccessKey: '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' });
 
 var app = express();
 app.collection = {};
@@ -78,11 +81,9 @@ app.use(express.static(__dirname + '/static'));
 if (process.env.TEMP_DIR) {
     app.use(multer({dest: process.env.TEMP_DIR}));
 }
-
-if (process.env.CLOUD_DIR) {
-    app.use(express.static(process.env.CLOUD_DIR));
+else{
+    app.use(multer({dest: __dirname}));
 }
-
 
 app.set('view engine', 'ejs');
 
@@ -144,10 +145,22 @@ app.post('/tour', ensureAuthenticated, function (req, res) {
         }
 
         if (req.files.videoFile) {
-            fs.readFile(req.files.videoFile.path, function (err, data) {
-                var newPath = path.join(process.env.CLOUD_DIR, dbProp[0]._id.toHexString() + '.mp4');
-                fs.writeFile(newPath, data, function (err) {
-                    console.log(err);
+            var fileStream = fs.createReadStream(req.files.videoFile.path);
+            fileStream.on('error', function (err) {
+                if (err) {
+                    throw err;
+                }
+            });
+            fileStream.on('open', function () {
+                var s3 = new AWS.S3();
+                s3.putObject({
+                    Bucket: 'vizzitupload',
+                    Key: req.files.videoFile.name,
+                    Body: fileStream
+                }, function (err) {
+                    if (err) {
+                        throw err;
+                    }
                 });
             });
         }
