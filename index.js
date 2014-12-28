@@ -17,7 +17,11 @@ var AWS = require('aws-sdk');
 var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
 var port = process.env.PORT || 3000;
 
-AWS.config.update({ accessKeyId: 'AKIAJZUHGBIVMAN6BKSA', secretAccessKey: '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' });
+AWS.config.update({
+    accessKeyId: 'AKIAJZUHGBIVMAN6BKSA',
+    secretAccessKey: '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',
+    region: 'us-east-1'
+});
 
 var app = express();
 app.collection = {};
@@ -81,7 +85,7 @@ app.use(express.static(__dirname + '/static'));
 if (process.env.TEMP_DIR) {
     app.use(multer({dest: process.env.TEMP_DIR}));
 }
-else{
+else {
     app.use(multer({dest: __dirname}));
 }
 
@@ -161,6 +165,25 @@ app.post('/tour', ensureAuthenticated, function (req, res) {
                     if (err) {
                         throw err;
                     }
+
+                    var transcoder = new AWS.ElasticTranscoder();
+                    transcoder.createJob(
+                        {
+                            PipelineId: '1419791970323-1aherg',
+                            Input: {
+                                Key: req.files.videoFile.name
+                            },
+                            Output: {
+                                Key: dbProp[0]._id.toHexString() + '.mp4',
+                                PresetId: '1351620000001-100070'
+                            }
+                        },
+                        function (err) {
+                            if (err) {
+                                throw err;
+                            }
+                        }
+                    );
                 });
             });
         }
