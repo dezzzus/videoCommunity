@@ -1,6 +1,7 @@
 <% include head.ejs %>
 <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
 <script src="/js/video_sync.js"></script>
+<script src="http://simplewebrtc.com/latest.js"></script>
 
 <script>
     _gaq.push(['_setCustomVar',
@@ -58,9 +59,26 @@
             <% if(property.playerType == 'flowplayer'){ %>
             <% include player/flowplayer.ejs %>
             <% } %>
+            <div class="row">
+                <div class="col-md-6">
+                    <video id="local_video"></video>
+                </div>
+                <div class="col-md-6">
+                    <div id="remote_video"></div>
+                </div>
+            </div>
         </div>
     </div>
-
 </div>
+<script>
+    var webrtc = new SimpleWebRTC({
+        localVideoEl: 'local_video',
+        remoteVideosEl: 'remote_video',
+        autoRequestMedia: true
+    });
 
+    webrtc.on('readyToCall', function () {
+        webrtc.joinRoom('VizzitRTC<%= property._id %>');
+    });
+</script>
 <% include foot.ejs %>
