@@ -24,7 +24,6 @@
         Agent: <%= agent.name %>
     </div>
 
-    <% if (agent.superuser) { %>
 
     <h1>Add tour:</h1>
 
@@ -40,14 +39,27 @@
                         <label for="address_input">Address:</label>
                         <input type="text" class="form-control" id="address_input" name="address"/>
                     </div>
-                    <div class="form-group">
-                        <label for="agent_select">Agent:</label>
-                        <select class="form-control" id="agent_select" name="agent">
-                            <% for (var i = 0; i < agents.length;i++) { %>
-                            <option value="<%= agents[i]._id %>"> <%= agents[i].name %> </option>
-                            <% } %>
-                        </select>
-                    </div>
+                    
+                    <% if (agent.superuser) { %>
+                        <div class="form-group">
+                            <label for="agent_select">Agent:</label>
+                            <select class="form-control" id="agent_select" name="agent">
+                                <% for (var i = 0; i < agents.length;i++) { %>
+                                    <option value="<%= agents[i]._id %>"
+                                    
+                                    <%# For some reason, _id comparison does not work, use name for now: %>
+                                    <% if (agent.name === agents[i].name) { %>
+                                       selected="selected"
+                                    <% } %>
+                                    
+                                    > <%= agents[i].name %> </option>
+                                <% } %>
+                            </select>
+                        </div>
+                    <% } else { %>
+                       <input type="hidden" name="agent" value="<%= agent._id %>">
+                    <% } %>
+                    
                     <div class="form-group">
                         <div class="submit_tour btn btn-success">
                             <i class="fa fa-refresh fa-spin"></i>
@@ -61,6 +73,10 @@
 
     <script type="application/javascript">
         $(function () {
+            _gaq.push(['_trackEvent',
+                'tour', // category of activity
+                'submit_new', // Action
+            ]);
             var submitBtn = $('.submit_tour');
             submitBtn.on('click', function () {
                 submitBtn.find('i').show();
@@ -69,7 +85,6 @@
         });
     </script>
 
-    <% } %>
 
     <h1>All tours:</h1>
 
