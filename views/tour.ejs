@@ -47,7 +47,6 @@
                                 <% for (var i = 0; i < agents.length;i++) { %>
                                     <option value="<%= agents[i]._id %>"
                                     
-                                    <%# For some reason, _id comparison does not work, use name for now: %>
                                     <% if (agent.name === agents[i].name) { %>
                                        selected="selected"
                                     <% } %>
