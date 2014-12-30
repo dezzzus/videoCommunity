@@ -206,3 +206,7 @@ p.copyright {
     padding: 15px;
     border: 1px solid #e7e7e7;
 }
+
+.submit_tour i {
+    display: none;
+}
