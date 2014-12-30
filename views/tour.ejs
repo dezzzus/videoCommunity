@@ -31,7 +31,7 @@
     <div class="row">
         <div class="col-md-4">
             <div class="formbox">
-                <form action="/tour" method="post" enctype="multipart/form-data">
+                <form action="/tour" method="post" id="tour_form" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="videofile_input">Video file:</label>
                         <input type="file" class="form-control" id="videofile_input" name="videoFile"/>
@@ -49,12 +49,25 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <input type="submit" class="btn btn-success">
+                        <div class="submit_tour btn btn-success">
+                            <i class="fa fa-refresh fa-spin"></i>
+                            Submit
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <script type="application/javascript">
+        $(function () {
+            var submitBtn = $('.submit_tour');
+            submitBtn.on('click', function () {
+                submitBtn.find('i').show();
+                $('#tour_form').submit();
+            });
+        });
+    </script>
 
     <% } %>
 
