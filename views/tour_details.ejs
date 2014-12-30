@@ -61,6 +61,9 @@
             <% } %>
             <div class="row">
                 <div class="col-md-6">
+                    <div class="voice_chat alert alert-success">
+                        Voice chat activated. Feel free to talk with your agent.
+                    </div>
                     <video id="local_video"></video>
                 </div>
                 <div class="col-md-6">
@@ -74,11 +77,16 @@
     var webrtc = new SimpleWebRTC({
         localVideoEl: 'local_video',
         remoteVideosEl: 'remote_video',
-        autoRequestMedia: true
+        autoRequestMedia: true,
+        media: {
+            video: false,
+            audio: true
+        }
     });
 
     webrtc.on('readyToCall', function () {
         webrtc.joinRoom('VizzitRTC<%= property._id %>');
+        $('.voice_chat').show();
     });
 </script>
 <% include foot.ejs %>
