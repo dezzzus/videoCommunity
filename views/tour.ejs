@@ -93,14 +93,12 @@
         <thead>
         <tr>
             <td>Address</td>
-            <% // <td>Player type</td> %>
         </tr>
         </thead>
         <tbody>
         <% for (var i = 0; i < tours.length;i++){ %>
         <tr>
             <td><a href="/tour/<%= tours[i]._id %>"><%= tours[i].address %></a></td>
-            <% // <td><%= tours[i].playerType %></td> %>
         </tr>
         <% } %>
         </tbody>
