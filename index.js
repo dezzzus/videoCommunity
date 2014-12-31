@@ -116,23 +116,34 @@ app.get('/logout', function (req, res) {
     res.redirect('/');
 });
 
+function processAgentTours(req, res, agent) {
+    app.collection.property.find({'agent': agent._id.toHexString()}).toArray(
+        function (err, tours) {
+            // A little wasteful to find all if it turns out that the current can only see itself
+            app.collection.agent.find().toArray(
+                function (err, agents) {
+                    res.render('tour', {
+                        tours: tours,
+                        agent: agent,
+                        agents: agent.superuser ? agents : [agent]
+                    });
+                }
+            );
+        }
+    );
+}
 
 app.get('/tour', ensureAuthenticated, function (req, res) {
     app.collection.agent.findOne({'_id': ObjectID(req.user._id.toHexString())}, function (err, agent) {
-        app.collection.property.find({'agent': req.user._id.toHexString()}).toArray(
-            function (err, tours) {
-                // A little wasteful to find all if it turns out that the current can only see itself
-                app.collection.agent.find().toArray(
-                    function (err, agents) {
-                        res.render('tour', {
-                            tours: tours,
-                            agent: agent,
-                            agents: agent.superuser ? agents : [agent]
-                        });
-                    }
-                );
-            }
-        );
+        if (agent.superuser && req.param('userid')) {
+            // super-user is asking for another agent's contents
+            app.collection.agent.findOne({'_id': ObjectID(req.param('userid'))}, function (err, agent_override) {
+                processAgentTours(req, res, agent_override);
+            });
+        }
+        else {
+            processAgentTours(req, res, agent);
+        }
     });
 });
 

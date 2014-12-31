@@ -47,7 +47,7 @@
                                 <% for (var i = 0; i < agents.length;i++) { %>
                                     <option value="<%= agents[i]._id %>"
                                     
-                                    <% if (agent.name === agents[i].name) { %>
+                                    <% if (agent._id.toHexString() === agents[i]._id.toHexString()) { %>
                                        selected="selected"
                                     <% } %>
                                     
