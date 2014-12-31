@@ -36,8 +36,11 @@ function wwwRedirect(req, res, next) {
 
 function renderWithUser(req, res, viewName, data) {
     if (!data) {
-        data = {user : null};
+        data = {};
     }
+    
+    data.user = null; // always init
+    
     if (req.user) {
         app.collection.agent.findOne({'_id': ObjectID(req.user._id.toHexString())}, function (err, agent) {
             data.user = agent;
