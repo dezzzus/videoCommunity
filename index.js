@@ -38,9 +38,9 @@ function renderWithUser(req, res, viewName, data) {
     if (!data) {
         data = {};
     }
-    
+
     data.user = null; // always init
-    
+
     if (req.user) {
         app.collection.agent.findOne({'_id': ObjectID(req.user._id.toHexString())}, function (err, agent) {
             data.user = agent;
@@ -231,6 +231,17 @@ app.get('/tour/:pid', function (req, res) {
             });
 
         });
+    });
+});
+
+app.delete('/tour/:pid', ensureAuthenticated, function (req, res) {
+    var pid = req.param('pid');
+    app.collection.property.findOne({'_id': ObjectID(pid)}, function (err, property) {
+        if (req.user._id.toHexString() == property.agent) {
+            app.collection.property.remove({'_id': ObjectID(pid)}, function () {
+                res.redirect('/tour');
+            });
+        }
     });
 });
 
