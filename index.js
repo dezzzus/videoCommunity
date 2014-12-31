@@ -34,6 +34,21 @@ function wwwRedirect(req, res, next) {
     next();
 }
 
+function renderWithUser(req, res, viewName, data) {
+    if (!data) {
+        data = {};
+    }
+    if (req.user) {
+        app.collection.agent.findOne({'_id': ObjectID(req.user._id.toHexString())}, function (err, agent) {
+            data.user = agent;
+            res.render(viewName, data);
+        });
+    }
+    else {
+        res.render(viewName, data);
+    }
+}
+
 app.set('trust proxy', true);
 app.use(wwwRedirect);
 
@@ -92,15 +107,15 @@ else {
 app.set('view engine', 'ejs');
 
 app.get('/', function (req, res) {
-    res.render('index');
+    renderWithUser(req, res, 'index');
 });
 
 app.get('/contactus', function (req, res) {
-    res.render('contactus');
+    renderWithUser(req, res, 'contactus');
 });
 
 app.get('/useterms', function (req, res) {
-    res.render('useterms');
+    renderWithUser(req, res, 'useterms');
 });
 
 
@@ -122,7 +137,7 @@ function processAgentTours(req, res, agent) {
             // A little wasteful to find all if it turns out that the current can only see itself
             app.collection.agent.find().toArray(
                 function (err, agents) {
-                    res.render('tour', {
+                    renderWithUser(req, res, 'tour', {
                         tours: tours,
                         agent: agent,
                         agents: agent.superuser ? agents : [agent]
@@ -205,7 +220,7 @@ app.get('/tour/:pid', function (req, res) {
     var pid = req.param('pid');
     app.collection.property.findOne({'_id': ObjectID(pid)}, function (err, property) {
         app.collection.agent.findOne({'_id': ObjectID(property.agent)}, function (err, agent) {
-            res.render('tour_details', {
+            renderWithUser(req, res, 'tour_details', {
                 property: property,
                 mapQuery: property.address.split(' ').join('+'),
                 agent: agent,
@@ -217,7 +232,7 @@ app.get('/tour/:pid', function (req, res) {
 });
 
 app.get('/login', function (req, res) {
-    res.render('login');
+    renderWithUser(req, res, 'login');
 });
 
 app.post('/login', passport.authenticate('local', {
@@ -226,7 +241,7 @@ app.post('/login', passport.authenticate('local', {
 }));
 
 app.get('/signup', function (req, res) {
-    res.render('signup');
+    renderWithUser(req, res, 'signup');
 });
 
 app.post('/signup', function (req, res) {
