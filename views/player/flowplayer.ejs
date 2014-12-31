@@ -13,17 +13,11 @@
 <script type="application/javascript">
     $(function () {
         var jqDiv = $(".flowplayer");
-        var withErrorHandling = false;
-        var flplayer;
-        if (!withErrorHandling) {
-            flplayer = flowplayer(jqDiv);
-        }
-        else {
-            flplayer = jqDiv.flowplayer({
-                errors: ['', 'Video loading aborted', 'Network error',
-                'Video not properly encoded', 'Video file is optimizing for web now, wait two minutes and reload a page']
-            });
-        } 
+        jqDiv.flowplayer({
+            errors: ['', 'Video loading aborted', 'Network error',
+            'Video not properly encoded', 'Video file is optimizing for web now, wait two minutes and reload a page']
+        });
+        var flplayer = flowplayer(jqDiv);
 
         <% if(!isPresenting){%>
         jqDiv.find('.fp-controls').hide();
