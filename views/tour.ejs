@@ -86,21 +86,21 @@
 
 
     <h1>All tours:</h1>
+    
+    To present a tour to your client, please click on the link below.  Once that page opens, share its full address with your client via email or text message.
 
     <table class="table table-hover">
         <thead>
         <tr>
-            <td>Tour id</td>
-            <td>Player type</td>
             <td>Address</td>
+            <% // <td>Player type</td> %>
         </tr>
         </thead>
         <tbody>
         <% for (var i = 0; i < tours.length;i++){ %>
         <tr>
-            <td><a href="/tour/<%= tours[i]._id %>"><%= tours[i]._id %></a></td>
-            <td><%= tours[i].playerType %></td>
-            <td><%= tours[i].address %></td>
+            <td><a href="/tour/<%= tours[i]._id %>"><%= tours[i].address %></a></td>
+            <% // <td><%= tours[i].playerType %></td> %>
         </tr>
         <% } %>
         </tbody>
