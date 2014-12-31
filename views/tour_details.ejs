@@ -44,7 +44,10 @@
         </div>
         <div class="col-md-8">
             <% if (isPresenting) { %>
-            <div><%= agent.name %>, you are the presenter.</div>
+            <div><%= agent.name %>, you are the presenter.  Please share this page's full address with you client via email or text message.  Once they open the page, you can start your guided tour using video + your phone 
+                (or a voice chat widget on the page, if supported and desired). You can pause and seek to any point in the video, and
+                your client's video will synchronize automatically.
+            </div>
             <br>
             <% } else { %>
             <div> <%= agent.name %> is controlling the playback, please ask them to pause or rewind if necessary. Thank
