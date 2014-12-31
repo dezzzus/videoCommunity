@@ -49,10 +49,18 @@
                     <a href="/">Home</a>
                 </li>
                 <li>
-                    <a href="/tour">My tours</a>
+                    <%if (user == null) { %>
+                        <a href="/login">Log in</a>
+                    <% } else { %>
+                        <a href="/tour">My tours</a>
+                    <% } %>
                 </li>
                 <li>
-                    <a href="/signup">Sign up</a>
+                    <%if (user == null) { %>
+                        <a href="/signup">Sign up</a>
+                    <% } else { %>
+                       <a href="/logout">Log out</a>
+                    <% } %>
                 </li>
                 <li>
                     <a href="/contactus">Contact</a>
