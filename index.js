@@ -225,6 +225,28 @@ app.get('/tour/:pid', function (req, res) {
     });
 });
 
+app.get('/tour/:pid/del', ensureAuthenticated, function (req, res) {
+    var pid = req.param('pid');
+    app.collection.property.findOne({'_id': ObjectID(pid)}, function (err, property) {
+        if (err) {
+            throw err;
+        }
+        if (property) {
+            if (req.user._id.toHexString() == property.agent) {
+                app.collection.property.remove({'_id': ObjectID(pid)}, function () {
+                    res.redirect('/tour');
+                });
+            }
+            else {
+                res.redirect('/tour');
+            }
+        }
+        else {
+            res.redirect('/tour');
+        }
+    });
+});
+
 app.get('/login', function (req, res) {
     renderWithUser(req, res, 'login');
 });

@@ -93,12 +93,14 @@
         <thead>
         <tr>
             <td>Address</td>
+            <td></td>
         </tr>
         </thead>
         <tbody>
         <% for (var i = 0; i < tours.length;i++){ %>
         <tr>
             <td><a href="/tour/<%= tours[i]._id %>"><%= tours[i].address %></a></td>
+            <td><a class="btn btn-danger" href="/tour/<%= tours[i]._id %>/del">delete</a></td>
         </tr>
         <% } %>
         </tbody>
