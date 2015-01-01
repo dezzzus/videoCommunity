@@ -210,3 +210,7 @@ p.copyright {
 .submit_tour i {
     display: none;
 }
+
+.terms_of_use {
+	font-weight: 400;
+}
