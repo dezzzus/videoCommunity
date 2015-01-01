@@ -203,6 +203,24 @@ app.post('/tour', ensureAuthenticated, function (req, res) {
                             }
                         }
                     );
+
+                    transcoder.createJob(
+                        {
+                            PipelineId: '1419791970323-1aherg',
+                            Input: {
+                                Key: req.files.videoFile.name
+                            },
+                            Output: {
+                                Key: dbProp[0]._id.toHexString() + '.webm',
+                                PresetId: '1420142016747-83m02n'
+                            }
+                        },
+                        function (err) {
+                            if (err) {
+                                throw err;
+                            }
+                        }
+                    );
                 });
             });
         }
