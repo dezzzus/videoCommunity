@@ -39,17 +39,8 @@ function renderWithUser(req, res, viewName, data) {
         data = {};
     }
     
-    data.user = null; // always init
-    
-    if (req.user) {
-        app.collection.agent.findOne({'_id': ObjectID(req.user._id.toHexString())}, function (err, agent) {
-            data.user = agent;
-            res.render(viewName, data);
-        });
-    }
-    else {
-        res.render(viewName, data);
-    }
+    data.user = req.user; // always init
+    res.render(viewName, data);
 }
 
 app.set('trust proxy', true);
