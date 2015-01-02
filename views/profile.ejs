@@ -1,0 +1,46 @@
+<% include head.ejs %>
+<div class="container">
+    <div class="row">
+        <h1>Profile</h1>
+
+        <div class="col-md-4">
+            <div class="formbox">
+                <form action="/profile" method="post">
+                    <div class="form-group">
+                        <label for="email_input">Email:</label>
+                        <input type="text" class="form-control" id="email_input" value="<%= user.email %>"
+                               name="email"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="name_input">Full name:</label>
+                        <input type="text" class="form-control" id="name_input" value="<%= user.name %>" name="name"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="agency_input">Agency:</label>
+                        <input type="text" class="form-control" id="agency_input" value="<%= user.agency %>"
+                               name="agency"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="photo_input">Photo URL:</label>
+                        <input type="text" class="form-control" id="photo_input" value="<%= user.photoURL %>"
+                               name="photoURL"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="password_input">Current password:</label>
+                        <input type="password" class="form-control" id="password_input" name="password"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="newpassword_input">New password:</label>
+                        <input type="password" class="form-control" id="newpassword_input" name="newpassword"/>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" class="btn btn-success"/>
+                        <a class="btn btn-warning" href="/logout">Logout</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+<% include foot.ejs %>

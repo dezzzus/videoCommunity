@@ -38,7 +38,7 @@ function renderWithUser(req, res, viewName, data) {
     if (!data) {
         data = {};
     }
-    
+
     data.user = req.user; // always init
     res.render(viewName, data);
 }
@@ -277,6 +277,11 @@ app.post('/login', passport.authenticate('local', {
 app.get('/signup', function (req, res) {
     renderWithUser(req, res, 'signup');
 });
+
+app.get('/profile', ensureAuthenticated, function (req, res) {
+    renderWithUser(req, res, 'profile');
+});
+
 
 app.post('/signup', function (req, res) {
     if (req.body['terms']) {
