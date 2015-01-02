@@ -38,7 +38,7 @@ function renderWithUser(req, res, viewName, data) {
     if (!data) {
         data = {};
     }
-    
+
     data.user = req.user; // always init
     res.render(viewName, data);
 }
@@ -277,6 +277,44 @@ app.post('/login', passport.authenticate('local', {
 app.get('/signup', function (req, res) {
     renderWithUser(req, res, 'signup');
 });
+
+app.get('/profile', ensureAuthenticated, function (req, res) {
+    renderWithUser(req, res, 'profile');
+});
+
+app.post('/profile', ensureAuthenticated, function (req, res) {
+    var updatedFields = {};
+    var reqName = req.body['name'];
+    if ((reqName !== '') && (reqName !== req.user.name)) {
+        updatedFields.name = reqName;
+    }
+    var reqEmail = req.body['email'];
+    if ((reqEmail !== '') && (reqEmail !== req.user.email)) {
+        updatedFields.email = reqEmail;
+    }
+    var reqAgency = req.body['agency'];
+    if ((reqAgency !== '') && (reqAgency !== req.user.agency)) {
+        updatedFields.agency = reqAgency;
+    }
+    var reqPhotoURL = req.body['photoURL'];
+    if ((reqPhotoURL !== '') && (reqPhotoURL !== req.user.photoURL)) {
+        updatedFields.photoURL = reqPhotoURL;
+    }
+    var reqPassword = req.body['password'];
+    if ((reqPassword !== '') && (!bcrypt.compareSync(reqPassword, req.user.passwordHash))) {
+        var salt = bcrypt.genSaltSync(10);
+        var newHash = bcrypt.hashSync(reqPassword, salt);
+        updatedFields.passwordHash = newHash;
+    }
+
+    app.collection.agent.update({_id: req.user._id}, {'$set': updatedFields}, function (err, updatedUser) {
+        if (err) {
+            throw err;
+        }
+        res.redirect('/profile');
+    })
+});
+
 
 app.post('/signup', function (req, res) {
     if (req.body['terms']) {

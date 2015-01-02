@@ -59,7 +59,7 @@
                     <%if (user == null) { %>
                         <a href="/signup">Sign up</a>
                     <% } else { %>
-                       <a href="/logout">Log out</a>
+                       <a href="/profile"><%= user.name %></a>
                     <% } %>
                 </li>
                 <li>
