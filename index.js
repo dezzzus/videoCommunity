@@ -301,13 +301,18 @@ app.post('/profile', ensureAuthenticated, function (req, res) {
         updatedFields.photoURL = reqPhotoURL;
     }
     var reqPassword = req.body['password'];
-    if (reqPassword !== '') {
+    if ((reqPassword !== '') && (!bcrypt.compareSync(reqPassword, req.user.passwordHash))) {
         var salt = bcrypt.genSaltSync(10);
         var newHash = bcrypt.hashSync(reqPassword, salt);
-        if (req.user.passwordHash !== newHash) {
-            updatedFields.passwordHash = newHash;
-        }
+        updatedFields.passwordHash = newHash;
     }
+
+    app.collection.agent.update({_id: req.user._id}, {'$set': updatedFields}, function (err, updatedUser) {
+        if (err) {
+            throw err;
+        }
+        res.redirect('/profile');
+    })
 });
 
 
