@@ -117,13 +117,15 @@
             type : 'redirect_tour',
             tour : newTour 
         });
-        window.location.href = "/tour/" + newTour;
+       	// Wait to allow pubnub call to succeed.
+       	setTimeout("window.location.href = '/tour/" + newTour + "';", 1500);
+        
     });
     
     // Remote control for tour change:
    	vvzzt.pubnub.pubnubSubscribe(function (m) {
         if (m.type === 'redirect_tour') {
-        	window.location.href = "/tour/" + m.tour;
+            window.location.href = "/tour/" + m.tour;
         }
     });
     
