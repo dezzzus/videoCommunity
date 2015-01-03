@@ -1,5 +1,6 @@
 <% include head.ejs %>
 <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
+<script src="/js/vv_pubnub.js"></script>
 <script src="/js/video_sync.js"></script>
 <script src="http://simplewebrtc.com/latest.js"></script>
 
@@ -62,6 +63,23 @@
             <% if(property.playerType == 'flowplayer'){ %>
             <% include player/flowplayer.ejs %>
             <% } %>
+            <% if (isPresenting) { %>
+	            <div class="form-group">
+	                <label for="tour_select">Switch to another tour:</label>
+	                <select class="form-control" id="tour_select" name="tour">
+	                    <% for (var i = 0; i < allProperties.length;i++) { %>
+	                        <option value="<%= allProperties[i]._id %>"
+	                        
+	                        <% if (property._id.toHexString() === allProperties[i]._id.toHexString()) { %>
+	                           selected="selected"
+	                        <% } %>
+	                        
+	                        > <%= allProperties[i].address %> </option>
+	                    <% } %>
+	                </select>
+	            </div>
+       	    <% } %>
+            
             <div class="row">
                 <div class="col-md-6">
                     <div class="voice_chat alert alert-success">
@@ -91,5 +109,23 @@
         webrtc.joinRoom('VizzitRTC<%= property._id %>');
         $('.voice_chat').show();
     });
+    
+    // React to tour change:
+    $("#tour_select").change(function () {
+        var newTour = this.options[this.selectedIndex].value;
+        vvzzt.pubnub.pubnubPublish({
+            type : 'redirect_tour',
+            tour : newTour 
+        });
+        window.location.href = "/tour/" + newTour;
+    });
+    
+    // Remote control for tour change:
+   	vvzzt.pubnub.pubnubSubscribe(function (m) {
+        if (m.type === 'redirect_tour') {
+        	window.location.href = "/tour/" + m.tour;
+        }
+    });
+    
 </script>
 <% include foot.ejs %>
