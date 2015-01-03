@@ -10,9 +10,17 @@ var LocalStrategy = require('passport-local').Strategy;
 var bcrypt = require('bcrypt');
 var cookieParser = require('cookie-parser');
 var fs = require('fs');
-var path = require('path');
 var multer = require('multer')
 var AWS = require('aws-sdk');
+var nodemailer = require('nodemailer');
+var awsMailer = nodemailer.createTransport({
+    service: 'SES',
+    auth: {
+        user: 'AKIAIZSWZHH37TQL4JSQ',
+        pass: 'Al622BfthhR2gRePM54XjwpXS6mnDaf45SdbjOQJ+k7s'
+    }
+});
+
 
 var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
 var port = process.env.PORT || 3000;
@@ -32,6 +40,12 @@ function wwwRedirect(req, res, next) {
         return res.redirect(301, req.protocol + '://' + newHost + req.originalUrl);
     }
     next();
+}
+
+function saltedHash(original) {
+    var salt = bcrypt.genSaltSync(10);
+    var newHash = bcrypt.hashSync(original, salt);
+    return newHash;
 }
 
 function renderWithUser(req, res, viewName, data) {
@@ -288,8 +302,92 @@ app.post('/login', passport.authenticate('local', {
     failureRedirect: '/login'
 }));
 
+app.get('/resetpass', function (req, res) {
+    renderWithUser(req, res, 'resetpass');
+});
+
+app.post('/resetpass', function (req, res) {
+    var reqMail = req.body['email'];
+
+    function generateRandomPass() {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for (var i = 0; i < 5; i++)
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+    }
+
+    app.collection.agent.findOne({email: reqMail}, function (err, agent) {
+        if (err) {
+            throw err;
+        }
+
+        if (agent) {
+            var newPass = generateRandomPass();
+            var newPassHash = saltedHash(newPass);
+            app.collection.agent.update({'_id': agent._id}, {'$set': {'passwordHash': newPassHash}},
+                function (err, upagent) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    awsMailer.sendMail({
+                        from: 'noreply@virtualvizzit.com',
+                        to: reqMail,
+                        subject: 'Virtualvizzit password reset',
+                        text: 'Your new password: ' + newPass
+                    }, function (err, info) {
+                        if (err) {
+                            throw err;
+                        }
+                    });
+
+                    res.redirect('/login');
+                });
+        }
+        else {
+            res.redirect('/signup');
+        }
+    });
+});
+
 app.get('/signup', function (req, res) {
     renderWithUser(req, res, 'signup');
+});
+
+app.post('/signup', function (req, res) {
+    if (req.body['terms']) {
+        app.collection.agent.findOne({email: req.body['email']}, function (err, user) {
+            if (err) {
+                throw err;
+            }
+            if (user) {
+                res.redirect('/signup');
+            }
+            else {
+                var hash = saltedHash(req.body['password']);
+                app.collection.agent.insert({
+                    email: req.body['email'],
+                    name: req.body['name'],
+                    agency: req.body['agency'],
+                    photoURL: req.body['photoURL'],
+                    passwordHash: hash,
+                    superuser: false // for now, every new user is NOT a super user unless manually changed in DB
+                }, function (err, agent) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    res.redirect('/login');
+                });
+            }
+        });
+    }
+    else {
+        res.redirect('/signup');
+    }
 });
 
 app.get('/profile', ensureAuthenticated, function (req, res) {
@@ -316,8 +414,7 @@ app.post('/profile', ensureAuthenticated, function (req, res) {
     }
     var reqPassword = req.body['password'];
     if ((reqPassword !== '') && (!bcrypt.compareSync(reqPassword, req.user.passwordHash))) {
-        var salt = bcrypt.genSaltSync(10);
-        var newHash = bcrypt.hashSync(reqPassword, salt);
+        var newHash = saltedHash(reqPassword);
         updatedFields.passwordHash = newHash;
     }
 
@@ -327,41 +424,6 @@ app.post('/profile', ensureAuthenticated, function (req, res) {
         }
         res.redirect('/profile');
     })
-});
-
-
-app.post('/signup', function (req, res) {
-    if (req.body['terms']) {
-        app.collection.agent.findOne({email: req.body['email']}, function (err, user) {
-            if (err) {
-                throw err;
-            }
-            if (user) {
-                res.redirect('/signup');
-            }
-            else {
-                var salt = bcrypt.genSaltSync(10);
-                var hash = bcrypt.hashSync(req.body['password'], salt);
-                app.collection.agent.insert({
-                    email: req.body['email'],
-                    name: req.body['name'],
-                    agency: req.body['agency'],
-                    photoURL: req.body['photoURL'],
-                    passwordHash: hash,
-                    superuser: false // for now, every new user is NOT a super user unless manually changed in DB
-                }, function (err, agent) {
-                    if (err) {
-                        throw err;
-                    }
-
-                    res.redirect('/login');
-                });
-            }
-        });
-    }
-    else {
-        res.redirect('/signup');
-    }
 });
 
 MongoClient.connect(mongoURI, function (dbErr, db) {
