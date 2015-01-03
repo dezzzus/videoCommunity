@@ -236,7 +236,7 @@ app.get('/tour/:pid', function (req, res) {
                 property: property,
                 mapQuery: property.address.split(' ').join('+'),
                 agent: agent,
-                isPresenting: req.isAuthenticated()
+                isPresenting: req.isAuthenticated() && agent._id.equals(req.user._id)
             });
 
         });
