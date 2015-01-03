@@ -105,7 +105,7 @@ app.get('/', function (req, res) {
 });
 
 app.get('/contactus', function (req, res) {
-    renderWithUser(req, res, 'contactus');
+    renderWithUser(req, res, 'contactus', {noindex: true});
 });
 
 app.get('/useterms', function (req, res) {
@@ -242,17 +242,17 @@ app.get('/tour/:pid', function (req, res) {
     var pid = req.param('pid');
     app.collection.property.findOne({'_id': ObjectID(pid)}, function (err, property) {
         app.collection.agent.findOne({'_id': ObjectID(property.agent)}, function (err, agent) {
-        	var isPresenting = req.isAuthenticated() && agent._id.equals(req.user._id);
-        	if (isPresenting) {
-        		// Find and send in all agent's tours, to allow redirect
-        		app.collection.property.find({'agent': agent._id.toHexString()}).toArray(
-    		        function (err, tours) {
-    		        	renderTourDetails(req, res, property, agent, isPresenting, tours);
-    		        });
-        	}
-        	else {
-            	renderTourDetails(req, res, property, agent, isPresenting, null);
-        	}
+            var isPresenting = req.isAuthenticated() && agent._id.equals(req.user._id);
+            if (isPresenting) {
+                // Find and send in all agent's tours, to allow redirect
+                app.collection.property.find({'agent': agent._id.toHexString()}).toArray(
+                    function (err, tours) {
+                        renderTourDetails(req, res, property, agent, isPresenting, tours);
+                    });
+            }
+            else {
+                renderTourDetails(req, res, property, agent, isPresenting, null);
+            }
         });
     });
 });
