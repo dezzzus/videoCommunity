@@ -9,23 +9,15 @@
  * @param player
  * @param isPresenter
  */
+
+/**
+ * Main function handling all registrations.
+ * Depends on vvzzt.pubnub namespace being initialized!
+ */
 function videoSync(roomId, player, isPresenter) {
-    var userId = PUBNUB.uuid();
+    var userId = vvzzt.pubnub.userId;
 
-    var pubnub = PUBNUB.init({
-        publish_key: 'pub-c-4dd374dc-c46a-40ee-9bbf-488f4f7449ef',
-        subscribe_key: 'sub-c-170d058e-8726-11e4-a400-02ee2ddab7fe',
-        uuid: userId
-    });
-
-    var pubnubPublish = function (message) {
-        message.sender = userId;
-        message.recipient = '';
-        pubnub.publish({
-            channel: roomId,
-            message: message
-        });
-    };
+    var pubnub = vvzzt.pubnub.init(roomId);
 
     var gaTrackPlayerEvent = function (event) {
         _gaq.push(['_trackEvent',
@@ -44,7 +36,7 @@ function videoSync(roomId, player, isPresenter) {
 
         if (playerEventCounter[type] == 0) {
             if (isPresenter) {
-                pubnubPublish({
+            	vvzzt.pubnub.pubnubPublish({
                     type: type
                 });
             }
@@ -75,36 +67,37 @@ function videoSync(roomId, player, isPresenter) {
     };
 
     var onPlayerReady = function () {
-        pubnub.subscribe({
-            channel: roomId,
-            callback: function (m) {
-                if ((m.recipient === userId || m.recipient === '') && m.sender !== userId) {
-                    if (m.type === 'pause') {
-                        callPlayer(player, 'pause');
+    	vvzzt.pubnub.pubnubSubscribe(function (m) {
+            if ((m.recipient === userId || m.recipient === '') && m.sender !== userId) {
+                if (m.type === 'pause') {
+                    callPlayer(player, 'pause');
+                }
+                else if (m.type === 'play') {
+                    callPlayer(player, 'play');
+                }
+                else if (m.type === 'presenterHeartbeat') {
+                    // First sync the clock if off by more than 1 second
+                    if (Math.abs(lastKnownMyPosition - m.position) > 1) {
+                        callPlayer(player, 'seekTo', m.position);
                     }
-                    else if (m.type === 'play') {
-                        callPlayer(player, 'play');
-                    }
-                    else if (m.type === 'presenterHeartbeat') {
-                        // First sync the clock if off by more than 1 second
-                        if (Math.abs(lastKnownMyPosition - m.position) > 1) {
-                            callPlayer(player, 'seekTo', m.position);
-                        }
 
-                        // Now sync the state
-                        player.api('paused', function (isPaused) {
-                            if (!isPaused && !m.isPlaying) {
-                                callPlayer(player, 'pause');
-                            }
-                            else if (isPaused && m.isPlaying) {
-                                callPlayer(player, 'play');
-                            }
-                        });
-                    }
-                    else if (m.type === 'seek') {
-                        // Not supporting seek at the moment.
-                        // Relying on the heartbeat instead.  It is simpler that way, at least for now.
-                    }
+                    // Now sync the state
+                    player.api('paused', function (isPaused) {
+                        if (!isPaused && !m.isPlaying) {
+                            callPlayer(player, 'pause');
+                        }
+                        else if (isPaused && m.isPlaying) {
+                            callPlayer(player, 'play');
+                        }
+                    });
+                }
+                else if (m.type === 'seek') {
+                    // Not supporting seek at the moment.
+                    // Relying on the heartbeat instead.  It is simpler that way, at least for now.
+                }
+                else if (m.type === 'redirect_tour') {
+                	// alert("redirecting to: " + m.tour);
+                	window.location.href = "/tour/" + m.tour;
                 }
             }
         });
@@ -166,7 +159,7 @@ function videoSync(roomId, player, isPresenter) {
                 // If this is the presenter, and either enough position changed or state changed, publish!
                 if (isPresenter &&
                     (Math.abs(curPos - lastKnownPresenterPosition) > .5 || isPaused != lastKnownMyPaused)) {
-                    pubnubPublish({
+                	vvzzt.pubnub.pubnubPublish({
                         type: 'presenterHeartbeat',
                         position: curPos,
                         isPlaying: !isPaused

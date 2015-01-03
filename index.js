@@ -228,17 +228,31 @@ app.post('/tour', ensureAuthenticated, function (req, res) {
     res.redirect('/tour');
 });
 
+function renderTourDetails(req, res, property, agent, isPresenting, allAgentProperties) {
+    renderWithUser(req, res, 'tour_details', {
+        property: property,
+        mapQuery: property.address.split(' ').join('+'),
+        agent: agent,
+        allProperties: allAgentProperties,
+        isPresenting: isPresenting
+    });
+}
+
 app.get('/tour/:pid', function (req, res) {
     var pid = req.param('pid');
     app.collection.property.findOne({'_id': ObjectID(pid)}, function (err, property) {
         app.collection.agent.findOne({'_id': ObjectID(property.agent)}, function (err, agent) {
-            renderWithUser(req, res, 'tour_details', {
-                property: property,
-                mapQuery: property.address.split(' ').join('+'),
-                agent: agent,
-                isPresenting: req.isAuthenticated() && agent._id.equals(req.user._id)
-            });
-
+        	var isPresenting = req.isAuthenticated() && agent._id.equals(req.user._id);
+        	if (isPresenting) {
+        		// Find and send in all agent's tours, to allow redirect
+        		app.collection.property.find({'agent': agent._id.toHexString()}).toArray(
+    		        function (err, tours) {
+    		        	renderTourDetails(req, res, property, agent, isPresenting, tours);
+    		        });
+        	}
+        	else {
+            	renderTourDetails(req, res, property, agent, isPresenting, null);
+        	}
         });
     });
 });
