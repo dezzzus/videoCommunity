@@ -64,14 +64,17 @@
                     <% } %>
                 </li>
                 <li>
+                    <a href="/contactus">Contact</a>
+                </li>
+                <li>
+                    <a href="/team">Team</a>
+                </li>
+                <li>
                     <% if (user == null) { %>
                     <a href="/signup">Sign up</a>
                     <% } else { %>
                     <a href="/profile"><%= user.name %></a>
                     <% } %>
-                </li>
-                <li>
-                    <a href="/contactus">Contact</a>
                 </li>
             </ul>
         </div>
