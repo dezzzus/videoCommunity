@@ -57,6 +57,10 @@ function renderWithUser(req, res, viewName, data) {
     res.render(viewName, data);
 }
 
+function isEmptyObject(obj) {
+    return !Object.keys(obj).length;
+}
+
 app.set('trust proxy', true);
 app.use(wwwRedirect);
 
@@ -146,7 +150,9 @@ function processAgentTours(req, res, agent) {
             app.collection.agent.find().toArray(
                 function (err, agents) {
                     renderWithUser(req, res, 'tour', {
-                        tours: tours,
+                        tours: tours.sort(function(a, b){
+                            return a.address.localeCompare(b.address);
+                        }),
                         agent: agent,
                         agents: agent.superuser ? agents : [agent]
                     });
@@ -271,7 +277,7 @@ app.get('/tour/:pid', function (req, res) {
     });
 });
 
-app.get('/tour/:pid/del', ensureAuthenticated, function (req, res) {
+function tourManageAction(req, res, actionFunc) {
     var pid = req.param('pid');
     app.collection.property.findOne({'_id': ObjectID(pid)}, function (err, property) {
         if (err) {
@@ -279,9 +285,7 @@ app.get('/tour/:pid/del', ensureAuthenticated, function (req, res) {
         }
         if (property) {
             if (req.user._id.toHexString() == property.agent) {
-                app.collection.property.remove({'_id': ObjectID(pid)}, function () {
-                    res.redirect('/tour');
-                });
+                actionFunc(property, pid);
             }
             else {
                 res.redirect('/tour');
@@ -290,8 +294,57 @@ app.get('/tour/:pid/del', ensureAuthenticated, function (req, res) {
         else {
             res.redirect('/tour');
         }
+    }); 
+}
+
+app.get('/tour/:pid/del', ensureAuthenticated, function (req, res) {
+    tourManageAction(req, res, function(property, pid) {
+        app.collection.property.remove({'_id': ObjectID(pid)}, function () {
+            res.redirect('/tour');
+        });
     });
 });
+
+app.get('/tour/:pid/edit', ensureAuthenticated, function (req, res) {
+    tourManageAction(req, res, function(property, pid) {
+        renderWithUser(req, res, 'tour_edit', { tour : property });
+    });
+});
+
+function processReqField(req, obj, fieldName, updatedFields, conditionFunc, setFunc) {
+    var reqValue = req.body[fieldName];
+    if (reqValue !== '' && 
+        (!conditionFunc && reqValue !== obj[fieldName] ||
+         conditionFunc && conditionFunc(obj, reqValue))) {
+         if (!setFunc) {
+             updatedFields[fieldName] = reqValue;
+         }
+         else {
+             setFunc(updatedFields, reqValue);
+         }
+    }
+        
+}
+
+app.post('/tour/:pid/edit', ensureAuthenticated, function (req, res) {
+    tourManageAction(req, res, function(property, pid) {
+        var updatedFields = {};
+        processReqField(req, property, 'address', updatedFields);
+        
+        if (!isEmptyObject(updatedFields)) {
+            app.collection.property.update({_id: ObjectID(pid)}, {'$set': updatedFields}, function (err, updatedProp) {
+                if (err) {
+                    throw err;
+                }
+                res.redirect('/tour');
+            })
+        }
+        else {
+            res.redirect('/tour');
+        }
+    });
+});
+
 
 app.get('/login', function (req, res) {
     renderWithUser(req, res, 'login');
@@ -396,34 +449,32 @@ app.get('/profile', ensureAuthenticated, function (req, res) {
 
 app.post('/profile', ensureAuthenticated, function (req, res) {
     var updatedFields = {};
-    var reqName = req.body['name'];
-    if ((reqName !== '') && (reqName !== req.user.name)) {
-        updatedFields.name = reqName;
-    }
-    var reqEmail = req.body['email'];
-    if ((reqEmail !== '') && (reqEmail !== req.user.email)) {
-        updatedFields.email = reqEmail;
-    }
-    var reqAgency = req.body['agency'];
-    if ((reqAgency !== '') && (reqAgency !== req.user.agency)) {
-        updatedFields.agency = reqAgency;
-    }
-    var reqPhotoURL = req.body['photoURL'];
-    if ((reqPhotoURL !== '') && (reqPhotoURL !== req.user.photoURL)) {
-        updatedFields.photoURL = reqPhotoURL;
-    }
-    var reqPassword = req.body['password'];
-    if ((reqPassword !== '') && (!bcrypt.compareSync(reqPassword, req.user.passwordHash))) {
-        var newHash = saltedHash(reqPassword);
-        updatedFields.passwordHash = newHash;
-    }
-
-    app.collection.agent.update({_id: req.user._id}, {'$set': updatedFields}, function (err, updatedUser) {
-        if (err) {
-            throw err;
+    processReqField(req, req.user, 'name', updatedFields);
+    processReqField(req, req.user, 'email', updatedFields);
+    processReqField(req, req.user, 'agency', updatedFields);
+    processReqField(req, req.user, 'photoURL', updatedFields);
+    processReqField(req, req.user, 'password', updatedFields, 
+        function(user, reqPassword) {
+            return !bcrypt.compareSync(reqPassword, user.passwordHash);
+        },
+        function(fields, reqPassword) {
+            console.log("setting new password: " + reqPassword);
+            var newHash = saltedHash(reqPassword);
+            fields.passwordHash = newHash;
         }
+    );
+    
+    if (!isEmptyObject(updatedFields)) { // $set does not like empty!
+        app.collection.agent.update({_id: req.user._id}, {'$set': updatedFields}, function (err, updatedUser) {
+            if (err) {
+                throw err;
+            }
+            res.redirect('/profile');
+        })
+    }
+    else {
         res.redirect('/profile');
-    })
+    }
 });
 
 MongoClient.connect(mongoURI, function (dbErr, db) {
@@ -436,4 +487,3 @@ MongoClient.connect(mongoURI, function (dbErr, db) {
         console.log('Vizzit app listening at port:%s', port)
     });
 });
-
