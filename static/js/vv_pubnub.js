@@ -44,15 +44,15 @@ vvzzt.pubnub.pubnubSubscribe = function (callback) {
     // Seems like only one subscribe is supported in some browsers, so collect callbacks here instead
     vvzzt.pubnub.allSubCallbacks.push(callback);
     
-	if (vvzzt.pubnub.pubnub && !vvzzt.pubnub.subscribed) {
-	    vvzzt.pubnub.subscribed = true;
-		vvzzt.pubnub.pubnub.subscribe({
-	        channel: vvzzt.pubnub.roomId,
-	        callback: function(m) {
-	            jQuery.each(vvzzt.pubnub.allSubCallbacks, function(i, cb) {cb(m);});
-	        }
-		});
-	}
+    if (vvzzt.pubnub.pubnub && !vvzzt.pubnub.subscribed) {
+        vvzzt.pubnub.subscribed = true;
+        vvzzt.pubnub.pubnub.subscribe({
+            channel: vvzzt.pubnub.roomId,
+            callback: function(m) {
+                jQuery.each(vvzzt.pubnub.allSubCallbacks, function(i, cb) {cb(m);});
+            }
+        });
+    }
 };
 
 
