@@ -14,13 +14,13 @@ vvzzt.ui = vvzzt.ui || {};
  * Simple blocking prompt for now, use lightbox in the future:
  */
 vvzzt.ui.confirmThenProceed = function(msg, func) {
-	if (confirm(msg)) {
-		func();
-	}
+    if (confirm(msg)) {
+        func();
+    }
 };
 
 vvzzt.ui.followURLAfterConfirm = function(msg, url) {
-	vvzzt.ui.confirmThenProceed(msg, function() {
-		window.location.href = url;
-	});
+    vvzzt.ui.confirmThenProceed(msg, function() {
+        window.location.href = url;
+    });
 };
