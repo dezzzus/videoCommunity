@@ -123,7 +123,11 @@ app.get('/', function (req, res) {
 });
 
 app.get('/contactus', function (req, res) {
-    renderWithUser(req, res, 'contactus', {noindex: true});
+    renderWithUser(req, res, 'contactus');
+});
+
+app.get('/team', function (req, res) {
+    renderWithUser(req, res, 'team', {noindex: true});
 });
 
 app.get('/useterms', function (req, res) {
