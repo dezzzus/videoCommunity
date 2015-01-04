@@ -17,6 +17,9 @@
         'pageview', // Action
     ]);
 </script>
+
+<script src="/js/vv_misc_ui.js"></script>
+
 <div class="container">
     <br>
 
@@ -100,7 +103,9 @@
         <% for (var i = 0; i < tours.length;i++){ %>
         <tr>
             <td><a href="/tour/<%= tours[i]._id %>"><%= tours[i].address %></a></td>
-            <td><a class="btn btn-danger" href="/tour/<%= tours[i]._id %>/del">delete</a></td>
+            <td><a class="btn btn-primary" href="/tour/<%= tours[i]._id %>/edit">edit</a></td>
+            <td><a class="btn btn-danger" onclick='vvzzt.ui.followURLAfterConfirm("Are you sure you want to delete " + "<%= tours[i].address %>" + "?",
+                "/tour/<%= tours[i]._id %>/del")'>delete</a></td>
         </tr>
         <% } %>
         </tbody>
