@@ -1,4 +1,4 @@
-// Vimeo playback sync
+// Video playback sync
 
 /**
  * For now, both viewer and presenter modes implementations are in one place.
@@ -14,11 +14,13 @@
  * Main function handling all registrations.
  * Depends on vvzzt.pubnub namespace being initialized!
  */
-function videoSync(roomId, player, isPresenter) {
+function videoSync(player, isPresenter, onPresenterChange) {
     var userId = vvzzt.pubnub.userId;
-
-    var pubnub = vvzzt.pubnub.init(roomId);
-
+    
+    var myCurDate = new Date();
+    // To GMT:
+    var myTimestamp = new Date(myCurDate.valueOf() + myCurDate.getTimezoneOffset() * 60000).getTime();
+    
     var gaTrackPlayerEvent = function (event) {
         _gaq.push(['_trackEvent',
             'player',
@@ -37,7 +39,8 @@ function videoSync(roomId, player, isPresenter) {
         if (playerEventCounter[type] == 0) {
             if (isPresenter) {
             	vvzzt.pubnub.pubnubPublish({
-                    type: type
+                    type: type,
+                    presenterTS : myTimestamp
                 });
             }
             wasUserEvent = true;
@@ -60,6 +63,7 @@ function videoSync(roomId, player, isPresenter) {
     var lastKnownMyPaused = false;
     var lastKnownPresenterPosition = 0;
     var lastKnownPresenterWasPlaying = false;
+    var lastKnownPresenterTS = 0;
 
     var callPlayer = function (player, state, time) {
         playerEventCounter[state] += 1;
@@ -67,8 +71,23 @@ function videoSync(roomId, player, isPresenter) {
     };
 
     var onPlayerReady = function () {
-    	vvzzt.pubnub.pubnubSubscribe(function (m) {
-            if ((m.recipient === userId || m.recipient === '') && m.sender !== userId) {
+        vvzzt.pubnub.pubnubSubscribe(function (m) {
+            var presenterTS = m.presenterTS || -1;
+            
+            if (isPresenter) {
+                // inform the caller that there is another presenter that is active!
+                if (presenterTS != -1 && presenterTS > myTimestamp) {
+                    if (onPresenterChange) {
+                        onPresenterChange(presenterTS);
+                        onPresenterChange = null; // Once is enough
+                    }
+                }
+                return;
+            }
+            
+            if ((m.recipient === userId || m.recipient === '') && m.sender !== userId && 
+                (presenterTS >= lastKnownPresenterTS)) {
+                lastKnownPresenterTS = presenterTS;
                 if (m.type === 'pause') {
                     callPlayer(player, 'pause');
                 }
@@ -96,8 +115,8 @@ function videoSync(roomId, player, isPresenter) {
                     // Relying on the heartbeat instead.  It is simpler that way, at least for now.
                 }
                 else if (m.type === 'redirect_tour') {
-                	// alert("redirecting to: " + m.tour);
-                	window.location.href = "/tour/" + m.tour;
+                    // alert("redirecting to: " + m.tour);
+                    window.location.href = "/tour/" + m.tour;
                 }
             }
         });
@@ -161,6 +180,7 @@ function videoSync(roomId, player, isPresenter) {
                     (Math.abs(curPos - lastKnownPresenterPosition) > .5 || isPaused != lastKnownMyPaused)) {
                 	vvzzt.pubnub.pubnubPublish({
                         type: 'presenterHeartbeat',
+                        presenterTS : myTimestamp,
                         position: curPos,
                         isPlaying: !isPaused
                     });
