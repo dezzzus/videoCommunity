@@ -60,8 +60,13 @@
         </div>
         <div class="col-md-8 video_section panel panel-default">
             <% if (isPresenting) { %>
-            <div><%= agent.name %>, you are the presenter.  Please share this page's full address with you client via email or text message.  Once they open the page, you can start your guided tour using video + your phone 
-                (or a voice chat widget on the page, if supported and desired). You can pause and seek to any point in the video, and
+            <div><%= agent.name %>, you are the presenter.</div>
+            <div class="btn  btn-primary send_tour">
+                <i class="fa fa-envelope-o"></i>Send tour to client
+            </div>
+            <div>Once they open the page, you can start your guided tour using video + your phone
+                (or a voice chat widget on the page, if supported and desired). You can pause and seek to any point in
+                the video, and
                 your client's video will synchronize automatically.
             </div>
             <br>
@@ -79,22 +84,22 @@
             <% include player/flowplayer.ejs %>
             <% } %>
             <% if (isPresenting) { %>
-	            <div class="form-group">
-	                <label for="tour_select">Switch to another tour:</label>
-	                <select class="form-control" id="tour_select" name="tour">
-	                    <% for (var i = 0; i < allProperties.length;i++) { %>
-	                        <option value="<%= allProperties[i]._id %>"
-	                        
-	                        <% if (property._id.toHexString() === allProperties[i]._id.toHexString()) { %>
-	                           selected="selected"
-	                        <% } %>
-	                        
-	                        > <%= allProperties[i].address %> </option>
-	                    <% } %>
-	                </select>
-	            </div>
-       	    <% } %>
-            
+            <div class="form-group">
+                <label for="tour_select">Switch to another tour:</label>
+                <select class="form-control" id="tour_select" name="tour">
+                    <% for (var i = 0; i < allProperties.length;i++) { %>
+                    <option value="<%= allProperties[i]._id %>"
+
+                            <% if (property._id.toHexString() === allProperties[i]._id.toHexString()) { %>
+                            selected="selected"
+                            <% } %>
+
+                            > <%= allProperties[i].address %> </option>
+                    <% } %>
+                </select>
+            </div>
+            <% } %>
+
             <div class="row">
                 <div class="col-md-6">
                     <div class="voice_chat alert alert-success">
@@ -113,32 +118,49 @@
     // global needed to be set before onLoad stuff happens
     // TODO: remove this globla, and set this asynchronously, and registration should happen lazily when this is set.
     var vv_pubnub_room_id = "SyncVideo" + "<%= property._id %>";
-    
+
     $(function () {
         try {
-	        var webrtc = new SimpleWebRTC({
-	            localVideoEl: 'local_video',
-	            remoteVideosEl: 'remote_video',
-	            autoRequestMedia: true,
-	            media: {
-	                video: false,
-	                audio: true
-	            }
-	        });
-	    
-	        webrtc.on('readyToCall', function () {
-	            webrtc.joinRoom('VizzitRTC<%= property._id %>');
-	            $('.voice_chat').show();
-	        });
+            var webrtc = new SimpleWebRTC({
+                localVideoEl: 'local_video',
+                remoteVideosEl: 'remote_video',
+                autoRequestMedia: true,
+                media: {
+                    video: false,
+                    audio: true
+                }
+            });
+
+            webrtc.on('readyToCall', function () {
+                webrtc.joinRoom('VizzitRTC<%= property._id %>');
+                $('.voice_chat').show();
+            });
         }
-        catch(e) {
+        catch (e) {
         }
         
 	    // React to tour change:
 	    vvzzt.ui.tourSwitchRegistration("#tour_select");
 	    
 	    vvzzt.ui.textChatRegistration('#chat_output', '#chat_input', <%= isPresenting %>, '<%= agent.name %>');
+	    
+        $('.send_tour').on('click', function () {
+            var clientMail = prompt('Enter client email');
+            $.ajax({
+                type: 'POST',
+                url: '/tour/<%= property._id %>/share',
+                data: {
+                    email: clientMail
+                },
+                success: function () {
+                    alert('Tour invitation sended.');
+                },
+                error: function () {
+                    alert('Tour invitation send error.');
+                }
+            });
+        });
     });
-    
+
 </script>
 <% include foot.ejs %>
