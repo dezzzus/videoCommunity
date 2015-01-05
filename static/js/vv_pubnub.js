@@ -27,7 +27,7 @@ vvzzt.pubnub.init = function() {
 };
 
 
-vvzzt.pubnub.pubnubPublish = function (message) {
+vvzzt.pubnub.pubnubPublish = function (message, onSuccess) {
     vvzzt.pubnub.init();
     
     message.sender = vvzzt.pubnub.userId;
@@ -36,6 +36,11 @@ vvzzt.pubnub.pubnubPublish = function (message) {
         channel: vvzzt.pubnub.roomId,
         message: message
     });
+    
+    // For now, always success, assume pubnub did not fail.
+    if (onSuccess) {
+        onSuccess();
+    }
 };
 
 vvzzt.pubnub.pubnubSubscribe = function (callback) {
@@ -49,7 +54,8 @@ vvzzt.pubnub.pubnubSubscribe = function (callback) {
         vvzzt.pubnub.pubnub.subscribe({
             channel: vvzzt.pubnub.roomId,
             callback: function(m) {
-                jQuery.each(vvzzt.pubnub.allSubCallbacks, function(i, cb) {cb(m);});
+                var isFromMyself = m.sender === vvzzt.pubnub.userId;
+                jQuery.each(vvzzt.pubnub.allSubCallbacks, function(i, cb) {cb(m, isFromMyself);});
             }
         });
     }

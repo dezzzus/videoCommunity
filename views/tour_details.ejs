@@ -2,6 +2,7 @@
 <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
 <script src="/js/vv_pubnub.js"></script>
 <script src="/js/video_sync.js"></script>
+<script src="/js/vv_misc_ui.js"></script>
 <script src="http://simplewebrtc.com/latest.js"></script>
 
 <script>
@@ -28,12 +29,26 @@
 
     <div class="row">
         <div class="col-md-4">
-            <div class="agent_photo">
-                <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
+            <div class="agent_info panel panel-default panel-body">
+	            <div class="agent_photo">
+	                <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
+	            </div>
+	            <div class="agent_name_box">
+	                <div class="agent_name">
+	                    <%= agent.name %>
+	                </div>
+	            </div>
             </div>
-            <div class="agent_name">
-                <%= agent.name %>
+            <div class="chat_box panel panel-default">
+                <div class="chat_output_panel" >
+                    <div id="chat_output" class="panel-body" style="display: none;">
+                    </div>
+                </div>
+            
+                To send a chat message, type and press Enter:
+                <div><input id="chat_input" placeholder="enter chat message" /></div>                 
             </div>
+            
             <iframe
                     class="property_map"
                     frameborder="0"
@@ -43,7 +58,7 @@
                 <%= property.address %>
             </div>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-8 video_section panel panel-default">
             <% if (isPresenting) { %>
             <div><%= agent.name %>, you are the presenter.  Please share this page's full address with you client via email or text message.  Once they open the page, you can start your guided tour using video + your phone 
                 (or a voice chat widget on the page, if supported and desired). You can pause and seek to any point in the video, and
@@ -95,7 +110,8 @@
     </div>
 </div>
 <script>
-    // global needed to be set before onLoad stuff happens:
+    // global needed to be set before onLoad stuff happens
+    // TODO: remove this globla, and set this asynchronously, and registration should happen lazily when this is set.
     var vv_pubnub_room_id = "SyncVideo" + "<%= property._id %>";
     
     $(function () {
@@ -119,23 +135,9 @@
         }
         
 	    // React to tour change:
-	    $("#tour_select").change(function () {
-	        var newTour = this.options[this.selectedIndex].value;
-	        vvzzt.pubnub.pubnubPublish({
-	            type : 'redirect_tour',
-	            tour : newTour 
-	        });
-	        // Wait to allow pubnub call to succeed.
-	        setTimeout("window.location.href = '/tour/" + newTour + "';", 1500);
-	        
-	    });
+	    vvzzt.ui.tourSwitchRegistration("#tour_select");
 	    
-	    // Remote control for tour change:
-	    vvzzt.pubnub.pubnubSubscribe(function (m) {
-	        if (m.type === 'redirect_tour') {
-	            window.location.href = "/tour/" + m.tour;
-	        }
-	    });
+	    vvzzt.ui.textChatRegistration('#chat_output', '#chat_input', <%= isPresenting %>, '<%= agent.name %>');
     });
     
 </script>
