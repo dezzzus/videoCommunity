@@ -355,8 +355,8 @@ app.post('/tour/:pid/share', ensureAuthenticated, function (req, res) {
     awsMailer.sendMail({
         from: 'noreply@virtualvizzit.com',
         to: reqEmail,
-        subject: 'Virtualvizzit tour invitation',
-        text: req.user.name + ' invite you to see virtual tour:\n http://virtualvizzit.com/tour/' + pid
+        subject: 'VirtualVizzit tour invitation',
+        text: req.user.name + ' invited you to see virtual tour:\n http://virtualvizzit.com/tour/' + pid
     }, function (err, info) {
         if (err) {
             throw err;
