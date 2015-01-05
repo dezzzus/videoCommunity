@@ -184,7 +184,13 @@ p.copyright {
 
 .agent_name {
     margin-top: 15px;
+    text-align: left;
+}
+
+.agent_phone {
     float: left;
+    font-style: italic;
+    text-align: left;
 }
 
 .chat_box {
