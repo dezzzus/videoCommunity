@@ -16,6 +16,10 @@
                         <input type="text" class="form-control" id="name_input" value="<%= user.name %>" name="name"/>
                     </div>
                     <div class="form-group">
+                        <label for="phone_input">Phone:</label>
+                        <input type="text" class="form-control" id="phone_input" name="phone" value="<%= user.phone || '' %>"/>
+                    </div>
+                    <div class="form-group">
                         <label for="agency_input">Agency:</label>
                         <input type="text" class="form-control" id="agency_input" value="<%= user.agency %>"
                                name="agency"/>
