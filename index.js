@@ -154,7 +154,7 @@ function processAgentTours(req, res, agent) {
             app.collection.agent.find().toArray(
                 function (err, agents) {
                     renderWithUser(req, res, 'tour', {
-                        tours: tours.sort(function(a, b){
+                        tours: tours.sort(function (a, b) {
                             return a.address.localeCompare(b.address);
                         }),
                         agent: agent,
@@ -298,11 +298,11 @@ function tourManageAction(req, res, actionFunc) {
         else {
             res.redirect('/tour');
         }
-    }); 
+    });
 }
 
 app.get('/tour/:pid/del', ensureAuthenticated, function (req, res) {
-    tourManageAction(req, res, function(property, pid) {
+    tourManageAction(req, res, function (property, pid) {
         app.collection.property.remove({'_id': ObjectID(pid)}, function () {
             res.redirect('/tour');
         });
@@ -310,31 +310,31 @@ app.get('/tour/:pid/del', ensureAuthenticated, function (req, res) {
 });
 
 app.get('/tour/:pid/edit', ensureAuthenticated, function (req, res) {
-    tourManageAction(req, res, function(property, pid) {
-        renderWithUser(req, res, 'tour_edit', { tour : property });
+    tourManageAction(req, res, function (property, pid) {
+        renderWithUser(req, res, 'tour_edit', {tour: property});
     });
 });
 
 function processReqField(req, obj, fieldName, updatedFields, conditionFunc, setFunc) {
     var reqValue = req.body[fieldName];
-    if (reqValue !== '' && 
+    if (reqValue !== '' &&
         (!conditionFunc && reqValue !== obj[fieldName] ||
-         conditionFunc && conditionFunc(obj, reqValue))) {
-         if (!setFunc) {
-             updatedFields[fieldName] = reqValue;
-         }
-         else {
-             setFunc(updatedFields, reqValue);
-         }
+        conditionFunc && conditionFunc(obj, reqValue))) {
+        if (!setFunc) {
+            updatedFields[fieldName] = reqValue;
+        }
+        else {
+            setFunc(updatedFields, reqValue);
+        }
     }
-        
+
 }
 
 app.post('/tour/:pid/edit', ensureAuthenticated, function (req, res) {
-    tourManageAction(req, res, function(property, pid) {
+    tourManageAction(req, res, function (property, pid) {
         var updatedFields = {};
         processReqField(req, property, 'address', updatedFields);
-        
+
         if (!isEmptyObject(updatedFields)) {
             app.collection.property.update({_id: ObjectID(pid)}, {'$set': updatedFields}, function (err, updatedProp) {
                 if (err) {
@@ -349,6 +349,24 @@ app.post('/tour/:pid/edit', ensureAuthenticated, function (req, res) {
     });
 });
 
+app.post('/tour/:pid/share', ensureAuthenticated, function (req, res) {
+    var reqEmail = req.body['email'];
+    var pid = req.param('pid');
+    awsMailer.sendMail({
+        from: 'noreply@virtualvizzit.com',
+        to: reqEmail,
+        subject: 'Virtualvizzit tour invitation',
+        text: req.user.name + ' invite you to see virtual tour:\n http://virtualvizzit.com/tour/' + pid
+    }, function (err, info) {
+        if (err) {
+            throw err;
+        }
+        else {
+            res.send({'status': 'OK'});
+        }
+    });
+
+});
 
 app.get('/login', function (req, res) {
     renderWithUser(req, res, 'login');
@@ -457,17 +475,17 @@ app.post('/profile', ensureAuthenticated, function (req, res) {
     processReqField(req, req.user, 'email', updatedFields);
     processReqField(req, req.user, 'agency', updatedFields);
     processReqField(req, req.user, 'photoURL', updatedFields);
-    processReqField(req, req.user, 'password', updatedFields, 
-        function(user, reqPassword) {
+    processReqField(req, req.user, 'password', updatedFields,
+        function (user, reqPassword) {
             return !bcrypt.compareSync(reqPassword, user.passwordHash);
         },
-        function(fields, reqPassword) {
+        function (fields, reqPassword) {
             console.log("setting new password: " + reqPassword);
             var newHash = saltedHash(reqPassword);
             fields.passwordHash = newHash;
         }
     );
-    
+
     if (!isEmptyObject(updatedFields)) { // $set does not like empty!
         app.collection.agent.update({_id: req.user._id}, {'$set': updatedFields}, function (err, updatedUser) {
             if (err) {
