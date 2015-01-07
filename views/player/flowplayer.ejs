@@ -18,7 +18,8 @@
         var jqDiv = $(".fplayer");
         jqDiv.flowplayer({
             errors: ['', 'Video loading aborted', 'Network error',
-                'Video not properly encoded', 'Video file is optimizing for web now, wait two minutes and reload a page']
+                'Video not properly encoded', 'Video file is optimizing for web now, wait two minutes and reload a page'],
+            disabled : <%= !isPresenting %>
         });
         var flplayer = flowplayer(jqDiv);
 

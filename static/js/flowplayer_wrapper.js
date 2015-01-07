@@ -2,13 +2,25 @@ function SyncWrapper(flowplayer) {
     var self = this;
     this.flplayer = flowplayer;
 
+    this.executeEnsureEnabled = function(func) {
+        var disabled = self.flplayer.disabled;
+        if (disabled) {
+            self.flplayer.disable(false);
+        }
+        
+        func();
+        
+        if (disabled) {
+            self.flplayer.disable(true);
+        }
+    };
 
     this.api = function (state, data) {
         if (state == 'play') {
-            self.flplayer.resume();
+            self.executeEnsureEnabled(self.flplayer.resume);
         }
         if (state == 'pause') {
-            self.flplayer.pause();
+            self.executeEnsureEnabled(self.flplayer.pause);
         }
         if (state == 'seekTo') {
             self.flplayer.seek(data);
