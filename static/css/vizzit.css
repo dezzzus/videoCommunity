@@ -168,20 +168,74 @@ p.copyright {
     margin: 15px 0 0;
 }
 
+.agent_photo {
+	float: left;
+}
+
 .agent_photo img {
-    max-width: 200px;
-    max-height: 200px;
+    max-width: 150px;
+    max-height: 100px;
     margin-top: 15px;
+}
+
+.agent_name_box {
+    text-align: left;
 }
 
 .agent_name {
     margin-top: 15px;
+    text-align: left;
+}
+
+.agent_phone {
+    float: left;
+    font-style: italic;
+    text-align: left;
+}
+
+.chat_box {
+	clear: both;
+	float: left;
+}
+
+.chat_box .panel-body {
+	padding: 2px;
+	min-height: 200px;
+	max-height: 200px;
+	overflow: auto;
+}
+
+.chat_other_username {
+    font-weight: 800;
+    float: left;
+    color: blue;
+}
+
+.chat_other_user_content {
+	float: left;
+	font-weight: 400;
+	color: blue;
+}
+
+.chat_my_username {
+    font-weight: 800;
+    float: left;
+    color: green;
+}
+
+.chat_my_content {
+    float: left;
+    font-weight: 400;
+    color: green;
+}
+
+.chat_box, .chat_box input {
+	width : 100%;
 }
 
 .property_map {
     width: 300px;
     height: 300px;
-    margin-top: 30px;
 }
 
 #local_video, #remote_video video, .voice_chat {

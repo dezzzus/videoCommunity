@@ -355,8 +355,8 @@ app.post('/tour/:pid/share', ensureAuthenticated, function (req, res) {
     awsMailer.sendMail({
         from: 'noreply@virtualvizzit.com',
         to: reqEmail,
-        subject: 'Virtualvizzit tour invitation',
-        text: req.user.name + ' invite you to see virtual tour:\n http://virtualvizzit.com/tour/' + pid
+        subject: 'VirtualVizzit tour invitation',
+        text: req.user.name + ' invited you to see virtual tour:\n http://virtualvizzit.com/tour/' + pid
     }, function (err, info) {
         if (err) {
             throw err;
@@ -446,6 +446,7 @@ app.post('/signup', function (req, res) {
                 app.collection.agent.insert({
                     email: req.body['email'],
                     name: req.body['name'],
+                    phone: req.body['phone'],
                     agency: req.body['agency'],
                     photoURL: req.body['photoURL'],
                     passwordHash: hash,
@@ -473,6 +474,7 @@ app.post('/profile', ensureAuthenticated, function (req, res) {
     var updatedFields = {};
     processReqField(req, req.user, 'name', updatedFields);
     processReqField(req, req.user, 'email', updatedFields);
+    processReqField(req, req.user, 'phone', updatedFields);
     processReqField(req, req.user, 'agency', updatedFields);
     processReqField(req, req.user, 'photoURL', updatedFields);
     processReqField(req, req.user, 'password', updatedFields,

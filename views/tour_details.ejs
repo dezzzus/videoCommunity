@@ -2,6 +2,7 @@
 <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
 <script src="/js/vv_pubnub.js"></script>
 <script src="/js/video_sync.js"></script>
+<script src="/js/vv_misc_ui.js"></script>
 <script src="http://simplewebrtc.com/latest.js"></script>
 
 <script>
@@ -28,12 +29,29 @@
 
     <div class="row">
         <div class="col-md-4">
-            <div class="agent_photo">
-                <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
+            <div class="agent_info panel panel-default panel-body">
+	            <div class="agent_photo">
+	                <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
+	            </div>
+	            <div class="agent_name_box">
+	                <div class="agent_name">
+	                    <%= agent.name %>
+	                </div>
+                    <div class="agent_phone">
+                        <%= agent.phone || '' %>
+                    </div>
+	            </div>
             </div>
-            <div class="agent_name">
-                <%= agent.name %>
+            <div class="chat_box panel panel-default">
+                <div class="chat_output_panel" >
+                    <div id="chat_output" class="panel-body" style="display: none;">
+                    </div>
+                </div>
+            
+                To send a chat message, type and press Enter:
+                <div><input id="chat_input" placeholder="enter chat message" /></div>                 
             </div>
+            
             <iframe
                     class="property_map"
                     frameborder="0"
@@ -43,7 +61,7 @@
                 <%= property.address %>
             </div>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-8 video_section panel panel-default">
             <% if (isPresenting) { %>
             <div><%= agent.name %>, you are the presenter.</div>
             <div class="btn  btn-primary send_tour">
@@ -100,7 +118,8 @@
     </div>
 </div>
 <script>
-    // global needed to be set before onLoad stuff happens:
+    // global needed to be set before onLoad stuff happens
+    // TODO: remove this globla, and set this asynchronously, and registration should happen lazily when this is set.
     var vv_pubnub_room_id = "SyncVideo" + "<%= property._id %>";
 
     $(function () {
@@ -122,26 +141,12 @@
         }
         catch (e) {
         }
-
-        // React to tour change:
-        $("#tour_select").change(function () {
-            var newTour = this.options[this.selectedIndex].value;
-            vvzzt.pubnub.pubnubPublish({
-                type: 'redirect_tour',
-                tour: newTour
-            });
-            // Wait to allow pubnub call to succeed.
-            setTimeout("window.location.href = '/tour/" + newTour + "';", 1500);
-
-        });
-
-        // Remote control for tour change:
-        vvzzt.pubnub.pubnubSubscribe(function (m) {
-            if (m.type === 'redirect_tour') {
-                window.location.href = "/tour/" + m.tour;
-            }
-        });
-
+        
+	    // React to tour change:
+	    vvzzt.ui.tourSwitchRegistration("#tour_select");
+	    
+	    vvzzt.ui.textChatRegistration('#chat_output', '#chat_input', <%= isPresenting %>, '<%= agent.name %>');
+	    
         $('.send_tour').on('click', function () {
             var clientMail = prompt('Enter client email');
             $.ajax({
@@ -151,10 +156,10 @@
                     email: clientMail
                 },
                 success: function () {
-                    alert('Tour invitation sended.');
+                    alert('Tour invitation sent.');
                 },
                 error: function () {
-                    alert('Tour invitation send error.');
+                    alert('Tour invitation could not be sent due to error.  Please copy the URL address from the browser and send manually.');
                 }
             });
         });

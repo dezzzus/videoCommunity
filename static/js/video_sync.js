@@ -71,7 +71,7 @@ function videoSync(player, isPresenter, onPresenterChange) {
     };
 
     var onPlayerReady = function () {
-        vvzzt.pubnub.pubnubSubscribe(function (m) {
+        vvzzt.pubnub.pubnubSubscribe(function (m, fromMyself) {
             var presenterTS = m.presenterTS || -1;
             
             if (isPresenter) {
@@ -85,7 +85,7 @@ function videoSync(player, isPresenter, onPresenterChange) {
                 return;
             }
             
-            if ((m.recipient === userId || m.recipient === '') && m.sender !== userId && 
+            if (!fromMyself && 
                 (presenterTS >= lastKnownPresenterTS)) {
                 lastKnownPresenterTS = presenterTS;
                 if (m.type === 'pause') {

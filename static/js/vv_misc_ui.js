@@ -24,3 +24,69 @@ vvzzt.ui.followURLAfterConfirm = function(msg, url) {
         window.location.href = url;
     });
 };
+
+vvzzt.ui.tourSwitchRegistration = function(elemSelector) {
+    $(elemSelector).change(function () {
+        var newTour = this.options[this.selectedIndex].value;
+        vvzzt.pubnub.pubnubPublish({
+            type : 'redirect_tour',
+            tour : newTour 
+        });
+        // Wait to allow pubnub call to succeed.
+        setTimeout("window.location.href = '/tour/" + newTour + "';", 1500);
+    });
+    
+    // Remote control for tour change:
+    vvzzt.pubnub.pubnubSubscribe(function (m) {
+        if (m.type === 'redirect_tour') {
+            window.location.href = "/tour/" + m.tour;
+        }
+    });
+};
+
+vvzzt.ui.textChatRegistration = function(outputSelector, inputSelector, isPresenting, agentName) {
+    var coutput = $(outputSelector), cinput = $(inputSelector);
+    coutput.html('');
+    var myName = 'me';
+    var otherName = agentName;
+    if (isPresenting) {
+        myName = agentName;
+        otherName = 'Viewer';
+    }
+
+    cinput.bind( 'keyup', function(e) {
+        (e.keyCode || e.charCode) === 13 && vvzzt.pubnub.pubnubPublish({
+               type : 'textchat', text : cinput.val() }, 
+               function() { 
+                   cinput.val(''); 
+               });
+        });
+    
+    var firstChatMsg = true;
+    vvzzt.pubnub.pubnubSubscribe(function (m, isFromMyself) {
+        if (m.type === 'textchat') {
+            var prev = coutput.html();
+            if (!firstChatMsg) {
+                prev = prev + '<br>';
+            } 
+            else {
+                coutput.show();
+                firstChatMsg = false;
+            }
+            
+            var uname = otherName;
+            var nameClass = "chat_other_username";
+            var msgClass = "chat_other_user_content";
+            if (isFromMyself) {
+                uname = myName;
+                nameClass = "chat_my_username";
+                msgClass = "chat_my_content";
+            }
+            coutput.html( prev + '<div><div class="'+nameClass+'">'+uname+':&nbsp;</div>'+ 
+                '<div class="'+msgClass+'">' + (''+m.text).replace( /[<>]/g, '' ) + '</div></div>' );
+            coutput.scrollTop(coutput.height());
+        }
+    });
+
+
+};
