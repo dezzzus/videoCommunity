@@ -10,7 +10,7 @@ var LocalStrategy = require('passport-local').Strategy;
 var bcrypt = require('bcrypt');
 var cookieParser = require('cookie-parser');
 var fs = require('fs');
-var multer = require('multer')
+var multer = require('multer');
 var AWS = require('aws-sdk');
 var nodemailer = require('nodemailer');
 var awsMailer = nodemailer.createTransport({
@@ -109,8 +109,8 @@ passport.use(new LocalStrategy({
 
 app.use(express.static(__dirname + '/static'));
 
-if (process.env.TEMP_DIR) {
-    app.use(multer({dest: process.env.TEMP_DIR}));
+if (process.env.CLOUD_DIR) {
+    app.use(multer({dest: process.env.CLOUD_DIR}));
 }
 else {
     app.use(multer({dest: __dirname}));
