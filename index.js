@@ -61,6 +61,31 @@ function isEmptyObject(obj) {
     return !Object.keys(obj).length;
 }
 
+function safeFindOne(collection, query, callback, next) {
+    collection.findOne(query, function (err, result) {
+        if (err) {
+            next(err);
+        }
+
+        callback(result);
+    })
+
+}
+
+function reportError(err) {
+    console.log(err);
+
+    awsMailer.sendMail({
+        from: 'noreply@virtualvizzit.com',
+        to: 'shikolay@gmail.com',
+        subject: 'Virtualvizzit errors',
+        text: JSON.stringify(err)
+    }, function (email_err, info) {
+        console.log(email_err);
+    });
+
+}
+
 app.set('trust proxy', true);
 app.use(wwwRedirect);
 
@@ -116,6 +141,12 @@ else {
     app.use(multer({dest: __dirname}));
 }
 
+app.use(function (err, req, res, next) {
+    reportError(err);
+    res.status(500).render('500');
+});
+
+
 app.set('view engine', 'ejs');
 
 app.get('/', function (req, res) {
@@ -147,12 +178,19 @@ app.get('/logout', function (req, res) {
     res.redirect('/');
 });
 
-function processAgentTours(req, res, agent) {
+function processAgentTours(req, res, next, agent) {
     app.collection.property.find({'agent': agent._id.toHexString()}).toArray(
         function (err, tours) {
-            // A little wasteful to find all if it turns out that the current can only see itself
+            if (err) {
+                next(err);
+                return false;
+            }
             app.collection.agent.find().toArray(
-                function (err, agents) {
+                function (agent_err, agents) {
+                    if (agent_err) {
+                        next(agent_err);
+                        return false;
+                    }
                     renderWithUser(req, res, 'tour', {
                         tours: tours.sort(function (a, b) {
                             return a.address.localeCompare(b.address);
@@ -166,21 +204,21 @@ function processAgentTours(req, res, agent) {
     );
 }
 
-app.get('/tour', ensureAuthenticated, function (req, res) {
-    app.collection.agent.findOne({'_id': ObjectID(req.user._id.toHexString())}, function (err, agent) {
+app.get('/tour', ensureAuthenticated, function (req, res, next) {
+    safeFindOne(app.collection.agent, {'_id': ObjectID(req.user._id.toHexString())}, function (agent) {
         if (agent.superuser && req.param('userid')) {
             // super-user is asking for another agent's contents
-            app.collection.agent.findOne({'_id': ObjectID(req.param('userid'))}, function (err, agent_override) {
-                processAgentTours(req, res, agent_override);
-            });
+            safeFindOne(app.collection.agent, {'_id': ObjectID(req.param('userid'))}, function (agent_override) {
+                processAgentTours(req, res, next, agent_override);
+            }, next);
         }
         else {
-            processAgentTours(req, res, agent);
+            processAgentTours(req, res, next, agent);
         }
-    });
+    }, next);
 });
 
-app.post('/tour', ensureAuthenticated, function (req, res) {
+app.post('/tour', ensureAuthenticated, function (req, res, next) {
     var newProperty = {
         playerType: 'flowplayer',
         address: req.body['address'],
@@ -188,14 +226,14 @@ app.post('/tour', ensureAuthenticated, function (req, res) {
     };
     app.collection.property.insert(newProperty, function (err, dbProp) {
         if (err) {
-            console.log('DB err' + err);
+            next(err);
         }
 
         if (req.files.videoFile) {
             var fileStream = fs.createReadStream(req.files.videoFile.path);
             fileStream.on('error', function (err) {
                 if (err) {
-                    throw err;
+                    reportError(err);
                 }
             });
             fileStream.on('open', function () {
@@ -206,7 +244,7 @@ app.post('/tour', ensureAuthenticated, function (req, res) {
                     Body: fileStream
                 }, function (err) {
                     if (err) {
-                        throw err;
+                        reportError(err);
                     }
 
                     var transcoder = new AWS.ElasticTranscoder();
@@ -223,7 +261,7 @@ app.post('/tour', ensureAuthenticated, function (req, res) {
                         },
                         function (err) {
                             if (err) {
-                                throw err;
+                                reportError(err);
                             }
                         }
                     );
@@ -241,7 +279,7 @@ app.post('/tour', ensureAuthenticated, function (req, res) {
                         },
                         function (err) {
                             if (err) {
-                                throw err;
+                                reportError(err);
                             }
                         }
                     );
@@ -262,31 +300,41 @@ function renderTourDetails(req, res, property, agent, isPresenting, allAgentProp
     });
 }
 
-app.get('/tour/:pid', function (req, res) {
+app.get('/tour/:pid', function (req, res, next) {
     var pid = req.param('pid');
-    app.collection.property.findOne({'_id': ObjectID(pid)}, function (err, property) {
-        app.collection.agent.findOne({'_id': ObjectID(property.agent)}, function (err, agent) {
-            var isPresenting = req.isAuthenticated() && agent._id.equals(req.user._id);
-            if (isPresenting) {
-                // Find and send in all agent's tours, to allow redirect
-                app.collection.property.find({'agent': agent._id.toHexString()}).toArray(
-                    function (err, tours) {
-                        renderTourDetails(req, res, property, agent, isPresenting, tours);
-                    });
+    if (pid.length >= 12) {
+        safeFindOne(app.collection.property, {'_id': ObjectID(pid)}, function (property) {
+            if (property) {
+                safeFindOne(app.collection.agent, {'_id': ObjectID(property.agent)}, function (agent) {
+                    var isPresenting = req.isAuthenticated() && agent._id.equals(req.user._id);
+                    if (isPresenting) {
+                        // Find and send in all agent's tours, to allow redirect
+                        app.collection.property.find({'agent': agent._id.toHexString()}).toArray(
+                            function (allprop_err, tours) {
+                                if (allprop_err) {
+                                    next(allprop_err);
+                                }
+                                renderTourDetails(req, res, property, agent, isPresenting, tours);
+                            });
+                    }
+                    else {
+                        renderTourDetails(req, res, property, agent, isPresenting, null);
+                    }
+                }, next);
             }
             else {
-                renderTourDetails(req, res, property, agent, isPresenting, null);
+                res.status(404).render('404');
             }
-        });
-    });
+        }, next);
+    }
+    else {
+        res.status(404).render('404');
+    }
 });
 
 function tourManageAction(req, res, actionFunc) {
     var pid = req.param('pid');
-    app.collection.property.findOne({'_id': ObjectID(pid)}, function (err, property) {
-        if (err) {
-            throw err;
-        }
+    safeFindOne(app.collection.property, {'_id': ObjectID(pid)}, function (property) {
         if (property) {
             if (req.user._id.toHexString() == property.agent) {
                 actionFunc(property, pid);
@@ -298,7 +346,7 @@ function tourManageAction(req, res, actionFunc) {
         else {
             res.redirect('/tour');
         }
-    });
+    }, next);
 }
 
 app.get('/tour/:pid/del', ensureAuthenticated, function (req, res) {
@@ -330,7 +378,7 @@ function processReqField(req, obj, fieldName, updatedFields, conditionFunc, setF
 
 }
 
-app.post('/tour/:pid/edit', ensureAuthenticated, function (req, res) {
+app.post('/tour/:pid/edit', ensureAuthenticated, function (req, res, next) {
     tourManageAction(req, res, function (property, pid) {
         var updatedFields = {};
         processReqField(req, property, 'address', updatedFields);
@@ -338,7 +386,7 @@ app.post('/tour/:pid/edit', ensureAuthenticated, function (req, res) {
         if (!isEmptyObject(updatedFields)) {
             app.collection.property.update({_id: ObjectID(pid)}, {'$set': updatedFields}, function (err, updatedProp) {
                 if (err) {
-                    throw err;
+                    next(err);
                 }
                 res.redirect('/tour');
             })
@@ -349,7 +397,7 @@ app.post('/tour/:pid/edit', ensureAuthenticated, function (req, res) {
     });
 });
 
-app.post('/tour/:pid/share', ensureAuthenticated, function (req, res) {
+app.post('/tour/:pid/share', ensureAuthenticated, function (req, res, next) {
     var reqEmail = req.body['email'];
     var pid = req.param('pid');
     awsMailer.sendMail({
@@ -359,7 +407,7 @@ app.post('/tour/:pid/share', ensureAuthenticated, function (req, res) {
         text: req.user.name + ' invited you to see virtual tour:\n http://virtualvizzit.com/tour/' + pid
     }, function (err, info) {
         if (err) {
-            throw err;
+            next(err);
         }
         else {
             res.send({'status': 'OK'});
@@ -381,7 +429,7 @@ app.get('/resetpass', function (req, res) {
     renderWithUser(req, res, 'resetpass');
 });
 
-app.post('/resetpass', function (req, res) {
+app.post('/resetpass', function (req, res, next) {
     var reqMail = req.body['email'];
 
     function generateRandomPass() {
@@ -394,18 +442,14 @@ app.post('/resetpass', function (req, res) {
         return text;
     }
 
-    app.collection.agent.findOne({email: reqMail}, function (err, agent) {
-        if (err) {
-            throw err;
-        }
-
+    safeFindOne(app.collection.agent, {email: reqMail}, function (agent) {
         if (agent) {
             var newPass = generateRandomPass();
             var newPassHash = saltedHash(newPass);
             app.collection.agent.update({'_id': agent._id}, {'$set': {'passwordHash': newPassHash}},
                 function (err, upagent) {
                     if (err) {
-                        throw err;
+                        next(err);
                     }
 
                     awsMailer.sendMail({
@@ -415,7 +459,7 @@ app.post('/resetpass', function (req, res) {
                         text: 'Your new password: ' + newPass
                     }, function (err, info) {
                         if (err) {
-                            throw err;
+                            next(err);
                         }
                     });
 
@@ -425,19 +469,16 @@ app.post('/resetpass', function (req, res) {
         else {
             res.redirect('/signup');
         }
-    });
+    }, next);
 });
 
 app.get('/signup', function (req, res) {
     renderWithUser(req, res, 'signup');
 });
 
-app.post('/signup', function (req, res) {
+app.post('/signup', function (req, res, next) {
     if (req.body['terms']) {
-        app.collection.agent.findOne({email: req.body['email']}, function (err, user) {
-            if (err) {
-                throw err;
-            }
+        safeFindOne(app.collection.agent, {email: req.body['email']}, function (user) {
             if (user) {
                 res.redirect('/signup');
             }
@@ -453,13 +494,13 @@ app.post('/signup', function (req, res) {
                     superuser: false // for now, every new user is NOT a super user unless manually changed in DB
                 }, function (err, agent) {
                     if (err) {
-                        throw err;
+                        next(err);
                     }
 
                     res.redirect('/login');
                 });
             }
-        });
+        }, next);
     }
     else {
         res.redirect('/signup');
@@ -470,7 +511,7 @@ app.get('/profile', ensureAuthenticated, function (req, res) {
     renderWithUser(req, res, 'profile');
 });
 
-app.post('/profile', ensureAuthenticated, function (req, res) {
+app.post('/profile', ensureAuthenticated, function (req, res, next) {
     var updatedFields = {};
     processReqField(req, req.user, 'name', updatedFields);
     processReqField(req, req.user, 'email', updatedFields);
@@ -491,7 +532,7 @@ app.post('/profile', ensureAuthenticated, function (req, res) {
     if (!isEmptyObject(updatedFields)) { // $set does not like empty!
         app.collection.agent.update({_id: req.user._id}, {'$set': updatedFields}, function (err, updatedUser) {
             if (err) {
-                throw err;
+                next(err);
             }
             res.redirect('/profile');
         })
@@ -502,7 +543,9 @@ app.post('/profile', ensureAuthenticated, function (req, res) {
 });
 
 MongoClient.connect(mongoURI, function (dbErr, db) {
-    if (dbErr) throw dbErr;
+    if (dbErr) {
+        throw dbErr;
+    }
 
     app.collection.property = db.collection('property');
     app.collection.agent = db.collection('agent');
