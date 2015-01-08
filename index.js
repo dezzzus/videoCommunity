@@ -161,10 +161,37 @@ app.get('/useterms', function (req, res) {
     renderWithUser(req, res, 'useterms');
 });
 
+// The stuff below is to handle special pages for promotion to advisors.
+// Dictionary key is the page name that is enabled and value is the formal name to use in the page.
+// Can put in DB if needed over time.  Or in the future these will 
+// likely not be needed once we are in the next phase.
+var advisors = {
+    'jen' : 'Jennifer'
+};
+
+app.get('/advisor/:advname', function (req, res, next) {
+    var advname = req.param('advname');
+    if (advname && (advname in advisors)) {
+        renderWithUser(req, res, 'advisor', {
+                noindex: true,
+                advisorFormalName : advisors[advname]
+            });
+    }
+    else {
+        res.redirect('/');
+    }
+});
+
+
 
 function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
-        return next();
+        if (req.user && req.user.approved) {
+            return next();
+        }
+        else {
+            renderWithUser(req, res, 'not_yet_approved');
+        }
     }
     res.redirect('/login');
 }
@@ -487,7 +514,9 @@ app.post('/signup', function (req, res, next) {
                     agency: req.body['agency'],
                     photoURL: req.body['photoURL'],
                     passwordHash: hash,
-                    superuser: false // for now, every new user is NOT a super user unless manually changed in DB
+                    superuser: false, // for now, every new user is NOT a super user unless manually changed in DB
+                    approved: false // every user must be approved in order to access functions.  When not approved, 
+                                    // we are just collecting them for future engagement.
                 }, function (err, agent) {
                     if (err) {
                         next(err);
