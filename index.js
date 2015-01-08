@@ -72,20 +72,23 @@ function safeFindOne(collection, query, callback, next) {
 
 }
 
-function reportError(err) {
-    console.log(err);
-
-    awsMailer.sendMail({
-        from: 'noreply@virtualvizzit.com',
-        to: 'shikolay@gmail.com',
-        subject: 'Virtualvizzit errors',
-        text: JSON.stringify(err)+'\n'+JSON.stringify(err.stack)
-    }, function (email_err, info) {
-        if (email_err) {
-            console.log(email_err);
-        }
-    });
-
+function reportError(err, req) {
+    if (req && req.headers.host === 'localhost') {
+        console.log(err);
+        console.log(err.stack);
+    }
+    else {
+        awsMailer.sendMail({
+            from: 'noreply@virtualvizzit.com',
+            to: 'shikolay@gmail.com',
+            subject: 'Virtualvizzit errors',
+            text: JSON.stringify(err)+'\n'+JSON.stringify(err.stack)
+        }, function (email_err, info) {
+            if (email_err) {
+                console.log(email_err);
+            }
+        });
+    }
 }
 
 app.set('trust proxy', true);
@@ -161,6 +164,10 @@ app.get('/useterms', function (req, res) {
     renderWithUser(req, res, 'useterms');
 });
 
+app.get('/beta_not_yet', function (req, res) {
+    renderWithUser(req, res, 'not_yet_approved');
+});
+
 // The stuff below is to handle special pages for promotion to advisors.
 // Dictionary key is the page name that is enabled and value is the formal name to use in the page.
 // Can put in DB if needed over time.  Or in the future these will 
@@ -190,7 +197,8 @@ function ensureAuthenticated(req, res, next) {
             return next();
         }
         else {
-            renderWithUser(req, res, 'not_yet_approved');
+            res.redirect('/beta_not_yet');
+            return;
         }
     }
     res.redirect('/login');
@@ -256,7 +264,7 @@ app.post('/tour', ensureAuthenticated, function (req, res, next) {
             var fileStream = fs.createReadStream(req.files.videoFile.path);
             fileStream.on('error', function (err) {
                 if (err) {
-                    reportError(err);
+                    reportError(err, req);
                 }
             });
             fileStream.on('open', function () {
@@ -267,7 +275,7 @@ app.post('/tour', ensureAuthenticated, function (req, res, next) {
                     Body: fileStream
                 }, function (err) {
                     if (err) {
-                        reportError(err);
+                        reportError(err, req);
                     }
 
                     var transcoder = new AWS.ElasticTranscoder();
@@ -284,7 +292,7 @@ app.post('/tour', ensureAuthenticated, function (req, res, next) {
                         },
                         function (err) {
                             if (err) {
-                                reportError(err);
+                                reportError(err, req);
                             }
                         }
                     );
@@ -302,7 +310,7 @@ app.post('/tour', ensureAuthenticated, function (req, res, next) {
                         },
                         function (err) {
                             if (err) {
-                                reportError(err);
+                                reportError(err, req);
                             }
                         }
                     );
@@ -568,7 +576,7 @@ app.post('/profile', ensureAuthenticated, function (req, res, next) {
 });
 
 app.use(function (err, req, res, next) {
-    reportError(err);
+    reportError(err, req);
     res.status(500).render('500');
 });
 
