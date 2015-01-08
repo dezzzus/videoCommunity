@@ -79,7 +79,7 @@ function reportError(err) {
         from: 'noreply@virtualvizzit.com',
         to: 'shikolay@gmail.com',
         subject: 'Virtualvizzit errors',
-        text: JSON.stringify(err)+'\n'+JSON.stringify(err.stack)
+        text: JSON.stringify(err) + '\n' + JSON.stringify(err.stack)
     }, function (email_err, info) {
         if (email_err) {
             console.log(email_err);
@@ -136,12 +136,13 @@ passport.use(new LocalStrategy({
 
 app.use(express.static(__dirname + '/static'));
 
-if (process.env.CLOUD_DIR) {
-    app.use(multer({dest: process.env.CLOUD_DIR}));
-}
-else {
-    app.use(multer({dest: __dirname}));
-}
+app.use(multer({
+    dest: __dirname,
+    limits: {
+        fileSize: 1.5e9
+    }
+
+}));
 
 app.set('view engine', 'ejs');
 
@@ -242,6 +243,13 @@ app.post('/tour', ensureAuthenticated, function (req, res, next) {
                     if (err) {
                         reportError(err);
                     }
+
+                    fs.unlink(req.files.videoFile.path, function (del_err) {
+                        if (del_err) {
+                            reportError(del_err);
+                        }
+                    });
+
 
                     var transcoder = new AWS.ElasticTranscoder();
                     transcoder.createJob(
