@@ -79,9 +79,11 @@ function reportError(err) {
         from: 'noreply@virtualvizzit.com',
         to: 'shikolay@gmail.com',
         subject: 'Virtualvizzit errors',
-        text: JSON.stringify(err)
+        text: JSON.stringify(err)+'\n'+JSON.stringify(err.stack)
     }, function (email_err, info) {
-        console.log(email_err);
+        if (email_err) {
+            console.log(email_err);
+        }
     });
 
 }
@@ -140,12 +142,6 @@ if (process.env.CLOUD_DIR) {
 else {
     app.use(multer({dest: __dirname}));
 }
-
-app.use(function (err, req, res, next) {
-    reportError(err);
-    res.status(500).render('500');
-});
-
 
 app.set('view engine', 'ejs');
 
@@ -540,6 +536,11 @@ app.post('/profile', ensureAuthenticated, function (req, res, next) {
     else {
         res.redirect('/profile');
     }
+});
+
+app.use(function (err, req, res, next) {
+    reportError(err);
+    res.status(500).render('500');
 });
 
 MongoClient.connect(mongoURI, function (dbErr, db) {
