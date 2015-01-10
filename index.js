@@ -82,7 +82,7 @@ function reportError(err, req) {
             from: 'noreply@virtualvizzit.com',
             to: 'shikolay@gmail.com',
             subject: 'Virtualvizzit errors',
-            text: JSON.stringify(err)+'\n'+JSON.stringify(err.stack)
+            text: JSON.stringify(err) + '\n' + JSON.stringify(err.stack)
         }, function (email_err, info) {
             if (email_err) {
                 console.log(email_err);
@@ -173,22 +173,21 @@ app.get('/beta_not_yet', function (req, res) {
 // Can put in DB if needed over time.  Or in the future these will 
 // likely not be needed once we are in the next phase.
 var advisors = {
-    'jen' : 'Jennifer'
+    'jen': 'Jennifer'
 };
 
 app.get('/advisor/:advname', function (req, res, next) {
     var advname = req.param('advname');
     if (advname && (advname in advisors)) {
         renderWithUser(req, res, 'advisor', {
-                noindex: true,
-                advisorFormalName : advisors[advname]
-            });
+            noindex: true,
+            advisorFormalName: advisors[advname]
+        });
     }
     else {
         res.redirect('/');
     }
 });
-
 
 
 function ensureAuthenticated(req, res, next) {
@@ -361,12 +360,14 @@ app.get('/tour/:pid', function (req, res, next) {
                 }, next);
             }
             else {
-                res.status(404).render('404');
+                res.status(404);
+                renderWithUser(req, res, '404');
             }
         }, next);
     }
     else {
-        res.status(404).render('404');
+        res.status(404)
+        renderWithUser(req, res, '404');
     }
 });
 
