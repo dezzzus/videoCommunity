@@ -1,4 +1,5 @@
 <% include head_begin.ejs %>
+<link rel="stylesheet" href="/unify/plugins/font-awesome/css/font-awesome.min.css">
 <% include head_end.ejs %>
 <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
 <script src="/js/vv_pubnub.js"></script>
@@ -26,48 +27,42 @@
 </script>
 
 <div class="container">
-    <h1><%= agent.agency || 'Video tour' %></h1>
-
     <div class="row">
-        <div class="col-md-4">
-            <div class="agent_info panel panel-default panel-body">
-	            <div class="agent_photo">
-	                <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
-	            </div>
-	            <div class="agent_name_box">
-	                <div class="agent_name">
-	                    <%= agent.name %>
-	                </div>
+        <div class="agent_info panel panel-default panel-body">
+            <div class="col-md-6">
+                <div class="agent_photo">
+                    <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
+                </div>
+                <div class="agent_name_box">
+                    <div class="agent_name">
+                        <%= agent.name %>
+                    </div>
+                    <h1><%= agent.agency || 'Video tour' %></h1>
+
                     <div class="agent_phone">
                         <%= agent.phone || '' %>
                     </div>
-	            </div>
-            </div>
-            <div class="chat_box panel panel-default">
-                <div class="chat_output_panel" >
-                    <div id="chat_output" class="panel-body" style="display: none;">
-                    </div>
                 </div>
-            
-                To send a chat message, type and press Enter:
-                <div><input id="chat_input" placeholder="enter chat message" /></div>                 
             </div>
-            
-            <iframe
-                    class="property_map"
-                    frameborder="0"
-                    src="https://www.google.com/maps/embed/v1/place?key=AIzaSyAEYY3qtKKd89MjKVea6ysS4OsJyscK2XE&q=<%= mapQuery %>">
-            </iframe>
-            <div class="property_address">
-                <%= property.address %>
+            <div class="col-md-6">
+                <iframe
+                        class="property_map"
+                        frameborder="0"
+                        src="https://www.google.com/maps/embed/v1/place?key=AIzaSyAEYY3qtKKd89MjKVea6ysS4OsJyscK2XE&q=<%= mapQuery %>">
+                </iframe>
+                <div class="property_address">
+                    <%= property.address %>
+                </div>
             </div>
         </div>
-        <div class="col-md-8 video_section panel panel-default">
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-9 video_section panel panel-default">
             <% if (isPresenting) { %>
             <div><%= agent.name %>, you are the presenter.</div>
-            <div class="btn  btn-primary send_tour">
-                <i class="fa fa-envelope-o"></i>Send tour to client
-            </div>
+
             <div>Once they open the page, you can start your guided tour using video + your phone
                 (or a voice chat widget on the page, if supported and desired). You can pause and seek to any point in
                 the video, and
@@ -87,6 +82,33 @@
             <% if(property.playerType == 'flowplayer'){ %>
             <% include player/flowplayer.ejs %>
             <% } %>
+
+        </div>
+        <div class="col-md-3">
+            <div class="chat_box panel panel-default">
+                <div class="voice_chat alert alert-success">
+                    Voice chat activated. Feel free to talk with your agent.
+                </div>
+                <video id="local_video"></video>
+                <div id="remote_video"></div>
+                <div class="chat_output_panel">
+                    <div id="chat_output" class="panel-body" style="display: none;">
+                    </div>
+                </div>
+
+                To send a chat message, type and press Enter:
+                <div><input id="chat_input" placeholder="enter chat message"/></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="btn  btn-primary send_tour">
+                <i class="fa fa-envelope-o"></i>Send tour to client
+            </div>
+        </div>
+        <div class="col-md-6">
             <% if (isPresenting) { %>
             <div class="form-group">
                 <label for="tour_select">Switch to another tour:</label>
@@ -103,18 +125,6 @@
                 </select>
             </div>
             <% } %>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="voice_chat alert alert-success">
-                        Voice chat activated. Feel free to talk with your agent.
-                    </div>
-                    <video id="local_video"></video>
-                </div>
-                <div class="col-md-6">
-                    <div id="remote_video"></div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -142,12 +152,12 @@
         }
         catch (e) {
         }
-        
-	    // React to tour change:
-	    vvzzt.ui.tourSwitchRegistration("#tour_select");
-	    
-	    vvzzt.ui.textChatRegistration('#chat_output', '#chat_input', <%= isPresenting %>, '<%= agent.name %>');
-	    
+
+        // React to tour change:
+        vvzzt.ui.tourSwitchRegistration("#tour_select");
+
+        vvzzt.ui.textChatRegistration('#chat_output', '#chat_input', <%= isPresenting %>, '<%= agent.name %>');
+
         $('.send_tour').on('click', function () {
             var clientMail = prompt('Enter client email');
             $.ajax({
