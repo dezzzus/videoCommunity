@@ -333,7 +333,8 @@ function renderTourDetails(req, res, property, agent, isPresenting, allAgentProp
         mapQuery: property.address.split(' ').join('+'),
         agent: agent,
         allProperties: allAgentProperties,
-        isPresenting: isPresenting
+        isPresenting: isPresenting,
+        videoID: property.videoID || property._id
     });
 }
 
