@@ -22,10 +22,11 @@ function videoSync(player, isPresenter, onPresenterChange) {
     var myTimestamp = new Date(myCurDate.valueOf() + myCurDate.getTimezoneOffset() * 60000).getTime();
     
     var gaTrackPlayerEvent = function (event) {
+    	var eventPrefix = isPresenter ? "presenter" : "viewer";
         _gaq.push(['_trackEvent',
             'player',
-            event,
-            String(isPresenter)
+            eventPrefix + "_" + event,
+            (new Date()).toISOString()
         ]);
     };
 
