@@ -168,6 +168,10 @@ app.get('/beta_not_yet', function (req, res) {
     renderWithUser(req, res, 'not_yet_approved');
 });
 
+app.get('/early_adopter', function (req, res) {
+    renderWithUser(req, res, 'early_adopter');
+});
+
 // The stuff below is to handle special pages for promotion to advisors.
 // Dictionary key is the page name that is enabled and value is the formal name to use in the page.
 // Can put in DB if needed over time.  Or in the future these will 
