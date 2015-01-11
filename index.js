@@ -371,7 +371,7 @@ app.get('/tour/:pid', function (req, res, next) {
     }
 });
 
-function tourManageAction(req, res, actionFunc) {
+function tourManageAction(req, res, next, actionFunc) {
     var pid = req.param('pid');
     safeFindOne(app.collection.property, {'_id': ObjectID(pid)}, function (property) {
         if (property) {
@@ -388,16 +388,16 @@ function tourManageAction(req, res, actionFunc) {
     }, next);
 }
 
-app.get('/tour/:pid/del', ensureAuthenticated, function (req, res) {
-    tourManageAction(req, res, function (property, pid) {
+app.get('/tour/:pid/del', ensureAuthenticated, function (req, res, next) {
+    tourManageAction(req, res, next, function (property, pid) {
         app.collection.property.remove({'_id': ObjectID(pid)}, function () {
             res.redirect('/tour');
         });
     });
 });
 
-app.get('/tour/:pid/edit', ensureAuthenticated, function (req, res) {
-    tourManageAction(req, res, function (property, pid) {
+app.get('/tour/:pid/edit', ensureAuthenticated, function (req, res, next) {
+    tourManageAction(req, res, next, function (property, pid) {
         renderWithUser(req, res, 'tour_edit', {tour: property});
     });
 });
@@ -418,7 +418,7 @@ function processReqField(req, obj, fieldName, updatedFields, conditionFunc, setF
 }
 
 app.post('/tour/:pid/edit', ensureAuthenticated, function (req, res, next) {
-    tourManageAction(req, res, function (property, pid) {
+    tourManageAction(req, res, next, function (property, pid) {
         var updatedFields = {};
         processReqField(req, property, 'address', updatedFields);
 
