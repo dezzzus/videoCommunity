@@ -28,31 +28,28 @@
 
 <div class="container">
     <div class="row">
-        <div class="agent_info panel panel-default panel-body">
-            <div class="col-md-6">
-                <div class="agent_photo">
-                    <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
+        <div class="col-md-6">
+            <div class="agent_photo">
+                <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
+            </div>
+            <div class="agent_name_box">
+                <div class="agent_name">
+                    <%= agent.name %>
                 </div>
-                <div class="agent_name_box">
-                    <div class="agent_name">
-                        <%= agent.name %>
-                    </div>
-                    <h1><%= agent.agency || 'Video tour' %></h1>
-
-                    <div class="agent_phone">
-                        <%= agent.phone || '' %>
-                    </div>
+                <div class="agent_agency">
+                    <%= agent.agency || 'Video tour' %>
+                </div>
+                <div class="agent_phone">
+                    <i class="fa fa-phone"></i> <%= agent.phone || '' %>
                 </div>
             </div>
-            <div class="col-md-6">
-                <iframe
-                        class="property_map"
-                        frameborder="0"
-                        src="https://www.google.com/maps/embed/v1/place?key=AIzaSyAEYY3qtKKd89MjKVea6ysS4OsJyscK2XE&q=<%= mapQuery %>">
-                </iframe>
+        </div>
+        <div class="col-md-6">
+            <div class="property_address_box">
                 <div class="property_address">
                     <%= property.address %>
                 </div>
+                <a target="_blank" href="https://www.google.com/maps/place/<%= mapQuery %>">View on map</a>
             </div>
         </div>
     </div>
