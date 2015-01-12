@@ -5,22 +5,32 @@
 .agent_photo img {
     max-width: 150px;
     max-height: 100px;
-    margin-top: 15px;
+    margin: 15px;
 }
 
 .agent_name_box {
     text-align: left;
+    font-size: 18px;
+}
+
+.property_address_box {
+    text-align: right;
+    font-size: 18px;
 }
 
 .agent_name {
-    margin-top: 15px;
+    margin-top: 22px;
     text-align: left;
+    font-weight: bold;
 }
 
 .agent_phone {
     float: left;
     font-style: italic;
     text-align: left;
+}
+.agent_phone i{
+    color: #3498db;
 }
 
 .chat_box {
@@ -64,8 +74,9 @@
 }
 
 .property_map {
-    width: 300px;
-    height: 300px;
+    width: 500px;
+    height: 100px;
+    float: right;
 }
 
 #local_video, #remote_video video, .voice_chat {
@@ -77,7 +88,7 @@
 }
 
 .property_address {
-    margin-top: 15px;
+    margin-top: 22px;
 }
 
 .team_pic {
