@@ -56,7 +56,7 @@
 
     <div class="row">
 
-        <div class="col-md-9 video_section panel panel-default">
+        <div class="col-md-9 video_section panel-body">
             <% if (isPresenting) { %>
             <div><%= agent.name %>, you are the presenter.</div>
 
@@ -82,7 +82,7 @@
 
         </div>
         <div class="col-md-3">
-            <div class="chat_box panel panel-default">
+            <div class="chat_box funny-boxes funny-boxes-left-green">
                 <div class="voice_chat alert alert-success">
                     Voice chat activated. Feel free to talk with your agent.
                 </div>
@@ -98,7 +98,7 @@
             </div>
         </div>
     </div>
-
+    <% if (isPresenting) { %>
     <div class="row">
         <div class="col-md-6">
             <div class="btn  btn-primary send_tour">
@@ -106,7 +106,7 @@
             </div>
         </div>
         <div class="col-md-6">
-            <% if (isPresenting) { %>
+
             <div class="form-group">
                 <label for="tour_select">Switch to another tour:</label>
                 <select class="form-control" id="tour_select" name="tour">
@@ -121,9 +121,10 @@
                     <% } %>
                 </select>
             </div>
-            <% } %>
+
         </div>
     </div>
+    <% } %>
 </div>
 <script>
     // global needed to be set before onLoad stuff happens
