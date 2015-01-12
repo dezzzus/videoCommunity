@@ -97,7 +97,7 @@ function videoSync(player, isPresenter, onPresenterChange) {
                 }
                 else if (m.type === 'presenterHeartbeat') {
                     // First sync the clock if off by more than 1 second
-                    if (Math.abs(lastKnownMyPosition - m.position) > 1) {
+                    if (Math.abs(lastKnownMyPosition - m.position) > 2) {
                         callPlayer(player, 'seekTo', m.position);
                     }
 
