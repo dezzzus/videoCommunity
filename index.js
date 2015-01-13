@@ -135,7 +135,7 @@ app.use(express.static(__dirname + '/static'));
 app.use(multer({
     dest: __dirname,
     limits: {
-        fileSize: 1.5e9
+        fileSize: 0.8e9
     }
 }));
 
