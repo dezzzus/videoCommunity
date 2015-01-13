@@ -23,7 +23,9 @@ var awsMailer = nodemailer.createTransport({
 
 
 var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
-var port = process.env.PORT || 3000;
+var ipaddress = process.env.OPENSHIFT_NODEJS_IP;
+var port      = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+
 
 AWS.config.update({
     accessKeyId: 'AKIAJZUHGBIVMAN6BKSA',
@@ -601,7 +603,7 @@ MongoClient.connect(mongoURI, function (dbErr, db) {
     app.collection.property = db.collection('property');
     app.collection.agent = db.collection('agent');
 
-    app.listen(port, function () {
+    app.listen(port, ipaddress, function () {
         console.log('Vizzit app listening at port:%s', port)
     });
 });
