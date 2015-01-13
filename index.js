@@ -24,7 +24,7 @@ var awsMailer = nodemailer.createTransport({
 
 var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
 var ipaddress = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
-var port      = process.env.OPENSHIFT_NODEJS_PORT || 3000;
+var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
 
 
 AWS.config.update({
@@ -66,8 +66,8 @@ function safeFindOne(collection, query, callback, next) {
 
 }
 
-function reportError(err, req) {
-    if (req && req.headers.host === 'localhost') {
+function reportError(err) {
+    if (!process.env.OPENSHIFT_NODEJS_IP) {
         console.log(err);
         console.log(err.stack);
     }
@@ -76,7 +76,7 @@ function reportError(err, req) {
             from: 'noreply@virtualvizzit.com',
             to: 'shikolay@gmail.com',
             subject: 'Virtualvizzit errors',
-            text: JSON.stringify(err) + '\n' + JSON.stringify(err.stack)
+            text: JSON.stringify(err) + '\n' + err.stack
         }, function (email_err, info) {
             if (email_err) {
                 console.log(email_err);
@@ -135,7 +135,7 @@ app.use(express.static(__dirname + '/static'));
 app.use(multer({
     dest: __dirname,
     limits: {
-        fileSize: 1.5e9
+        fileSize: 0.8e9
     }
 }));
 
@@ -260,7 +260,7 @@ app.post('/tour', ensureAuthenticated, function (req, res, next) {
             var fileStream = fs.createReadStream(req.files.videoFile.path);
             fileStream.on('error', function (err) {
                 if (err) {
-                    reportError(err, req);
+                    reportError(err);
                 }
             });
             fileStream.on('open', function () {
@@ -271,7 +271,7 @@ app.post('/tour', ensureAuthenticated, function (req, res, next) {
                     Body: fileStream
                 }, function (err) {
                     if (err) {
-                        reportError(err, req);
+                        reportError(err);
                     }
 
                     fs.unlink(req.files.videoFile.path, function (del_err) {
@@ -295,7 +295,7 @@ app.post('/tour', ensureAuthenticated, function (req, res, next) {
                         },
                         function (err) {
                             if (err) {
-                                reportError(err, req);
+                                reportError(err);
                             }
                         }
                     );
@@ -313,7 +313,7 @@ app.post('/tour', ensureAuthenticated, function (req, res, next) {
                         },
                         function (err) {
                             if (err) {
-                                reportError(err, req);
+                                reportError(err);
                             }
                         }
                     );
@@ -581,8 +581,14 @@ app.post('/profile', ensureAuthenticated, function (req, res, next) {
     }
 });
 
+//404 route should be always be last route
+app.get('*', function (req, res) {
+    res.status(404);
+    renderWithUser(req, res, '404');
+});
+
 app.use(function (err, req, res, next) {
-    reportError(err, req);
+    reportError(err);
     res.status(500).render('500');
 });
 
