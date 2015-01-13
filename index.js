@@ -581,6 +581,12 @@ app.post('/profile', ensureAuthenticated, function (req, res, next) {
     }
 });
 
+//404 route should be always be last route
+app.get('*', function (req, res) {
+    res.status(404);
+    renderWithUser(req, res, '404');
+});
+
 app.use(function (err, req, res, next) {
     reportError(err);
     res.status(500).render('500');
