@@ -36,14 +36,6 @@ AWS.config.update({
 var app = express();
 app.collection = {};
 
-function wwwRedirect(req, res, next) {
-    if (req.headers.host.slice(0, 4) === 'www.') {
-        var newHost = req.headers.host.slice(4);
-        return res.redirect(301, req.protocol + '://' + newHost + req.originalUrl);
-    }
-    next();
-}
-
 function saltedHash(original) {
     var salt = bcrypt.genSaltSync(10);
     var newHash = bcrypt.hashSync(original, salt);
@@ -94,7 +86,6 @@ function reportError(err, req) {
 }
 
 app.set('trust proxy', true);
-app.use(wwwRedirect);
 
 app.use(bodyParser.urlencoded({'extended': true}));
 app.use(cookieParser());
