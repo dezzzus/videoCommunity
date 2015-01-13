@@ -23,8 +23,8 @@ var awsMailer = nodemailer.createTransport({
 
 
 var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
-var ipaddress = process.env.OPENSHIFT_NODEJS_IP;
-var port      = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+var ipaddress = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
+var port      = process.env.OPENSHIFT_NODEJS_PORT || 3000;
 
 
 AWS.config.update({
