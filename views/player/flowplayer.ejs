@@ -12,25 +12,3 @@
 <!-- Include lines below to support multiple resolutions via quality selector plugin -->
 <script src="//flowplayer.org/drive/quality-selector.js"></script>
 <script src="/js/flowplayer_wrapper.js"></script>
-
-<script type="application/javascript">
-    $(function () {
-        var jqDiv = $(".fplayer");
-        jqDiv.flowplayer({
-            errors: ['', 'Video loading aborted', 'Network error',
-                'Video not properly encoded', 'Video file is optimizing for web now, wait two minutes and reload a page'],
-            disabled : <%= !isPresenting %>
-        });
-        var flplayer = flowplayer(jqDiv);
-
-        <% if(!isPresenting){%>
-        jqDiv.find('.fp-controls').hide();
-        <%}%>
-        var wrapper = new SyncWrapper(flplayer);
-        videoSync(wrapper, <%= isPresenting %>,
-            function(presenterTS) {
-                $("#video_alert").html("<h3>Another presenter became active, this session is no longer controlling playback.  If you refresh this browser window, or switch to another tour from here, you will regain control.</h3>");
-            }
-        );
-    });
-</script>

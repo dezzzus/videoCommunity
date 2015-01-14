@@ -1,0 +1,94 @@
+<% include head_begin.ejs %>
+</head>
+<body>
+<div class="wrapper">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="agent_photo">
+                    <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
+                </div>
+                <div class="agent_name_box">
+                    <div class="agent_name">
+                        <%= agent.name %>
+                    </div>
+                    <div class="agent_agency">
+                        <%= agent.agency || 'Video tour' %>
+                    </div>
+                    <div class="agent_phone">
+                        <i class="fa fa-phone"></i> <%= agent.phone || '' %>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="property_address_box">
+                    <div class="property_address">
+                        <%= property.address %>
+                    </div>
+                    <a target="_blank" href="https://www.google.com/maps/place/<%= mapQuery %>">View on map</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+
+            <div class="col-md-9 video_section panel-body">
+                <% if(property.playerType == 'flowplayer'){ %>
+                <% include player/flowplayer.ejs %>
+                <% } %>
+            </div>
+            <div class="col-md-3">
+                <div class="chat_box funny-boxes funny-boxes-left-green">
+                    <div class="voice_chat alert alert-success">
+                        Voice chat activated. Feel free to talk with your agent.
+                    </div>
+                    <video id="local_video"></video>
+                    <div id="remote_video"></div>
+                    <div class="chat_output_panel">
+                        <div id="chat_output" class="panel-body" style="display: none;">
+                        </div>
+                    </div>
+
+                    To send a chat message, type and press Enter:
+                    <div><input id="chat_input" placeholder="enter chat message"/></div>
+                </div>
+            </div>
+        </div>
+        <% if (isPresenting) { %>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="btn  btn-primary send_tour">
+                    <i class="fa fa-envelope-o"></i>Send tour to client
+                </div>
+            </div>
+            <div class="col-md-6">
+
+                <div class="form-group">
+                    <label for="tour_select">Switch to another tour:</label>
+                    <select class="form-control" id="tour_select" name="tour">
+                        <% for (var i = 0; i < allProperties.length;i++) { %>
+                        <option value="<%= allProperties[i]._id %>"
+
+                                <% if (property._id.toHexString() === allProperties[i]._id.toHexString()) { %>
+                                selected="selected"
+                                <% } %>
+
+                                > <%= allProperties[i].address %> </option>
+                        <% } %>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+        <% } %>
+    </div>
+    <script type="application/javascript">
+        var jqDiv = $(".fplayer");
+        jqDiv.flowplayer({
+            errors: ['', 'Video loading aborted', 'Network error',
+                'Video not properly encoded', 'Video file is optimizing for web now, wait two minutes and reload a page']
+        });
+    </script>
+
+
+<% include foot.ejs %>
