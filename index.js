@@ -453,6 +453,52 @@ app.post('/tour/:pid/share', ensureAuthenticated, function (req, res, next) {
 
 });
 
+//We need to clean this up with original page
+function renderVideoDetails(req, res, property, agent, isPresenting, allAgentProperties) {
+    renderWithUser(req, res, 'video', {
+        property: property,
+        mapQuery: property.address.split(' ').join('+'),
+        agent: agent,
+        allProperties: allAgentProperties,
+        isPresenting: isPresenting,
+        videoID: property.videoID || property._id
+    });
+}
+
+app.get('/video/:pid', function (req, res, next) {
+    var pid = req.param('pid');
+    if (pid.length >= 12) {
+        safeFindOne(app.collection.property, {'_id': ObjectID(pid)}, function (property) {
+            if (property) {
+                safeFindOne(app.collection.agent, {'_id': ObjectID(property.agent)}, function (agent) {
+                    var isPresenting = req.isAuthenticated() && agent._id.equals(req.user._id);
+                    if (isPresenting) {
+                        // Find and send in all agent's tours, to allow redirect
+                        app.collection.property.find({'agent': agent._id.toHexString()}).toArray(
+                            function (allprop_err, tours) {
+                                if (allprop_err) {
+                                    next(allprop_err);
+                                }
+                                renderVideoDetails(req, res, property, agent, isPresenting, tours);
+                            });
+                    }
+                    else {
+                        renderVideoDetails(req, res, property, agent, isPresenting, null);
+                    }
+                }, next);
+            }
+            else {
+                res.status(404);
+                renderWithUser(req, res, '404');
+            }
+        }, next);
+    }
+    else {
+        res.status(404)
+        renderWithUser(req, res, '404');
+    }
+});
+
 app.get('/login', function (req, res) {
     renderWithUser(req, res, 'login');
 });
