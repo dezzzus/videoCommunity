@@ -185,51 +185,6 @@ app.get('/logout', function (req, res) {
 
 tourController.addTourRoutes(app);
 
-
-//We need to clean this up with original page
-function renderVideoDetails(req, res, property, agent, isPresenting, allAgentProperties) {
-    res.render('video', {
-        property: property,
-        mapQuery: property.address.split(' ').join('+'),
-        agent: agent,
-        allProperties: allAgentProperties,
-        isPresenting: isPresenting,
-        videoID: property.videoID || property._id
-    });
-}
-
-app.get('/video/:pid', function (req, res, next) {
-    var pid = req.param('pid');
-    if (pid.length >= 12) {
-        lib.safeFindOne(app.collection.property, {'_id': ObjectID(pid)}, function (property) {
-            if (property) {
-                lib.safeFindOne(app.collection.agent, {'_id': ObjectID(property.agent)}, function (agent) {
-                    var isPresenting = req.isAuthenticated() && agent._id.equals(req.user._id);
-                    if (isPresenting) {
-                        // Find and send in all agent's tours, to allow redirect
-                        app.collection.property.find({'agent': agent._id.toHexString()}).toArray(
-                            function (allprop_err, tours) {
-                                if (allprop_err) {
-                                    next(allprop_err);
-                                }
-                                renderVideoDetails(req, res, property, agent, isPresenting, tours);
-                            });
-                    }
-                    else {
-                        renderVideoDetails(req, res, property, agent, isPresenting, null);
-                    }
-                }, next);
-            }
-            else {
-                res.status(404).render('404');
-            }
-        }, next);
-    }
-    else {
-        res.status(404).render('404');
-    }
-});
-
 app.get('/login', function (req, res) {
     res.render('login');
 });
@@ -329,12 +284,12 @@ app.get('/profile', lib.ensureAuthenticated, function (req, res) {
 
 app.post('/profile', lib.ensureAuthenticated, function (req, res, next) {
     var updatedFields = {};
-    processReqField(req, req.user, 'name', updatedFields);
-    processReqField(req, req.user, 'email', updatedFields);
-    processReqField(req, req.user, 'phone', updatedFields);
-    processReqField(req, req.user, 'agency', updatedFields);
-    processReqField(req, req.user, 'photoURL', updatedFields);
-    processReqField(req, req.user, 'password', updatedFields,
+    lib.processReqField(req, req.user, 'name', updatedFields);
+    lib.processReqField(req, req.user, 'email', updatedFields);
+    lib.processReqField(req, req.user, 'phone', updatedFields);
+    lib.processReqField(req, req.user, 'agency', updatedFields);
+    lib.processReqField(req, req.user, 'photoURL', updatedFields);
+    lib.processReqField(req, req.user, 'password', updatedFields,
         function (user, reqPassword) {
             return !bcrypt.compareSync(reqPassword, user.passwordHash);
         },

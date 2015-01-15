@@ -122,8 +122,8 @@ exports.addTourRoutes = function (app) {
         res.redirect('/tour');
     });
 
-    function renderTourDetails(req, res, property, agent, isPresenting, allAgentProperties) {
-        res.render('tour_details', {
+    function renderDetails(templateName, res, property, agent, isPresenting, allAgentProperties) {
+        res.render(templateName, {
             property: property,
             mapQuery: property.address.split(' ').join('+'),
             agent: agent,
@@ -133,8 +133,7 @@ exports.addTourRoutes = function (app) {
         });
     }
 
-
-    app.get('/tour/:pid', function (req, res, next) {
+    function handlePropertyDetails(req, res, next, templateName) {
         var pid = req.param('pid');
         if (pid.length >= 12) {
             lib.safeFindOne(app.collection.property, {'_id': ObjectID(pid)}, function (property) {
@@ -148,11 +147,11 @@ exports.addTourRoutes = function (app) {
                                     if (allprop_err) {
                                         next(allprop_err);
                                     }
-                                    renderTourDetails(req, res, property, agent, isPresenting, tours);
+                                    renderDetails(templateName, res, property, agent, isPresenting, tours);
                                 });
                         }
                         else {
-                            renderTourDetails(req, res, property, agent, isPresenting, null);
+                            renderDetails(templateName, res, property, agent, isPresenting, null);
                         }
                     }, next);
                 }
@@ -164,6 +163,14 @@ exports.addTourRoutes = function (app) {
         else {
             res.status(404).render('404');
         }
+    }
+
+    app.get('/tour/:pid', function (req, res, next) {
+        handlePropertyDetails(req, res, next, 'tour_details');
+    });
+
+    app.get('/video/:pid', function (req, res, next) {
+        handlePropertyDetails(req, res, next, 'video');
     });
 
     function tourManageAction(req, res, next, actionFunc) {
@@ -197,25 +204,10 @@ exports.addTourRoutes = function (app) {
         });
     });
 
-    function processReqField(req, obj, fieldName, updatedFields, conditionFunc, setFunc) {
-        var reqValue = req.body[fieldName];
-        if (reqValue !== '' &&
-            (!conditionFunc && reqValue !== obj[fieldName] ||
-            conditionFunc && conditionFunc(obj, reqValue))) {
-            if (!setFunc) {
-                updatedFields[fieldName] = reqValue;
-            }
-            else {
-                setFunc(updatedFields, reqValue);
-            }
-        }
-
-    }
-
     app.post('/tour/:pid/edit', lib.ensureAuthenticated, function (req, res, next) {
         tourManageAction(req, res, next, function (property, pid) {
             var updatedFields = {};
-            processReqField(req, property, 'address', updatedFields);
+            lib.processReqField(req, property, 'address', updatedFields);
 
             if (!isEmptyObject(updatedFields)) {
                 app.collection.property.update({_id: ObjectID(pid)}, {'$set': updatedFields}, function (err, updatedProp) {
