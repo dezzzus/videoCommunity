@@ -14,6 +14,7 @@ var multer = require('multer');
 var AWS = require('aws-sdk');
 var lib = require('./lib');
 var tourController = require('./controllers/tours');
+var apiController = require('./controllers/api')
 var nodemailer = require('nodemailer');
 var awsMailer = nodemailer.createTransport({
     service: 'SES',
@@ -185,6 +186,8 @@ app.get('/logout', function (req, res) {
 
 tourController.addTourRoutes(app);
 
+apiController.addAPIRoutes(app);
+
 app.get('/login', function (req, res) {
     res.render('login');
 });
@@ -330,6 +333,8 @@ MongoClient.connect(mongoURI, function (dbErr, db) {
 
     app.collection.property = db.collection('property');
     app.collection.agent = db.collection('agent');
+    app.collection.lead = db.collection('lead');
+    app.collection.leadMsg = db.collection('leadMsg');
 
     app.listen(port, ipaddress, function () {
         console.log('Vizzit app listening at port:%s', port)
