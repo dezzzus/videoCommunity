@@ -12,6 +12,8 @@ var cookieParser = require('cookie-parser');
 var fs = require('fs');
 var multer = require('multer');
 var AWS = require('aws-sdk');
+var lib = require('./lib');
+var tourController = require('./controllers/tours');
 var nodemailer = require('nodemailer');
 var awsMailer = nodemailer.createTransport({
     service: 'SES',
@@ -42,28 +44,8 @@ function saltedHash(original) {
     return newHash;
 }
 
-function renderWithUser(req, res, viewName, data) {
-    if (!data) {
-        data = {};
-    }
-
-    data.user = req.user; // always init
-    res.render(viewName, data);
-}
-
 function isEmptyObject(obj) {
     return !Object.keys(obj).length;
-}
-
-function safeFindOne(collection, query, callback, next) {
-    collection.findOne(query, function (err, result) {
-        if (err) {
-            next(err);
-        }
-
-        callback(result);
-    })
-
 }
 
 function reportError(err) {
@@ -132,6 +114,16 @@ passport.use(new LocalStrategy({
 
 app.use(express.static(__dirname + '/static'));
 
+app.use(function(req, res, next){
+    if(req.user){
+        app.locals.user = req.user;
+    }
+    else{
+        app.locals.user = null;
+    }
+    next();
+});
+
 app.use(multer({
     dest: __dirname,
     limits: {
@@ -142,27 +134,27 @@ app.use(multer({
 app.set('view engine', 'ejs');
 
 app.get('/', function (req, res) {
-    renderWithUser(req, res, 'index');
+    res.render('index');
 });
 
 app.get('/contactus', function (req, res) {
-    renderWithUser(req, res, 'contactus');
+    res.render('contactus');
 });
 
 app.get('/team', function (req, res) {
-    renderWithUser(req, res, 'team', {noindex: true});
+    res.render('team', {noindex: true});
 });
 
 app.get('/useterms', function (req, res) {
-    renderWithUser(req, res, 'useterms');
+    res.render('useterms');
 });
 
 app.get('/beta_not_yet', function (req, res) {
-    renderWithUser(req, res, 'not_yet_approved');
+    res.render('not_yet_approved');
 });
 
 app.get('/early_adopter', function (req, res) {
-    renderWithUser(req, res, 'early_adopter');
+    res.render('early_adopter');
 });
 
 // The stuff below is to handle special pages for promotion to advisors.
@@ -176,7 +168,7 @@ var advisors = {
 app.get('/advisor/:advname', function (req, res, next) {
     var advname = req.param('advname');
     if (advname && (advname in advisors)) {
-        renderWithUser(req, res, 'advisor', {
+        res.render('advisor', {
             noindex: true,
             advisorFormalName: advisors[advname]
         });
@@ -186,276 +178,17 @@ app.get('/advisor/:advname', function (req, res, next) {
     }
 });
 
-
-function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        if (req.user && req.user.approved) {
-            return next();
-        }
-        else {
-            res.redirect('/beta_not_yet');
-            return;
-        }
-    }
-    res.redirect('/login');
-}
-
 app.get('/logout', function (req, res) {
     req.logout();
     res.redirect('/');
 });
 
-function processAgentTours(req, res, next, agent) {
-    app.collection.property.find({'agent': agent._id.toHexString()}).toArray(
-        function (err, tours) {
-            if (err) {
-                next(err);
-                return false;
-            }
-            app.collection.agent.find().toArray(
-                function (agent_err, agents) {
-                    if (agent_err) {
-                        next(agent_err);
-                        return false;
-                    }
-                    renderWithUser(req, res, 'tour', {
-                        tours: tours.sort(function (a, b) {
-                            return a.address.localeCompare(b.address);
-                        }),
-                        agent: agent,
-                        agents: agent.superuser ? agents : [agent]
-                    });
-                }
-            );
-        }
-    );
-}
+tourController.addTourRoutes(app);
 
-app.get('/tour', ensureAuthenticated, function (req, res, next) {
-    safeFindOne(app.collection.agent, {'_id': ObjectID(req.user._id.toHexString())}, function (agent) {
-        if (agent.superuser && req.param('userid')) {
-            // super-user is asking for another agent's contents
-            safeFindOne(app.collection.agent, {'_id': ObjectID(req.param('userid'))}, function (agent_override) {
-                processAgentTours(req, res, next, agent_override);
-            }, next);
-        }
-        else {
-            processAgentTours(req, res, next, agent);
-        }
-    }, next);
-});
-
-app.post('/tour', ensureAuthenticated, function (req, res, next) {
-    var newProperty = {
-        playerType: 'flowplayer',
-        address: req.body['address'],
-        agent: req.body['agent']
-    };
-    app.collection.property.insert(newProperty, function (err, dbProp) {
-        if (err) {
-            next(err);
-        }
-
-        if (req.files.videoFile) {
-            var fileStream = fs.createReadStream(req.files.videoFile.path);
-            fileStream.on('error', function (err) {
-                if (err) {
-                    reportError(err);
-                }
-            });
-            fileStream.on('open', function () {
-                var s3 = new AWS.S3();
-                s3.putObject({
-                    Bucket: 'vizzitupload',
-                    Key: req.files.videoFile.name,
-                    Body: fileStream
-                }, function (err) {
-                    if (err) {
-                        reportError(err);
-                    }
-
-                    fs.unlink(req.files.videoFile.path, function (del_err) {
-                        if (del_err) {
-                            reportError(del_err);
-                        }
-                    });
-
-
-                    var transcoder = new AWS.ElasticTranscoder();
-                    transcoder.createJob(
-                        {
-                            PipelineId: '1419791970323-1aherg',
-                            Input: {
-                                Key: req.files.videoFile.name
-                            },
-                            Output: {
-                                Key: dbProp[0]._id.toHexString() + '.mp4',
-                                PresetId: '1351620000001-100070'
-                            }
-                        },
-                        function (err) {
-                            if (err) {
-                                reportError(err);
-                            }
-                        }
-                    );
-
-                    transcoder.createJob(
-                        {
-                            PipelineId: '1419791970323-1aherg',
-                            Input: {
-                                Key: req.files.videoFile.name
-                            },
-                            Output: {
-                                Key: dbProp[0]._id.toHexString() + '.webm',
-                                PresetId: '1420142016747-83m02n'
-                            }
-                        },
-                        function (err) {
-                            if (err) {
-                                reportError(err);
-                            }
-                        }
-                    );
-                });
-            });
-        }
-    });
-    res.redirect('/tour');
-});
-
-function renderTourDetails(req, res, property, agent, isPresenting, allAgentProperties) {
-    renderWithUser(req, res, 'tour_details', {
-        property: property,
-        mapQuery: property.address.split(' ').join('+'),
-        agent: agent,
-        allProperties: allAgentProperties,
-        isPresenting: isPresenting,
-        videoID: property.videoID || property._id
-    });
-}
-
-app.get('/tour/:pid', function (req, res, next) {
-    var pid = req.param('pid');
-    if (pid.length >= 12) {
-        safeFindOne(app.collection.property, {'_id': ObjectID(pid)}, function (property) {
-            if (property) {
-                safeFindOne(app.collection.agent, {'_id': ObjectID(property.agent)}, function (agent) {
-                    var isPresenting = req.isAuthenticated() && agent._id.equals(req.user._id);
-                    if (isPresenting) {
-                        // Find and send in all agent's tours, to allow redirect
-                        app.collection.property.find({'agent': agent._id.toHexString()}).toArray(
-                            function (allprop_err, tours) {
-                                if (allprop_err) {
-                                    next(allprop_err);
-                                }
-                                renderTourDetails(req, res, property, agent, isPresenting, tours);
-                            });
-                    }
-                    else {
-                        renderTourDetails(req, res, property, agent, isPresenting, null);
-                    }
-                }, next);
-            }
-            else {
-                res.status(404);
-                renderWithUser(req, res, '404');
-            }
-        }, next);
-    }
-    else {
-        res.status(404)
-        renderWithUser(req, res, '404');
-    }
-});
-
-function tourManageAction(req, res, next, actionFunc) {
-    var pid = req.param('pid');
-    safeFindOne(app.collection.property, {'_id': ObjectID(pid)}, function (property) {
-        if (property) {
-            if (req.user._id.toHexString() == property.agent) {
-                actionFunc(property, pid);
-            }
-            else {
-                res.redirect('/tour');
-            }
-        }
-        else {
-            res.redirect('/tour');
-        }
-    }, next);
-}
-
-app.get('/tour/:pid/del', ensureAuthenticated, function (req, res, next) {
-    tourManageAction(req, res, next, function (property, pid) {
-        app.collection.property.remove({'_id': ObjectID(pid)}, function () {
-            res.redirect('/tour');
-        });
-    });
-});
-
-app.get('/tour/:pid/edit', ensureAuthenticated, function (req, res, next) {
-    tourManageAction(req, res, next, function (property, pid) {
-        renderWithUser(req, res, 'tour_edit', {tour: property});
-    });
-});
-
-function processReqField(req, obj, fieldName, updatedFields, conditionFunc, setFunc) {
-    var reqValue = req.body[fieldName];
-    if (reqValue !== '' &&
-        (!conditionFunc && reqValue !== obj[fieldName] ||
-        conditionFunc && conditionFunc(obj, reqValue))) {
-        if (!setFunc) {
-            updatedFields[fieldName] = reqValue;
-        }
-        else {
-            setFunc(updatedFields, reqValue);
-        }
-    }
-
-}
-
-app.post('/tour/:pid/edit', ensureAuthenticated, function (req, res, next) {
-    tourManageAction(req, res, next, function (property, pid) {
-        var updatedFields = {};
-        processReqField(req, property, 'address', updatedFields);
-
-        if (!isEmptyObject(updatedFields)) {
-            app.collection.property.update({_id: ObjectID(pid)}, {'$set': updatedFields}, function (err, updatedProp) {
-                if (err) {
-                    next(err);
-                }
-                res.redirect('/tour');
-            })
-        }
-        else {
-            res.redirect('/tour');
-        }
-    });
-});
-
-app.post('/tour/:pid/share', ensureAuthenticated, function (req, res, next) {
-    var reqEmail = req.body['email'];
-    var pid = req.param('pid');
-    awsMailer.sendMail({
-        from: 'noreply@virtualvizzit.com',
-        to: reqEmail,
-        subject: 'VirtualVizzit tour invitation',
-        text: req.user.name + ' invited you to see virtual tour:\n http://virtualvizzit.com/tour/' + pid
-    }, function (err, info) {
-        if (err) {
-            next(err);
-        }
-        else {
-            res.send({'status': 'OK'});
-        }
-    });
-
-});
 
 //We need to clean this up with original page
 function renderVideoDetails(req, res, property, agent, isPresenting, allAgentProperties) {
-    renderWithUser(req, res, 'video', {
+    res.render('video', {
         property: property,
         mapQuery: property.address.split(' ').join('+'),
         agent: agent,
@@ -468,9 +201,9 @@ function renderVideoDetails(req, res, property, agent, isPresenting, allAgentPro
 app.get('/video/:pid', function (req, res, next) {
     var pid = req.param('pid');
     if (pid.length >= 12) {
-        safeFindOne(app.collection.property, {'_id': ObjectID(pid)}, function (property) {
+        lib.safeFindOne(app.collection.property, {'_id': ObjectID(pid)}, function (property) {
             if (property) {
-                safeFindOne(app.collection.agent, {'_id': ObjectID(property.agent)}, function (agent) {
+                lib.safeFindOne(app.collection.agent, {'_id': ObjectID(property.agent)}, function (agent) {
                     var isPresenting = req.isAuthenticated() && agent._id.equals(req.user._id);
                     if (isPresenting) {
                         // Find and send in all agent's tours, to allow redirect
@@ -488,19 +221,17 @@ app.get('/video/:pid', function (req, res, next) {
                 }, next);
             }
             else {
-                res.status(404);
-                renderWithUser(req, res, '404');
+                res.status(404).render('404');
             }
         }, next);
     }
     else {
-        res.status(404)
-        renderWithUser(req, res, '404');
+        res.status(404).render('404');
     }
 });
 
 app.get('/login', function (req, res) {
-    renderWithUser(req, res, 'login');
+    res.render('login');
 });
 
 app.post('/login', passport.authenticate('local', {
@@ -509,7 +240,7 @@ app.post('/login', passport.authenticate('local', {
 }));
 
 app.get('/resetpass', function (req, res) {
-    renderWithUser(req, res, 'resetpass');
+    res.render('resetpass');
 });
 
 app.post('/resetpass', function (req, res, next) {
@@ -525,7 +256,7 @@ app.post('/resetpass', function (req, res, next) {
         return text;
     }
 
-    safeFindOne(app.collection.agent, {email: reqMail}, function (agent) {
+    lib.safeFindOne(app.collection.agent, {email: reqMail}, function (agent) {
         if (agent) {
             var newPass = generateRandomPass();
             var newPassHash = saltedHash(newPass);
@@ -556,12 +287,12 @@ app.post('/resetpass', function (req, res, next) {
 });
 
 app.get('/signup', function (req, res) {
-    renderWithUser(req, res, 'signup');
+    res.render('signup');
 });
 
 app.post('/signup', function (req, res, next) {
     if (req.body['terms']) {
-        safeFindOne(app.collection.agent, {email: req.body['email']}, function (user) {
+        lib.safeFindOne(app.collection.agent, {email: req.body['email']}, function (user) {
             if (user) {
                 res.redirect('/signup');
             }
@@ -592,11 +323,11 @@ app.post('/signup', function (req, res, next) {
     }
 });
 
-app.get('/profile', ensureAuthenticated, function (req, res) {
-    renderWithUser(req, res, 'profile');
+app.get('/profile', lib.ensureAuthenticated, function (req, res) {
+    res.render('profile');
 });
 
-app.post('/profile', ensureAuthenticated, function (req, res, next) {
+app.post('/profile', lib.ensureAuthenticated, function (req, res, next) {
     var updatedFields = {};
     processReqField(req, req.user, 'name', updatedFields);
     processReqField(req, req.user, 'email', updatedFields);
@@ -629,8 +360,7 @@ app.post('/profile', ensureAuthenticated, function (req, res, next) {
 
 //404 route should be always be last route
 app.get('*', function (req, res) {
-    res.status(404);
-    renderWithUser(req, res, '404');
+    res.status(404).render('404');
 });
 
 app.use(function (err, req, res, next) {
