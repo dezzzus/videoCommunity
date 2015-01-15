@@ -215,7 +215,7 @@ exports.addTourRoutes = function (app) {
                         next(err);
                     }
                     res.redirect('/tour');
-                })
+                });
             }
             else {
                 res.redirect('/tour');
