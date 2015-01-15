@@ -1,4 +1,8 @@
 <% include head_begin.ejs %>
+<script src="http://cdn.pubnub.com/pubnub.min.js"></script>
+<script src="/js/vv_pubnub.js"></script>
+<script src="/js/vv_misc_ui.js"></script>
+<script src="/js/vv_chat.js"></script>
 </head>
 <body>
 <div class="wrapper">
@@ -83,10 +87,19 @@
         <% } %>
     </div>
     <script type="application/javascript">
-        var jqDiv = $(".fplayer");
-        jqDiv.flowplayer({
-            errors: ['', 'Video loading aborted', 'Network error',
-                'Video not properly encoded', 'Video file is optimizing for web now, wait two minutes and reload a page']
+        // global needed to be set before onLoad stuff happens
+        // TODO: remove this global, and set this asynchronously, and registration should happen lazily when this is set.
+        var vv_pubnub_room_id = "SyncVideo" + "<%= property._id %>";
+    
+        $(function () {
+            vvzzt.chat.textChatRegistration('#chat_output', 
+               '#chat_input', <%= isPresenting %>, '<%= agent.name %>', '<%= agent._id %>');
+      
+            var jqDiv = $(".fplayer");
+            jqDiv.flowplayer({
+                errors: ['', 'Video loading aborted', 'Network error',
+                    'Video not properly encoded', 'Video file is optimizing for web now, wait two minutes and reload a page']
+            });
         });
     </script>
 
