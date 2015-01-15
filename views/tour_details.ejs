@@ -171,7 +171,8 @@
         // React to tour change:
         vvzzt.ui.tourSwitchRegistration("#tour_select");
 
-        vvzzt.chat.textChatRegistration('#chat_output', '#chat_input', <%= isPresenting %>, '<%= agent.name %>');
+        vvzzt.chat.textChatRegistration('#chat_output', '#chat_input', <%= isPresenting %>, 
+            '<%= agent.name %>',  '<%= agent._id %>');
 
         $('.send_tour').on('click', function () {
             var clientMail = prompt('Enter client email');

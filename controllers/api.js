@@ -20,7 +20,7 @@ var send500APIError = function(err, res) {
 var addLeadMsg = function(app, leadId, res, msg, sender) {
     app.collection.leadMsg.insert(
         {
-            leadID : ObjectID(leadId),
+            leadID : leadId,
             sender : sender,
             msg : msg,
             time : new Date()
@@ -38,7 +38,7 @@ exports.addAPIRoutes = function (app) {
         // TODO: protect with a unique token issued to a page (sign requests in the future)
         app.collection.lead.insert(
             {
-                agentID : ObjectID(req.body.agentId),
+                agentID : req.body.agentID,
                 status : LeadStatus.chatting,
                 lastPing : new Date()
             },
@@ -46,7 +46,7 @@ exports.addAPIRoutes = function (app) {
                 if (!send500APIError(err, res)) {
                     
                     // First message is always from viewer
-                    addLeadMsg(app, dbProp[0]._id, res, req.body.msg, "viewer");
+                    addLeadMsg(app, dbProp[0]._id.toHexString(), res, req.body.msg, "viewer");
                     
                     res.send(dbProp[0]._id.toHexString());
                 }
