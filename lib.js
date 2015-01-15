@@ -21,8 +21,22 @@ module.exports = {
             callback(result);
         })
 
-    }
+    },
 
+    processReqField: function (req, obj, fieldName, updatedFields, conditionFunc, setFunc) {
+        var reqValue = req.body[fieldName];
+        if (reqValue !== '' &&
+            (!conditionFunc && reqValue !== obj[fieldName] ||
+            conditionFunc && conditionFunc(obj, reqValue))) {
+            if (!setFunc) {
+                updatedFields[fieldName] = reqValue;
+            }
+            else {
+                setFunc(updatedFields, reqValue);
+            }
+        }
+
+    }
 
 
 };
