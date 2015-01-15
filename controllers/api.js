@@ -17,6 +17,20 @@ var send500APIError = function(err, res) {
     return false;
 };
 
+var addLeadMsg = function(app, leadId, res, msg, sender) {
+    app.collection.leadMsg.insert(
+        {
+            leadID : ObjectID(leadId),
+            sender : sender,
+            msg : msg,
+            time : new Date()
+        },
+        function (err, dbProp){
+            send500APIError(err, res);
+        }
+    );  
+};
+
 exports.addAPIRoutes = function (app) {
 
     app.post('/api/lead', function (req, res, next) {
@@ -30,6 +44,10 @@ exports.addAPIRoutes = function (app) {
             },
             function (err, dbProp){
                 if (!send500APIError(err, res)) {
+                    
+                    // First message is always from viewer
+                    addLeadMsg(app, dbProp[0]._id, res, req.body.msg, "viewer");
+                    
                     res.send(dbProp[0]._id.toHexString());
                 }
             }
@@ -49,16 +67,6 @@ exports.addAPIRoutes = function (app) {
     app.post('/api/lead/msg', function (req, res, next) {
         // TODO: validate req.body inputs!
         // TODO: protect with a unique token issued to a page (sign requests in the future)
-        app.collection.leadMsg.insert(
-            {
-                leadID : ObjectID(req.body.leadId),
-                sender : req.body.sender,
-                msg : req.body.msg,
-                time : new Date()
-            },
-            function (err, dbProp){
-                send500APIError(err, res);
-            }
-        );
+        addLeadMsg(app, req.body.leadId, res, req.body.msg, req.body.sender);
     });
 };

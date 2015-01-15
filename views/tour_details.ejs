@@ -5,6 +5,7 @@
 <script src="/js/vv_pubnub.js"></script>
 <script src="/js/video_sync.js"></script>
 <script src="/js/vv_misc_ui.js"></script>
+<script src="/js/vv_chat.js"></script>
 <script src="http://simplewebrtc.com/latest.js"></script>
 
 <script>
@@ -170,7 +171,7 @@
         // React to tour change:
         vvzzt.ui.tourSwitchRegistration("#tour_select");
 
-        vvzzt.ui.textChatRegistration('#chat_output', '#chat_input', <%= isPresenting %>, '<%= agent.name %>');
+        vvzzt.chat.textChatRegistration('#chat_output', '#chat_input', <%= isPresenting %>, '<%= agent.name %>');
 
         $('.send_tour').on('click', function () {
             var clientMail = prompt('Enter client email');
