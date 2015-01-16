@@ -14,6 +14,7 @@ var multer = require('multer');
 var AWS = require('aws-sdk');
 var lib = require('./lib');
 var tourController = require('./controllers/tours');
+var leadController = require('./controllers/leads');
 var apiController = require('./controllers/api')
 var nodemailer = require('nodemailer');
 var awsMailer = nodemailer.createTransport({
@@ -185,6 +186,8 @@ app.get('/logout', function (req, res) {
 });
 
 tourController.addTourRoutes(app);
+
+leadController.addLeadRoutes(app);
 
 apiController.addAPIRoutes(app);
 

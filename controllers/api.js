@@ -40,6 +40,7 @@ exports.addAPIRoutes = function (app) {
             {
                 agentID : req.body.agentID,
                 status : LeadStatus.chatting,
+                property: req.body.propertyID,
                 lastPing : new Date()
             },
             function (err, dbProp){
