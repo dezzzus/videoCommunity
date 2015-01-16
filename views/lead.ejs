@@ -28,7 +28,7 @@
         <% for (var i = 0; i < leads.length;i++){ %>
         <tr>
             <td>Address will be here</td>
-            <td><a class="btn btn-primary" href="/video/<%= leads[i].property %>">Open</a></td>
+            <td><a class="btn btn-primary" href="/video/<%= leads[i].property %>?lead=<%= leads[i]._id %>">Open</a></td>
             <td><%= leads[i].lastPing %></td>
         </tr>
         <% } %>

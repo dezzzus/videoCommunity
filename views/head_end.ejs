@@ -23,14 +23,19 @@
                         <li>
                             <a href="/">Home</a>
                         </li>
+                        <% if (user == null) { %>
                         <li>
-                            <% if (user == null) { %>
                             <a href="/login">Log in</a>
-                            <% } else { %>
-                            <a href="/tour">My tours</a>
-                            <a href="/lead">My leads</a> 
-                            <% } %>
                         </li>
+                        <% } else { %>
+                        <li>
+                            <a href="/tour">My tours</a>
+                        </li>
+                        <li>
+                            <a href="/lead">My leads</a> 
+                        </li>
+                        <% } %>
+                        
                         <li>
                             <a href="/contactus">Contact</a>
                         </li>
