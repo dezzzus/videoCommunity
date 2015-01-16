@@ -122,18 +122,21 @@ exports.addTourRoutes = function (app) {
         res.redirect('/tour');
     });
 
-    function renderDetails(templateName, res, property, agent, isPresenting, allAgentProperties) {
+    function renderDetails(templateName, res, property, agent, 
+                                isPresenting, allAgentProperties, leadID) {
         res.render(templateName, {
             property: property,
             mapQuery: property.address.split(' ').join('+'),
             agent: agent,
             allProperties: allAgentProperties,
             isPresenting: isPresenting,
-            videoID: property.videoID || property._id
+            videoID: property.videoID || property._id,
+            leadID : leadID || null
         });
     }
 
     function handlePropertyDetails(req, res, next, templateName) {
+        var leadID = req.param('lead');
         var pid = req.param('pid');
         if (pid.length >= 12) {
             lib.safeFindOne(app.collection.property, {'_id': ObjectID(pid)}, function (property) {
@@ -147,11 +150,12 @@ exports.addTourRoutes = function (app) {
                                     if (allprop_err) {
                                         next(allprop_err);
                                     }
-                                    renderDetails(templateName, res, property, agent, isPresenting, tours);
+                                    renderDetails(templateName, res, property, agent, 
+                                        isPresenting, tours, leadID);
                                 });
                         }
                         else {
-                            renderDetails(templateName, res, property, agent, isPresenting, null);
+                            renderDetails(templateName, res, property, agent, isPresenting, null, leadID);
                         }
                     }, next);
                 }

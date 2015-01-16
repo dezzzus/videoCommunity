@@ -4,6 +4,10 @@
  * Intended to be called from video pages, and possibly from agent's dashboard page.  
  * Not secure, not for CORS or other external usage!
  */
+
+// TODO: validate req.body everywhere
+// TODO: protect with a unique token issued to a page (sign requests in the future)
+
 var lib = require('../lib');
 var mongodb = require('mongodb');
 var ObjectID = mongodb.ObjectID;
@@ -34,8 +38,6 @@ var addLeadMsg = function(app, leadId, res, msg, sender) {
 exports.addAPIRoutes = function (app) {
 
     app.post('/api/lead', function (req, res, next) {
-        // TODO: validate req.body
-        // TODO: protect with a unique token issued to a page (sign requests in the future)
         app.collection.lead.insert(
             {
                 agentID : req.body.agentID,
@@ -55,9 +57,38 @@ exports.addAPIRoutes = function (app) {
         );
     });
     
+    /**
+     * Ping to indicate lead is still active
+     */
     app.put('/api/lead/:leadId/ping', function (req, res, next) {
-        // TODO: validate req.body
-        // TODO: protect with a unique token issued to a page (sign requests in the future)
+        app.collection.lead.update({_id: ObjectID(req.param('leadId'))}, {'$set': {"lastPing" : new Date()}}, 
+            function (err, updatedProp) {
+                send500APIError(err, res);
+            }
+        );
+    });
+    
+    /**
+     * Record new chat message
+     */
+    app.post('/api/lead/msg', function (req, res, next) {
+        addLeadMsg(app, req.body.leadID, res, req.body.msg, req.body.sender);
+    });
+    
+    /**
+     * Get this lead's chat history
+     */
+    app.get('/api/lead/msg/:leadId', function (req, res, next) {
+        app.collection.leadMsg.find({'leadID': req.param('leadId')}).toArray(
+            function (err, msgs) {
+                if (!send500APIError(err, res)) {
+                    res.send(msgs.sort(function (a, b) {
+                        return a.time - b.time;
+                    }));
+                }
+            }
+        );
+
         app.collection.lead.update({_id: ObjectID(req.param('leadId'))}, {'$set': {"lastPing" : new Date()}}, 
             function (err, updatedProp) {
                 send500APIError(err, res);
@@ -65,9 +96,5 @@ exports.addAPIRoutes = function (app) {
         );
     });
 
-    app.post('/api/lead/msg', function (req, res, next) {
-        // TODO: validate req.body inputs!
-        // TODO: protect with a unique token issued to a page (sign requests in the future)
-        addLeadMsg(app, req.body.leadId, res, req.body.msg, req.body.sender);
-    });
+
 };

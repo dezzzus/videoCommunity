@@ -92,9 +92,8 @@
         var vv_pubnub_room_id = "SyncVideo" + "<%= property._id %>";
     
         $(function () {
-            vvzzt.chat.textChatRegistration('#chat_output', 
-               '#chat_input', <%= isPresenting %>, '<%= agent.name %>', '<%= agent._id %>', '<%= property._id %>');
-      
+            <% include text_chat.ejs %>
+        
             var jqDiv = $(".fplayer");
             jqDiv.flowplayer({
                 errors: ['', 'Video loading aborted', 'Network error',
