@@ -10,7 +10,8 @@
 var vvzzt = vvzzt || {};
 vvzzt.chat = vvzzt.chat || {};
 
-vvzzt.chat.textChatRegistration = function(outputSelector, inputSelector, isPresenting, agentName, agentId) {
+vvzzt.chat.textChatRegistration = function(outputSelector, inputSelector, isPresenting, agentName, agentId, 
+    propertyID) {
     var coutput = $(outputSelector), cinput = $(inputSelector);
     coutput.html('');
     var myName = 'me';
@@ -33,7 +34,8 @@ vvzzt.chat.textChatRegistration = function(outputSelector, inputSelector, isPres
             if (firstChatMsg) {
                 jQuery.post("/api/lead", {
                         agentID : agentId,
-                        msg : msg
+                        msg : msg,
+                        propertyID : propertyID
                     }, 
                     function(data, textStatus, jqXHR){
                         leadID = data;
