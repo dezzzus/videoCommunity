@@ -6,12 +6,14 @@
  */
 
 // TODO: validate req.body everywhere
+// TODO: error handling when things can't be found
 // TODO: protect with a unique token issued to a page (sign requests in the future)
 
 var lib = require('../lib');
 var mongodb = require('mongodb');
 var ObjectID = mongodb.ObjectID;
 var LeadStatus = { chatting : 0, getBackToMe : 1, stale : 2, archived : 3 };
+var notifyMailer = null;
 
 var send500APIError = function(err, res) {
     if (err) {
@@ -29,6 +31,37 @@ var recordPing = function(app, leadId, res) {
     );  
 };
 
+/**
+ * This one probably does not belong here.
+ * TODO: move to the proper module
+ */
+var notifyAgentAboutLead = function(req, app, agentID, propID, leadID, firstMsg) {
+    app.collection.agent.findOne({_id: ObjectID(agentID)}, function (err, agent) {
+        if (agent) {
+            if (!err && notifyMailer) {
+                var msgText = "To view the lead, please log in from your computer's browser, and go to 'My Leads' page.<br>"
+                    + 'If you are reading this on your computer, you can follow '
+                    + '<a href = "http://' + req.headers.host + '/video/' + propID + '?lead=' + leadID + '">'
+                    + 'this link'
+                    + '</a>'
+                    + ' directly to start chatting.';
+                notifyMailer.sendMail({
+                    from: 'noreply@virtualvizzit.com',
+                    to: agent.email,
+                    subject: 'You have a new sales lead (Chat message: ' + firstMsg + ')',
+                    html: msgText
+                }, function (err, info) {
+                    if (err) {
+                        // log it?
+                    }
+                });
+            }
+        }
+    });  
+};
+
+
+
 var addLeadMsg = function(app, leadId, res, msg, sender) {
     app.collection.leadMsg.insert(
         {
@@ -43,8 +76,8 @@ var addLeadMsg = function(app, leadId, res, msg, sender) {
     );
 };
 
-exports.addAPIRoutes = function (app) {
-
+exports.addAPIRoutes = function (app, mailer) {
+    notifyMailer = mailer;
     app.post('/api/lead', function (req, res, next) {
         app.collection.lead.insert(
             {
@@ -56,11 +89,14 @@ exports.addAPIRoutes = function (app) {
             },
             function (err, dbProp){
                 if (!send500APIError(err, res)) {
+                    var leadID = dbProp[0]._id.toHexString();
                     
                     // First message is always from viewer
                     addLeadMsg(app, dbProp[0]._id.toHexString(), res, req.body.msg, "viewer");
                     
-                    res.send(dbProp[0]._id.toHexString());
+                    notifyAgentAboutLead(req, app, req.body.agentID, req.body.propertyID, leadID, req.body.msg || "");
+                    
+                    res.send(leadID);
                 }
             }
         );
