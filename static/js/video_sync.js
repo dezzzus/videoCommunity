@@ -13,8 +13,18 @@
 /**
  * Main function handling all registrations.
  * Depends on vvzzt.pubnub namespace being initialized!
+ * 
+ * If not "presenterControl", then viewer mode is independent, and
+ * sends signals to presenter so that the presenter can be aware of where viewer is.
+ * 
+ * Also, if not "presenterControl", chat box is shown after 5 seconds of playback
+ * 
  */
-function videoSync(player, isPresenter, onPresenterChange) {
+function videoSync(presenterControl, player, isPresenter, onPresenterChange, chatBoxSelector) {
+    if (isPresenter && chatBoxSelector) {
+        $(chatBoxSelector).show();
+    }
+    
     var userId = vvzzt.pubnub.userId;
     
     var myCurDate = new Date();
@@ -75,7 +85,7 @@ function videoSync(player, isPresenter, onPresenterChange) {
         vvzzt.pubnub.pubnubSubscribe(function (m, fromMyself) {
             var presenterTS = m.presenterTS || -1;
             
-            if (isPresenter) {
+            if (isPresenter && presenterControl) {
                 // inform the caller that there is another presenter that is active!
                 if (presenterTS != -1 && presenterTS > myTimestamp) {
                     if (onPresenterChange) {
@@ -86,7 +96,8 @@ function videoSync(player, isPresenter, onPresenterChange) {
                 return;
             }
             
-            if (!fromMyself && 
+            if (presenterControl && 
+                !fromMyself && 
                 (presenterTS >= lastKnownPresenterTS)) {
                 lastKnownPresenterTS = presenterTS;
                 if (m.type === 'pause') {
@@ -135,16 +146,23 @@ function videoSync(player, isPresenter, onPresenterChange) {
     var onPause = function (id) {
         publishWithProcessing('pause', function () {
             // was a user event, but not a presenter, so counter-act the user action.
-            if (!isPresenter) {
+            if (!isPresenter && presenterControl) {
                 callPlayer(player, 'play');
             }
         });
     };
 
     var onPlay = function (id) {
+        // show chat box after 5 sec of playing
+        if (!isPresenter && !presenterControl) {
+            var z = setTimeout(function(){
+                $(chatBoxSelector).show();
+            }, 5000);
+        }
+        
         publishWithProcessing('play', function () {
             // was a user event, but not a presenter, so counter-act the user action.
-            if (!isPresenter) {
+            if (!isPresenter && presenterControl) {
                 callPlayer(player, 'pause');
             }
         });
@@ -153,7 +171,7 @@ function videoSync(player, isPresenter, onPresenterChange) {
     var onSeek = function (id) {
         publishWithProcessing('seek', function () {
             // was a user event, but not a presenter, so counter-act the user action.
-            if (!isPresenter) {
+            if (!isPresenter && presenterControl) {
                 callPlayer(player, 'seekTo', lastKnownPresenterPosition);
                 // make sure keeps playing or pausing
                 callPlayer(player, lastKnownPresenterWasPlaying ? 'play' : 'pause');

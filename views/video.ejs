@@ -4,6 +4,7 @@
 <% } %>
 <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
 <script src="/js/vv_pubnub.js"></script>
+<script src="/js/video_sync.js"></script>
 <script src="/js/vv_misc_ui.js"></script>
 <script src="/js/vv_chat.js"></script>
 </head>
@@ -45,12 +46,13 @@
                 <% } %>
             </div>
             <div class="col-md-3">
-                <div class="chat_box funny-boxes funny-boxes-left-green">
+                <div id="lead_chat" class="chat_box funny-boxes funny-boxes-left-green" style="display: none;">
                     <div class="voice_chat alert alert-success">
                         Voice chat activated. Feel free to talk with your agent.
                     </div>
                     <video id="local_video"></video>
                     <div id="remote_video"></div>
+                    
                     <div class="chat_output_panel">
                         <div id="chat_output" class="panel-body" style="display: none;">
                         </div>
@@ -58,6 +60,7 @@
 
                     To send a chat message, type and press Enter:
                     <div><input id="chat_input" placeholder="enter chat message"/></div>
+                    
                 </div>
             </div>
         </div>
@@ -102,6 +105,13 @@
                 errors: ['', 'Video loading aborted', 'Network error',
                     'Video not properly encoded', 'Video file is optimizing for web now, wait two minutes and reload a page']
             });
+            var flplayer = flowplayer(jqDiv);
+            
+            var wrapper = new SyncWrapper(flplayer);
+            videoSync(false, wrapper, <%= isPresenting %>,
+                null, "#lead_chat"
+        );
+            
         });
     </script>
 

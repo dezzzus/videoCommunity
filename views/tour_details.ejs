@@ -143,10 +143,10 @@
         jqDiv.find('.fp-controls').hide();
         <%}%>
         var wrapper = new SyncWrapper(flplayer);
-        videoSync(wrapper, <%= isPresenting %>,
+        videoSync(true, wrapper, <%= isPresenting %>,
                 function (presenterTS) {
                     $("#video_alert").html("<h3>Another presenter became active, this session is no longer controlling playback.  If you refresh this browser window, or switch to another tour from here, you will regain control.</h3>");
-                }
+                }, null
         );
 
         try {
