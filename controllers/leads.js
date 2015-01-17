@@ -1,6 +1,7 @@
 var lib = require('../lib');
 var mongodb = require('mongodb');
 var ObjectID = mongodb.ObjectID;
+var heartbeatInterval = 15000;
 
 /**
  * TODO
@@ -9,6 +10,9 @@ var ObjectID = mongodb.ObjectID;
  * - ensure only leads' owner can touch them
  * 
  */
+exports.getHeartbeatInterval = function() {
+    return heartbeatInterval;
+};
 
 exports.addLeadRoutes = function (app) {
     
@@ -51,12 +55,12 @@ exports.addLeadRoutes = function (app) {
                                     return b.lastPing - a.lastPing;
                                 });
                                 
-                                // Anything more than X sec is inactive - need to tune the X
+                                // heartbeatInterval x3 - need to tune that with experience.
                                 var curTime = new Date();
                                 var firstInactive = -1;
                                 allLeads.forEach(function(val, idx){
                                     if (firstInactive == -1 &&
-                                        curTime.getTime() - val.lastPing.getTime() > 10000) {
+                                        curTime.getTime() - val.lastPing.getTime() > heartbeatInterval*3) {
                                         firstInactive = idx;
                                     }
                                 });

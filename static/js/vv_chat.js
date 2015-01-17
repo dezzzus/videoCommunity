@@ -43,7 +43,8 @@ vvzzt.chat.startLeadHeartbeat = function(leadId) {
 };
 
 vvzzt.chat.textChatRegistration = function(outputSelector, inputSelector, isPresenting, agentName, agentId, 
-    propertyID, leadID) {
+    propertyID, leadID, leadHeartbeatInterval) {
+    vvzzt.chat.leadHeartbeatInterval = leadHeartbeatInterval;
     var coutput = $(outputSelector), cinput = $(inputSelector);
     coutput.html('');
     var myName = 'me';

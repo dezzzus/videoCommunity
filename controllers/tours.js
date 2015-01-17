@@ -131,7 +131,8 @@ exports.addTourRoutes = function (app) {
             allProperties: allAgentProperties,
             isPresenting: isPresenting,
             videoID: property.videoID || property._id,
-            leadID : leadID || null
+            leadID : leadID || null,
+            leadHeartbeatInterval : app.leadHeartbeatInterval || null
         });
     }
 

@@ -1,4 +1,7 @@
 <% include head_begin.ejs %>
+<% if (isPresenting) { %>
+<% include head_end.ejs %>
+<% } %>
 <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
 <script src="/js/vv_pubnub.js"></script>
 <script src="/js/vv_misc_ui.js"></script>
