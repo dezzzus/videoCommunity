@@ -25,21 +25,25 @@ vvzzt.ui.followURLAfterConfirm = function(msg, url) {
     });
 };
 
-vvzzt.ui.tourSwitchRegistration = function(elemSelector) {
+vvzzt.ui.tourSwitchRegistration = function(elemSelector, typeOfPage) {
     $(elemSelector).change(function () {
         var newTour = this.options[this.selectedIndex].value;
         vvzzt.pubnub.pubnubPublish({
             type : 'redirect_tour',
-            tour : newTour 
-        });
+            tour : newTour,
+            leadId : vvzzt.chat ? vvzzt.chat.leadId : null
+        })
         // Wait to allow pubnub call to succeed.
-        setTimeout("window.location.href = '/tour/" + newTour + "';", 1500);
+        setTimeout("window.location.href = /" + typeOfPage + "/" + newTour + "';", 1500);
     });
     
     // Remote control for tour change:
     vvzzt.pubnub.pubnubSubscribe(function (m) {
+        if (vvzzt.chat && vvzzt.chat.leadId && vvzzt.chat.leadId != m.leadId) {
+            return; // does not apply to us
+        }
         if (m.type === 'redirect_tour') {
-            window.location.href = "/tour/" + m.tour;
+            window.location.href = "/" + typeOfPage + "/" + m.tour;
         }
     });
 };

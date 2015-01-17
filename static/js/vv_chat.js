@@ -9,6 +9,7 @@
  */
 var vvzzt = vvzzt || {};
 vvzzt.chat = vvzzt.chat || {};
+vvzzt.chat.leadId = null;
 
 vvzzt.chat.addToChatOutput = function(coutput, first, uname, msg, fromMe) {
     
@@ -66,7 +67,7 @@ vvzzt.chat.textChatRegistration = function(chatBoxSelector, outputSelector, inpu
         myName = agentName;
         otherName = 'Viewer';
     }
-    
+    vvzzt.chat.leadId = leadID;
     var agentDelayedTitle = "Apologies, this is taking a little longer than expected. ";
     var agentDelayedMsg = "If you'd like the Agent to get back to you, please send via this chat your contact info" +
     ' and anything else you would like the Agent to know about your needs. ';
@@ -144,6 +145,7 @@ vvzzt.chat.textChatRegistration = function(chatBoxSelector, outputSelector, inpu
                     }, 
                     function(data, textStatus, jqXHR){
                         leadID = data;
+                        vvzzt.chat.leadId = leadID;
                         // Start heartbeat 
                         vvzzt.chat.startLeadHeartbeat(leadID);
                         
