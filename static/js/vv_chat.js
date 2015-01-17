@@ -23,7 +23,7 @@ vvzzt.chat.addToChatOutput = function(coutput, first, uname, msg, fromMe) {
     if (!first) {
         prev = prev + '<br>';
     }
-    coutput.html( prev + '<div><div class="'+nameClass+'">'+uname+':&nbsp;</div>'+ 
+    coutput.html( prev + '<div class="oneChatMsg"><div class="'+nameClass+'">'+uname+':&nbsp;</div>'+ 
         '<div class="'+msgClass+'">' + (''+msg).replace( /[<>]/g, '' ) + '</div></div>' );
     coutput.scrollTop(coutput.height());
   
@@ -42,6 +42,18 @@ vvzzt.chat.startLeadHeartbeat = function(leadId) {
     }, interval);
 };
 
+vvzzt.chat.showChatAlert = function(msg, removeAfter) {
+    if ($('#chat_alert').hasClass('in')) {
+        return;
+    }
+    
+    $('#chat_alert').html(msg);
+    $('#chat_alert').addClass('in');
+    setTimeout(function(){
+        $('#chat_alert').removeClass('in');
+    }, removeAfter);
+};
+
 vvzzt.chat.textChatRegistration = function(chatBoxSelector, outputSelector, inputSelector, 
     isPresenting, agentName, agentId, 
     propertyID, leadID, leadHeartbeatInterval) {
@@ -55,34 +67,39 @@ vvzzt.chat.textChatRegistration = function(chatBoxSelector, outputSelector, inpu
         otherName = 'Viewer';
     }
     
+    var agentDelayedTitle = "Apologies, this is taking a little longer than expected. ";
+    var agentDelayedMsg = "If you'd like the Agent to get back to you, please send via this chat your contact info" +
+    ' and anything else you would like the Agent to know about your needs. ';
+    
     // When the selector is first shown to viewer, show alert
     if (!isPresenting) {
+        var firstChatAlertShown = false;
         
+        // this is just a placeholder:
         $('<div>')
             .attr( 'id', 'chat_alert' )
-            .html(
-               '<h1>Thank you for your interest!</h1>' +
-               '<p>' +
-               "   If you'd like to contact the Agent and chat with them in real time, please enter your chat message here." +
-               '</p>')
+            .html('')
             .addClass('alert alert-attention flyover flyover-top-offset')
             .appendTo( $(chatBoxSelector) );
 
         $(chatBoxSelector).on('show', function() {
-            setTimeout(function() {
-                $('#chat_alert').addClass('in');
+            if (!firstChatAlertShown) {
+                firstChatAlertShown = true;
+                
                 setTimeout(function(){
-                    $('#chat_alert').removeClass('in');
-                }, 5000);
-
-            }, 500);
-            
+                    vvzzt.chat.showChatAlert(
+                        '<h1>Thank you for your interest!</h1>' +
+                        '<p>' +
+                        "   If you'd like to contact the Agent and chat with them in real time, please enter your chat message here." +
+                        '</p>',
+                        5000);
+                }, 200);
+            }
         });
-        
-        
     }
 
     var firstChatMsg = true;
+    var receivedResponses = false;
 
     if (leadID && isPresenting) {
         // get history, assuming this is agent session!
@@ -129,6 +146,24 @@ vvzzt.chat.textChatRegistration = function(chatBoxSelector, outputSelector, inpu
                         leadID = data;
                         // Start heartbeat 
                         vvzzt.chat.startLeadHeartbeat(leadID);
+                        
+                        vvzzt.chat.addToChatOutput(coutput, false, 
+                            "auto-response", "Waiting for the agent to respond.  Please allow a couple of minutes...", false);
+                        
+                        // If after enough time, no response, suggest to leave contact info
+                        setTimeout(function(){
+                            if (!receivedResponses) {
+                                vvzzt.chat.showChatAlert(
+                                    '<h1>' + agentDelayedTitle + '</h1>' +
+                                    '<p>' +
+                                    agentDelayedMsg +
+                                    '<br>  Thank you!' +
+                                    '</p>',
+                                    6000);
+                                vvzzt.chat.addToChatOutput(coutput, false, 
+                                    "auto-response", agentDelayedTitle + agentDelayedMsg, false);
+                            }
+                        }, 120000);
                     }
                 );
             }
@@ -148,6 +183,10 @@ vvzzt.chat.textChatRegistration = function(chatBoxSelector, outputSelector, inpu
             if (firstChatMsg) {
                 coutput.show();
                 firstChatMsg = false;
+            }
+            
+            if (!isFromMyself) {
+                receivedResponses = true;
             }
             
             vvzzt.chat.addToChatOutput(coutput, firstChatMsg, 

@@ -73,6 +73,10 @@
 	width : 100%;
 }
 
+.oneChatMsg {
+	float : left;
+}
+
 .property_map {
     width: 500px;
     height: 100px;
