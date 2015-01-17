@@ -62,9 +62,8 @@ function reportError(err) {
             subject: 'Virtualvizzit errors',
             text: JSON.stringify(err) + '\n' + err.stack
         }, function (email_err, info) {
-            if (email_err) {
-                console.log(email_err);
-            }
+            // always log anyway, for later review if needed.
+            console.log(email_err);
         });
     }
 }
