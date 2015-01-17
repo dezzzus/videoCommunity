@@ -98,6 +98,8 @@
         var vv_pubnub_room_id = "SyncVideo" + "<%= property._id %>";
     
         $(function () {
+            vvzzt.ui.tourSwitchRegistration("#tour_select", 'video');
+            
             <% include text_chat.ejs %>
         
             var jqDiv = $(".fplayer");
@@ -110,7 +112,7 @@
             var wrapper = new SyncWrapper(flplayer);
             videoSync(false, wrapper, <%= isPresenting %>,
                 null, "#lead_chat"
-        );
+            );
             
         });
     </script>
