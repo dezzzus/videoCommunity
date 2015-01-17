@@ -42,7 +42,8 @@ vvzzt.chat.startLeadHeartbeat = function(leadId) {
     }, interval);
 };
 
-vvzzt.chat.textChatRegistration = function(outputSelector, inputSelector, isPresenting, agentName, agentId, 
+vvzzt.chat.textChatRegistration = function(chatBoxSelector, outputSelector, inputSelector, 
+    isPresenting, agentName, agentId, 
     propertyID, leadID, leadHeartbeatInterval) {
     vvzzt.chat.leadHeartbeatInterval = leadHeartbeatInterval;
     var coutput = $(outputSelector), cinput = $(inputSelector);
@@ -52,6 +53,33 @@ vvzzt.chat.textChatRegistration = function(outputSelector, inputSelector, isPres
     if (isPresenting) {
         myName = agentName;
         otherName = 'Viewer';
+    }
+    
+    // When the selector is first shown to viewer, show alert
+    if (!isPresenting) {
+        
+        $('<div>')
+            .attr( 'id', 'chat_alert' )
+            .html(
+               '<h1>Thank you for your interest!</h1>' +
+               '<p>' +
+               "   If you'd like to contact the Agent and chat with them in real time, please enter your chat message here." +
+               '</p>')
+            .addClass('alert alert-attention flyover flyover-top-offset')
+            .appendTo( $(chatBoxSelector) );
+
+        $(chatBoxSelector).on('show', function() {
+            setTimeout(function() {
+                $('#chat_alert').addClass('in');
+                setTimeout(function(){
+                    $('#chat_alert').removeClass('in');
+                }, 5000);
+
+            }, 500);
+            
+        });
+        
+        
     }
 
     var firstChatMsg = true;
