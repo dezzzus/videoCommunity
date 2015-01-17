@@ -188,6 +188,7 @@ app.get('/logout', function (req, res) {
 tourController.addTourRoutes(app);
 
 leadController.addLeadRoutes(app);
+app.leadHeartbeatInterval = leadController.getHeartbeatInterval();
 
 apiController.addAPIRoutes(app);
 

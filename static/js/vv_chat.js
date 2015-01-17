@@ -29,8 +29,22 @@ vvzzt.chat.addToChatOutput = function(coutput, first, uname, msg, fromMe) {
   
 };
 
+/**
+ * Pings to be able to confirm whether this lead is still active or not.
+ */
+vvzzt.chat.startLeadHeartbeat = function(leadId) {
+    var interval = vvzzt.chat.leadHeartbeatInterval || 10000;
+    var z = setInterval(function () {
+        jQuery.ajax({
+            url: '/api/lead/'+leadId+'/ping',
+            type: 'PUT'
+          });
+    }, interval);
+};
+
 vvzzt.chat.textChatRegistration = function(outputSelector, inputSelector, isPresenting, agentName, agentId, 
-    propertyID, leadID) {
+    propertyID, leadID, leadHeartbeatInterval) {
+    vvzzt.chat.leadHeartbeatInterval = leadHeartbeatInterval;
     var coutput = $(outputSelector), cinput = $(inputSelector);
     coutput.html('');
     var myName = 'me';
@@ -42,7 +56,7 @@ vvzzt.chat.textChatRegistration = function(outputSelector, inputSelector, isPres
 
     var firstChatMsg = true;
 
-    if (leadID) {
+    if (leadID && isPresenting) {
         // get history, assuming this is agent session!
         jQuery.get("/api/lead/msg/" + leadID, {
             }, 
@@ -85,6 +99,8 @@ vvzzt.chat.textChatRegistration = function(outputSelector, inputSelector, isPres
                     }, 
                     function(data, textStatus, jqXHR){
                         leadID = data;
+                        // Start heartbeat 
+                        vvzzt.chat.startLeadHeartbeat(leadID);
                     }
                 );
             }

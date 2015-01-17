@@ -52,7 +52,7 @@ exports.addAPIRoutes = function (app) {
                 status : LeadStatus.chatting,
                 property: req.body.propertyID,
                 lastPing : new Date(),
-                archived : false
+                archived : String(false) // TODO: convert this to boolean once confusion in query sorted out
             },
             function (err, dbProp){
                 if (!send500APIError(err, res)) {

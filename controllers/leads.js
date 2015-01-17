@@ -1,6 +1,18 @@
 var lib = require('../lib');
 var mongodb = require('mongodb');
 var ObjectID = mongodb.ObjectID;
+var heartbeatInterval = 15000;
+
+/**
+ * TODO
+ * Known issues:
+ * - more edge case handling, mismatching ids, etc.
+ * - ensure only leads' owner can touch them
+ * 
+ */
+exports.getHeartbeatInterval = function() {
+    return heartbeatInterval;
+};
 
 exports.addLeadRoutes = function (app) {
     
@@ -10,8 +22,11 @@ exports.addLeadRoutes = function (app) {
             function (agent) {
             app.collection.lead.find(
                 {
-                    'agentID': agent._id.toHexString(),
-                    'archived': archivedToggle
+                    $and : [
+                             { agentID: agent._id.toHexString() },
+                             // Note, archived coming back as String...
+                             { archived: String(archivedToggle) }
+                         ]
                 }).toArray(
                 function (err, leads) {
                     if (err) {
@@ -19,35 +34,57 @@ exports.addLeadRoutes = function (app) {
                         return false;
                     }
                     
-                    // Need to also find properties to extract their addresses... 
-                    var allLeads = leads.sort(function (a, b) {
-                        return b.lastPing - a.lastPing;
+                    var propIds = [];
+                    leads.forEach(function(val, idx){
+                        propIds.push(ObjectID(val.property));
                     });
                     
-                    // Anything more than X sec is inactive - need to tune the X
-                    var curTime = new Date();
-                    var firstInactive = -1;
-                    allLeads.forEach(function(val, idx){
-                        if (firstInactive == -1 &&
-                            curTime.getTime() - val.lastPing.getTime() > 10000) {
-                            firstInactive = idx;
+                    app.collection.property.find(
+                        {
+                            '_id': { $in : propIds }
                         }
-                    });
-                    var activeLeads = [];
-                    var inactiveLeads = [];
-                    if (firstInactive == -1) {
-                        activeLeads = allLeads;
-                    }
-                    else {
-                        activeLeads = allLeads.slice(0, firstInactive);
-                        inactiveLeads = allLeads.slice(firstInactive);
-                    }
-                    res.render('lead', {
-                        activeLeads : activeLeads,
-                        inactiveLeads : inactiveLeads,
-                        archived : archivedToggle,
-                        agent: agent
-                    });
+                    ).toArray(
+                        function (err, props) {
+                            if (!err) {
+                                var propAddresses = {};
+                                props.forEach(function(val, idx){
+                                    propAddresses[val._id.toHexString()] = val.address;
+                                });
+                                
+                                var allLeads = leads.sort(function (a, b) {
+                                    return b.lastPing - a.lastPing;
+                                });
+                                
+                                // heartbeatInterval x3 - need to tune that with experience.
+                                var curTime = new Date();
+                                var firstInactive = -1;
+                                allLeads.forEach(function(val, idx){
+                                    if (firstInactive == -1 &&
+                                        curTime.getTime() - val.lastPing.getTime() > heartbeatInterval*3) {
+                                        firstInactive = idx;
+                                    }
+                                });
+                                var activeLeads = [];
+                                var inactiveLeads = [];
+                                if (firstInactive == -1) {
+                                    activeLeads = allLeads;
+                                }
+                                else {
+                                    activeLeads = allLeads.slice(0, firstInactive);
+                                    inactiveLeads = allLeads.slice(firstInactive);
+                                }
+                                res.render('lead', {
+                                    activeLeads : activeLeads,
+                                    inactiveLeads : inactiveLeads,
+                                    archived : archivedToggle,
+                                    propAddresses : propAddresses,
+                                    agent: agent
+                                });
+
+                            }
+                        }
+                    );
+                    
 
                 }
             );
@@ -69,6 +106,7 @@ exports.addLeadRoutes = function (app) {
                             });
                             
                             res.render('lead_details', {
+                                lead : lead,
                                 chatMsgs : chatMsgs,
                                 lastPing : lead.lastPing,
                                 myName : req.user.name
@@ -80,5 +118,27 @@ exports.addLeadRoutes = function (app) {
             }
         );
     });
+    
+    app.get('/lead/:leadId/archiveAction/:toggle', lib.ensureAuthenticated, function (req, res, next) {
+        var toggle = req.param('toggle');
+        lib.safeFindOne(app.collection.lead, {'_id': ObjectID(req.param('leadId'))}, 
+            function (lead) {
+                if (!lead) {
+                    res.status(404).render('404');
+                }
+                else {
+                    
+                    app.collection.lead.update({_id: lead._id}, 
+                        {'$set': {archived : toggle}}, function (err, updatedProp) {
+                        if (err) {
+                            next(err);
+                        }
+                        res.redirect('/lead');
+                    });
+                }
+            }
+        );
+    });
+
 
 };

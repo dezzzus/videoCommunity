@@ -8,18 +8,21 @@
 <div class="container">
     <br>
 
-    <div>
+    <h2>
         Agent: <%= agent.name %>
+    </h2>
+    
+    <div>
+      Showing <%=!archived ? 'Unarchived' : 'Archvied' %> leads.
+      <a href="/lead?archivedToggle=<%= !archived%>">Switch to <%=!archived ? 'Archived' : 'Unarchvied' %></a>
     </div>
+    
+    <% var archToggleButton = archived ? 'Unarchive' : 'Archive';  var archToggleAction = !archived; %>
 
-    <h1>Active leads:</h1>
-
-    <% var leads = activeLeads; %>
+    <% var leads = activeLeads; var leadsTitle = 'Active leads:'; var noOpen = false; %>    
     <% include leads_table.ejs %>
     
-    <h1>Inactive leads:</h1>
-    
-    <% var leads = inactiveLeads; %>
+    <% var leads = inactiveLeads; var leadsTitle = 'Inactive leads:'; var noOpen = true; %>
     <% include leads_table.ejs %>
     
 
