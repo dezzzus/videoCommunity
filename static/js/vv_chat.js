@@ -70,7 +70,8 @@ vvzzt.chat.textChatRegistration = function(chatBoxSelector, outputSelector, inpu
     vvzzt.chat.leadId = leadID;
     var agentDelayedTitle = "Apologies, this is taking a little longer than expected. ";
     var agentDelayedMsg = "If you'd like the Agent to get back to you, please send via this chat your contact info" +
-    ' and anything else you would like the Agent to know about your needs. ';
+    ' and anything else you would like the Agent to know about your needs. ' + 
+    '<br>  Thank you!';
     
     // When the selector is first shown to viewer, show alert
     if (!isPresenting) {
@@ -149,23 +150,24 @@ vvzzt.chat.textChatRegistration = function(chatBoxSelector, outputSelector, inpu
                         // Start heartbeat 
                         vvzzt.chat.startLeadHeartbeat(leadID);
                         
-                        vvzzt.chat.addToChatOutput(coutput, false, 
-                            "auto-response", "Waiting for the agent to respond.  Please allow a couple of minutes...", false);
+                        if (!isPresenting) {
+                            vvzzt.chat.addToChatOutput(coutput, false, 
+                                "auto-response", "Waiting for the agent to respond.  Please allow a couple of minutes...", false);
                         
-                        // If after enough time, no response, suggest to leave contact info
-                        setTimeout(function(){
-                            if (!receivedResponses) {
-                                vvzzt.chat.showChatAlert(
-                                    '<h1>' + agentDelayedTitle + '</h1>' +
-                                    '<p>' +
-                                    agentDelayedMsg +
-                                    '<br>  Thank you!' +
-                                    '</p>',
-                                    6000);
-                                vvzzt.chat.addToChatOutput(coutput, false, 
-                                    "auto-response", agentDelayedTitle + agentDelayedMsg, false);
-                            }
-                        }, 120000);
+                            // If after enough time, no response, suggest to leave contact info
+                            setTimeout(function(){
+                                if (!receivedResponses) {
+                                    vvzzt.chat.showChatAlert(
+                                        '<h1>' + agentDelayedTitle + '</h1>' +
+                                        '<p>' +
+                                        agentDelayedMsg +
+                                        '</p>',
+                                        6000);
+                                    vvzzt.chat.addToChatOutput(coutput, false, 
+                                        "auto-response", agentDelayedTitle + agentDelayedMsg, false);
+                                }
+                            }, 120000);
+                        }
                     }
                 );
             }
