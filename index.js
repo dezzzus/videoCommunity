@@ -190,7 +190,7 @@ tourController.addTourRoutes(app);
 leadController.addLeadRoutes(app);
 app.leadHeartbeatInterval = leadController.getHeartbeatInterval();
 
-apiController.addAPIRoutes(app);
+apiController.addAPIRoutes(app, awsMailer);
 
 app.get('/login', function (req, res) {
     res.render('login');
