@@ -21,6 +21,14 @@ var send500APIError = function(err, res) {
     return false;
 };
 
+var recordPing = function(app, leadId, res) {
+    app.collection.lead.update({_id: ObjectID(leadId)}, {'$set': {"lastPing" : new Date()}}, 
+        function (err, updatedProp) {
+            send500APIError(err, res);
+        }
+    );  
+};
+
 var addLeadMsg = function(app, leadId, res, msg, sender) {
     app.collection.leadMsg.insert(
         {
@@ -32,7 +40,7 @@ var addLeadMsg = function(app, leadId, res, msg, sender) {
         function (err, dbProp){
             send500APIError(err, res);
         }
-    );  
+    );
 };
 
 exports.addAPIRoutes = function (app) {
@@ -43,7 +51,8 @@ exports.addAPIRoutes = function (app) {
                 agentID : req.body.agentID,
                 status : LeadStatus.chatting,
                 property: req.body.propertyID,
-                lastPing : new Date()
+                lastPing : new Date(),
+                archived : false
             },
             function (err, dbProp){
                 if (!send500APIError(err, res)) {
@@ -61,11 +70,7 @@ exports.addAPIRoutes = function (app) {
      * Ping to indicate lead is still active
      */
     app.put('/api/lead/:leadId/ping', function (req, res, next) {
-        app.collection.lead.update({_id: ObjectID(req.param('leadId'))}, {'$set': {"lastPing" : new Date()}}, 
-            function (err, updatedProp) {
-                send500APIError(err, res);
-            }
-        );
+        recordPing(app, req.param('leadId'), res);
     });
     
     /**
@@ -73,6 +78,13 @@ exports.addAPIRoutes = function (app) {
      */
     app.post('/api/lead/msg', function (req, res, next) {
         addLeadMsg(app, req.body.leadID, res, req.body.msg, req.body.sender);
+        app.collection.lead.update({_id: ObjectID(req.param('leadId'))}, {'$set': {"lastPing" : new Date()}}, 
+            function (err, updatedProp) {
+                if(!send500APIError(err, res)) {
+                    recordPing(app, req.body.leadID, res);
+                }
+            }
+        );
     });
     
     /**
@@ -86,12 +98,6 @@ exports.addAPIRoutes = function (app) {
                         return a.time - b.time;
                     }));
                 }
-            }
-        );
-
-        app.collection.lead.update({_id: ObjectID(req.param('leadId'))}, {'$set': {"lastPing" : new Date()}}, 
-            function (err, updatedProp) {
-                send500APIError(err, res);
             }
         );
     });

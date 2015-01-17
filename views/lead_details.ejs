@@ -1,0 +1,37 @@
+<% include head_begin.ejs %>
+<% include head_end.ejs %>
+<script>
+</script>
+
+<script src="/js/vv_misc_ui.js"></script>
+
+<div class="container">
+    <br>
+
+    <div>
+        Lead history: 
+    </div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <td>Sender</td>
+            <td>Text</td>
+            <td>Sent</td>
+        </tr>
+        </thead>
+        <tbody>
+        <% for (var i = 0; i < chatMsgs.length;i++){ %>
+        <tr>
+            <td><%= chatMsgs[i].sender === 'agent' ? myName : chatMsgs[i].sender %></td>
+            <td><%= chatMsgs[i].msg %></td>
+            <td><%= chatMsgs[i].time %></td>
+        </tr>
+        <% } %>
+        </tbody>
+    </table>
+    
+
+</div>
+<% include foot.ejs %>
+
