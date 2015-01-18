@@ -58,6 +58,9 @@ vvzzt.chat.showChatAlert = function(msg, removeAfter) {
 vvzzt.chat.textChatRegistration = function(chatBoxSelector, outputSelector, inputSelector, 
     isPresenting, agentName, agentId, 
     propertyID, leadID, leadHeartbeatInterval) {
+    if (leadID === 'null') {
+        leadID = null;
+    }
     vvzzt.chat.leadHeartbeatInterval = leadHeartbeatInterval;
     var coutput = $(outputSelector), cinput = $(inputSelector);
     coutput.html('');
@@ -68,13 +71,15 @@ vvzzt.chat.textChatRegistration = function(chatBoxSelector, outputSelector, inpu
         otherName = 'Viewer';
     }
     vvzzt.chat.leadId = leadID;
+    var firstMsgTitle = "Thank you for your interest! ";
+    var firstMsgText = "If you'd like to contact the Agent and chat with them in real time, please enter your chat message here.";
     var agentDelayedTitle = "Apologies, this is taking a little longer than expected. ";
     var agentDelayedMsg = "If you'd like the Agent to get back to you, please send via this chat your contact info" +
     ' and anything else you would like the Agent to know about your needs. ' + 
     '<br>  Thank you!';
     
     // When the selector is first shown to viewer, show alert
-    if (!isPresenting) {
+    if (!isPresenting && !leadID) {
         var firstChatAlertShown = false;
         
         // this is just a placeholder:
@@ -90,11 +95,18 @@ vvzzt.chat.textChatRegistration = function(chatBoxSelector, outputSelector, inpu
                 
                 setTimeout(function(){
                     vvzzt.chat.showChatAlert(
-                        '<h1>Thank you for your interest!</h1>' +
+                        '<h1>' + firstMsgTitle + '</h1>' +
                         '<p>' +
-                        "   If you'd like to contact the Agent and chat with them in real time, please enter your chat message here." +
+                        firstMsgText +
                         '</p>',
                         5000);
+
+                    setTimeout(function() {
+                        coutput.show();
+                        vvzzt.chat.addToChatOutput(coutput, false, 
+                            "auto-response", firstMsgTitle + firstMsgText, false);
+                    }, 6000);
+
                 }, 200);
             }
         });
@@ -103,7 +115,7 @@ vvzzt.chat.textChatRegistration = function(chatBoxSelector, outputSelector, inpu
     var firstChatMsg = true;
     var receivedResponses = false;
 
-    if (leadID && isPresenting) {
+    if (leadID) {
         // get history, assuming this is agent session!
         jQuery.get("/api/lead/msg/" + leadID, {
             }, 
@@ -113,11 +125,22 @@ vvzzt.chat.textChatRegistration = function(chatBoxSelector, outputSelector, inpu
                     $.each(data, function(idx, entry){
                         var uname = entry.sender;
                         var isFromMe = true;
-                        if (uname === "viewer") {
-                            isFromMe = false;
+                        if (isPresenting) {
+                            if (uname === "viewer") {
+                                isFromMe = false;
+                            }
+                            else {
+                                uname = myName;
+                            }
                         }
                         else {
-                            uname = myName;
+                            if (uname === "agent") {
+                                isFromMe = false;
+                                uname = agentName;
+                            }
+                            else {
+                                uname = myName;
+                            }
                         }
 
                         vvzzt.chat.addToChatOutput(coutput, firstChatMsg, 

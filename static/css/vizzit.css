@@ -76,6 +76,7 @@
 
 .oneChatMsg {
     float: left;
+    clear: left;
 }
 
 .property_map {
