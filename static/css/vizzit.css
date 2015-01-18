@@ -1,5 +1,5 @@
 .agent_photo {
-	float: left;
+    float: left;
 }
 
 .agent_photo img {
@@ -29,20 +29,21 @@
     font-style: italic;
     text-align: left;
 }
-.agent_phone i{
+
+.agent_phone i {
     color: #3498db;
 }
 
 .chat_box {
-	clear: both;
-	float: left;
+    clear: both;
+    float: left;
 }
 
 .chat_box .panel-body {
-	padding: 2px;
-	min-height: 200px;
-	max-height: 200px;
-	overflow: auto;
+    padding: 2px;
+    min-height: 200px;
+    max-height: 200px;
+    overflow: auto;
 }
 
 .chat_other_username {
@@ -52,9 +53,9 @@
 }
 
 .chat_other_user_content {
-	float: left;
-	font-weight: 400;
-	color: blue;
+    float: left;
+    font-weight: 400;
+    color: blue;
 }
 
 .chat_my_username {
@@ -70,11 +71,11 @@
 }
 
 .chat_box, .chat_box input {
-	width : 100%;
+    width: 100%;
 }
 
 .oneChatMsg {
-	float : left;
+    float: left;
 }
 
 .property_map {
@@ -115,7 +116,7 @@
 }
 
 .early_adopter_bold {
-	font-weight: 800;
+    font-weight: 800;
 }
 
 .alert {
@@ -126,37 +127,49 @@
     margin-bottom: 20px;
     padding: 10px 35px 10px 15px;
 }
+
 .alert h4 {
     color: inherit;
     margin-top: 0;
 }
+
 .alert-attention {
     background-color: #8FED80;
     border-color: #ff0000;
     color: #B94A48;
 }
+
 .alert-attention hr {
     border-top-color: #E6C1C7;
 }
+
 .alert-attention .alert-link {
     color: #953B39;
 }
 
 .flyover {
-   left: 150%;
-   overflow: hidden;
-   position: fixed;
-   width: 30%;
-   opacity: 0.97;
-   z-index: 1050;
-   -webkit-transition: left 1s ease-out 0s;
-   transition: left 1s ease-out 0s;
+    left: 150%;
+    overflow: hidden;
+    position: fixed;
+    width: 30%;
+    opacity: 0.97;
+    z-index: 1050;
+    -webkit-transition: left 1s ease-out 0s;
+    transition: left 1s ease-out 0s;
 }
 
 .flyover-top-offset {
-   top: 200px;
+    top: 200px;
 }
 
 .flyover.in {
-   left: 70%;
+    left: 70%;
+}
+
+.tenant_info {
+    display: none;
+}
+
+.tenant_time{
+    display: inline-block;
 }

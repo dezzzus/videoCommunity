@@ -23,6 +23,7 @@
 
 var vvzzt = vvzzt || {};
 vvzzt.sync = vvzzt.sync || {};
+vvzzt.sync.syncHeartBeat = false;
 
 vvzzt.sync.publishHeartBeat = function (player) {
     setInterval(function () {
@@ -39,10 +40,22 @@ vvzzt.sync.publishHeartBeat = function (player) {
     }, 1000);
 };
 
-vvzzt.sync.listenHeartBeat = function (jqBeatEl) {
+vvzzt.sync.listenHeartBeat = function (jqBeatEl, jqNotifEl, player) {
     vvzzt.pubnub.pubnubSubscribe(function (msg) {
         if (msg.type == 'heartbeat') {
-            jqBeatEl.html(Math.round(msg.position));
+            if (msg.position > 0) {
+                if (!jqNotifEl.is(':visible')) {
+                    jqNotifEl.show();
+                }
+                jqBeatEl.html(Math.round(msg.position));
+                if(vvzzt.sync.syncHeartBeat){
+                    player.api('getCurrentTime', function(curTime){
+                       if(Math.abs(curTime - msg.position)>2){
+                           player.api('seekTo', msg.position);
+                       }
+                    });
+                }
+            }
         }
     });
 };
