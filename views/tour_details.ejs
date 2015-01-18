@@ -3,7 +3,7 @@
 <% include head_end.ejs %>
 <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
 <script src="/js/vv_pubnub.js"></script>
-<script src="/js/video_sync.js"></script>
+<script src="/js/vv_sync.js"></script>
 <script src="/js/vv_misc_ui.js"></script>
 <script src="/js/vv_chat.js"></script>
 <script src="http://simplewebrtc.com/latest.js"></script>
@@ -11,8 +11,8 @@
 <script>
     _gaq.push(['_setCustomVar',
         1,
-        'IsPresenter',
-        '<%= isPresenting %>',
+        'IsAgent',
+        '<%= isAgent %>',
         3 // page level
     ]);
     _gaq.push(['_setCustomVar',
@@ -58,7 +58,7 @@
     <div class="row">
 
         <div class="col-md-9 video_section panel-body">
-            <% if (isPresenting) { %>
+            <% if (isAgent) { %>
             <div><%= agent.name %>, you are the presenter.</div>
 
             <div>Once they open the page, you can start your guided tour using video + your phone
@@ -96,7 +96,7 @@
             </div>
         </div>
     </div>
-    <% if (isPresenting) { %>
+    <% if (isAgent) { %>
     <div class="row">
         <div class="col-md-6">
             <div class="btn  btn-primary send_tour">
@@ -135,15 +135,15 @@
         jqDiv.flowplayer({
             errors: ['', 'Video loading aborted', 'Network error',
                 'Video not properly encoded', 'Video file is optimizing for web now, wait two minutes and reload a page'],
-            disabled: <%= !isPresenting %>
+            disabled: <%= !isAgent %>
         });
         var flplayer = flowplayer(jqDiv);
 
-        <% if(!isPresenting){%>
+        <% if(!isAgent){%>
         jqDiv.find('.fp-controls').hide();
         <%}%>
         var wrapper = new SyncWrapper(flplayer);
-        videoSync(true, wrapper, <%= isPresenting %>,
+        videoSync(true, wrapper, <%= isAgent %>,
                 function (presenterTS) {
                     $("#video_alert").html("<h3>Another presenter became active, this session is no longer controlling playback.  If you refresh this browser window, or switch to another tour from here, you will regain control.</h3>");
                 }, null

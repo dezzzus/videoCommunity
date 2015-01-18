@@ -123,7 +123,7 @@
             vvzzt.sync.publishHeartBeat(playerWrapper);
             setTimeout(function () {
                 $('#lead_chat').show();
-            }, 5000);
+            }, <%= leadID == null ? 10000 : 0 %>);
             <%}else{%>
             var jqHeartBeat = $('.tenant_time');
             var jqJumpTo = $('.jump_to');
