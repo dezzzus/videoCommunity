@@ -41,7 +41,7 @@ var notifyAgentAboutLead = function(req, app, agentID, propID, leadID, firstMsg)
             if (!err && notifyMailer) {
                 var msgText = "To view the lead, please log in from your computer's browser, and go to 'My Leads' page.<br>"
                     + 'If you are reading this on your computer, you can follow '
-                    + '<a href = "http://' + req.headers.host + '/video/' + propID + '?lead=' + leadID + '">'
+                    + '<a href = "http://' + req.headers.host + '/video_lead/' + propID + '?lead=' + leadID + '">'
                     + 'this link'
                     + '</a>'
                     + ' directly to start chatting.';

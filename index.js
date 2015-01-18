@@ -195,10 +195,20 @@ app.get('/login', function (req, res) {
     res.render('login');
 });
 
-app.post('/login', passport.authenticate('local', {
-    successRedirect: '/tour',
-    failureRedirect: '/login'
-}));
+app.post('/login', function(req, res, next) {
+    passport.authenticate('local', function(err, user, info) {
+        if (err) { return next(err); }
+        // Redirect if it fails
+        if (!user) { return res.redirect('/login'); }
+        req.logIn(user, function(err) {
+            if (err) { return next(err); }
+            
+            // Redirect if it succeeds
+            return res.redirect(req.session.returnTo || '/tour');
+        });
+    })(req, res, next);
+});
+
 
 app.get('/resetpass', function (req, res) {
     res.render('resetpass');
