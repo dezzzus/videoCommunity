@@ -41,7 +41,15 @@
         <div class="row">
 
             <div class="col-md-9 video_section panel-body">
-                Your client currently on:<div class="tenant_time"></div> sec of video
+                <div class="tenant_info">Your client currently on:
+                    <div class="tenant_time"></div>
+                    sec of video
+                    <a class="jump_to">Sync my player</a>
+
+                    <div>
+                        <input type="checkbox" class="always_sync"/> Keep in sync
+                    </div>
+                </div>
                 <% if(property.playerType == 'flowplayer'){ %>
                 <% include player/flowplayer.ejs %>
                 <% } %>
@@ -113,9 +121,33 @@
             var playerWrapper = new SyncWrapper(flplayer);
             <%if(!isAgent){%>
             vvzzt.sync.publishHeartBeat(playerWrapper);
+            setTimeout(function () {
+                $('#lead_chat').show();
+            }, 5000);
             <%}else{%>
-            vvzzt.sync.listenHeartBeat($('.tenant_time'));
+            var jqHeartBeat = $('.tenant_time');
+            var jqJumpTo = $('.jump_to');
+
+            $('#lead_chat').show();
+            vvzzt.sync.listenHeartBeat(jqHeartBeat, $('.tenant_info'), playerWrapper);
+
+            jqJumpTo.on('click', function () {
+                playerWrapper.api('seekTo', jqHeartBeat.text())
+            });
+
+            var jqCheckBox = $('.always_sync');
+            jqCheckBox.on('change', function () {
+                var isChecked = jqCheckBox.is(':checked');
+                vvzzt.sync.syncHeartBeat = isChecked;
+                if (isChecked) {
+                    jqJumpTo.hide();
+                }
+                else {
+                    jqJumpTo.show();
+                }
+            });
             <%}%>
+
 
         });
     </script>
