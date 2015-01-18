@@ -123,13 +123,13 @@ exports.addTourRoutes = function (app) {
     });
 
     function renderDetails(templateName, res, property, agent, 
-                                isPresenting, allAgentProperties, leadID) {
+                                isAgent, allAgentProperties, leadID) {
         res.render(templateName, {
             property: property,
             mapQuery: property.address.split(' ').join('+'),
             agent: agent,
             allProperties: allAgentProperties,
-            isPresenting: isPresenting,
+            isAgent: isAgent,
             videoID: property.videoID || property._id,
             leadID : leadID || null,
             leadHeartbeatInterval : app.leadHeartbeatInterval || null
@@ -143,8 +143,8 @@ exports.addTourRoutes = function (app) {
             lib.safeFindOne(app.collection.property, {'_id': ObjectID(pid)}, function (property) {
                 if (property) {
                     lib.safeFindOne(app.collection.agent, {'_id': ObjectID(property.agent)}, function (agent) {
-                        var isPresenting = req.isAuthenticated() && agent._id.equals(req.user._id);
-                        if (isPresenting) {
+                        var isAgent = req.isAuthenticated() && agent._id.equals(req.user._id);
+                        if (isAgent) {
                             // Find and send in all agent's tours, to allow redirect
                             app.collection.property.find({'agent': agent._id.toHexString()}).toArray(
                                 function (allprop_err, tours) {
@@ -152,11 +152,11 @@ exports.addTourRoutes = function (app) {
                                         next(allprop_err);
                                     }
                                     renderDetails(templateName, res, property, agent, 
-                                        isPresenting, tours, leadID);
+                                        isAgent, tours, leadID);
                                 });
                         }
                         else {
-                            renderDetails(templateName, res, property, agent, isPresenting, null, leadID);
+                            renderDetails(templateName, res, property, agent, isAgent, null, leadID);
                         }
                     }, next);
                 }
