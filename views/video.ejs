@@ -1,10 +1,10 @@
 <% include head_begin.ejs %>
-<% if (isPresenting) { %>
+<% if (isAgent) { %>
 <% include head_end.ejs %>
 <% } %>
 <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
 <script src="/js/vv_pubnub.js"></script>
-<script src="/js/video_sync.js"></script>
+<script src="/js/vv_sync.js"></script>
 <script src="/js/vv_misc_ui.js"></script>
 <script src="/js/vv_chat.js"></script>
 </head>
@@ -41,6 +41,7 @@
         <div class="row">
 
             <div class="col-md-9 video_section panel-body">
+                Your client currently on:<div class="tenant_time"></div> sec of video
                 <% if(property.playerType == 'flowplayer'){ %>
                 <% include player/flowplayer.ejs %>
                 <% } %>
@@ -52,7 +53,7 @@
                     </div>
                     <video id="local_video"></video>
                     <div id="remote_video"></div>
-                    
+
                     <div class="chat_output_panel">
                         <div id="chat_output" class="panel-body" style="display: none;">
                         </div>
@@ -60,11 +61,11 @@
 
                     To send a chat message, type and press Enter:
                     <div><input id="chat_input" placeholder="enter chat message"/></div>
-                    
+
                 </div>
             </div>
         </div>
-        <% if (isPresenting) { %>
+        <% if (isAgent) { %>
         <div class="row">
             <div class="col-md-6">
                 <div class="btn  btn-primary send_tour">
@@ -96,24 +97,26 @@
         // global needed to be set before onLoad stuff happens
         // TODO: remove this global, and set this asynchronously, and registration should happen lazily when this is set.
         var vv_pubnub_room_id = "SyncVideo" + "<%= property._id %>";
-    
+
         $(function () {
             vvzzt.ui.tourSwitchRegistration("#tour_select", 'video');
-            
+
             <% include text_chat.ejs %>
-        
+
             var jqDiv = $(".fplayer");
             jqDiv.flowplayer({
                 errors: ['', 'Video loading aborted', 'Network error',
                     'Video not properly encoded', 'Video file is optimizing for web now, wait two minutes and reload a page']
             });
             var flplayer = flowplayer(jqDiv);
-            
-            var wrapper = new SyncWrapper(flplayer);
-            videoSync(false, wrapper, <%= isPresenting %>,
-                null, "#lead_chat"
-            );
-            
+
+            var playerWrapper = new SyncWrapper(flplayer);
+            <%if(!isAgent){%>
+            vvzzt.sync.publishHeartBeat(playerWrapper);
+            <%}else{%>
+            vvzzt.sync.listenHeartBeat($('.tenant_time'));
+            <%}%>
+
         });
     </script>
 

@@ -13,26 +13,53 @@
 /**
  * Main function handling all registrations.
  * Depends on vvzzt.pubnub namespace being initialized!
- * 
+ *
  * If not "presenterControl", then viewer mode is independent, and
  * sends signals to presenter so that the presenter can be aware of where viewer is.
- * 
+ *
  * Also, if not "presenterControl", chat box is shown after 5 seconds of playback
- * 
+ *
  */
+
+var vvzzt = vvzzt || {};
+vvzzt.sync = vvzzt.sync || {};
+
+vvzzt.sync.publishHeartBeat = function (player) {
+    setInterval(function () {
+        player.api('getCurrentTime', function (curPos) {
+            player.api('paused', function (isPaused) {
+                // If this is the presenter, and either enough position changed or state changed, publish!
+                vvzzt.pubnub.pubnubPublish({
+                    type: 'heartbeat',
+                    position: curPos,
+                    isPlaying: !isPaused
+                });
+            });
+        });
+    }, 1000);
+};
+
+vvzzt.sync.listenHeartBeat = function (jqBeatEl) {
+    vvzzt.pubnub.pubnubSubscribe(function (msg) {
+        if (msg.type == 'heartbeat') {
+            jqBeatEl.html(Math.round(msg.position));
+        }
+    });
+};
+
 function videoSync(presenterControl, player, isPresenter, onPresenterChange, chatBoxSelector) {
     if (isPresenter && chatBoxSelector) {
         $(chatBoxSelector).show();
     }
-    
+
     var userId = vvzzt.pubnub.userId;
-    
+
     var myCurDate = new Date();
     // To GMT:
     var myTimestamp = new Date(myCurDate.valueOf() + myCurDate.getTimezoneOffset() * 60000).getTime();
-    
+
     var gaTrackPlayerEvent = function (event) {
-    	var eventPrefix = isPresenter ? "presenter" : "viewer";
+        var eventPrefix = isPresenter ? "presenter" : "viewer";
         _gaq.push(['_trackEvent',
             'player',
             eventPrefix + "_" + event,
@@ -49,9 +76,9 @@ function videoSync(presenterControl, player, isPresenter, onPresenterChange, cha
 
         if (playerEventCounter[type] == 0) {
             if (isPresenter) {
-            	vvzzt.pubnub.pubnubPublish({
+                vvzzt.pubnub.pubnubPublish({
                     type: type,
-                    presenterTS : myTimestamp
+                    presenterTS: myTimestamp
                 });
             }
             wasUserEvent = true;
@@ -84,7 +111,7 @@ function videoSync(presenterControl, player, isPresenter, onPresenterChange, cha
     var onPlayerReady = function () {
         vvzzt.pubnub.pubnubSubscribe(function (m, fromMyself) {
             var presenterTS = m.presenterTS || -1;
-            
+
             if (isPresenter && presenterControl) {
                 // inform the caller that there is another presenter that is active!
                 if (presenterTS != -1 && presenterTS > myTimestamp) {
@@ -95,9 +122,8 @@ function videoSync(presenterControl, player, isPresenter, onPresenterChange, cha
                 }
                 return;
             }
-            
-            if (presenterControl && 
-                !fromMyself && 
+
+            if (presenterControl && !fromMyself &&
                 (presenterTS >= lastKnownPresenterTS)) {
                 lastKnownPresenterTS = presenterTS;
                 if (m.type === 'pause') {
@@ -155,11 +181,11 @@ function videoSync(presenterControl, player, isPresenter, onPresenterChange, cha
     var onPlay = function (id) {
         // show chat box after 5 sec of playing
         if (!isPresenter && !presenterControl) {
-            var z = setTimeout(function(){
+            var z = setTimeout(function () {
                 $(chatBoxSelector).show();
             }, 5000);
         }
-        
+
         publishWithProcessing('play', function () {
             // was a user event, but not a presenter, so counter-act the user action.
             if (!isPresenter && presenterControl) {
@@ -197,9 +223,9 @@ function videoSync(presenterControl, player, isPresenter, onPresenterChange, cha
                 // If this is the presenter, and either enough position changed or state changed, publish!
                 if (isPresenter &&
                     (Math.abs(curPos - lastKnownPresenterPosition) > .5 || isPaused != lastKnownMyPaused)) {
-                	vvzzt.pubnub.pubnubPublish({
+                    vvzzt.pubnub.pubnubPublish({
                         type: 'presenterHeartbeat',
-                        presenterTS : myTimestamp,
+                        presenterTS: myTimestamp,
                         position: curPos,
                         isPlaying: !isPaused
                     });
