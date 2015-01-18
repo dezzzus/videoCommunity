@@ -177,6 +177,11 @@ exports.addTourRoutes = function (app) {
     app.get('/video/:pid', function (req, res, next) {
         handlePropertyDetails(req, res, next, 'video');
     });
+    
+    app.get('/video_lead/:pid', lib.ensureAuthenticated, function (req, res, next) {
+        handlePropertyDetails(req, res, next, 'video');
+    });
+    
 
     function tourManageAction(req, res, next, actionFunc) {
         var pid = req.param('pid');
