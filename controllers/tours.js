@@ -219,7 +219,7 @@ exports.addTourRoutes = function (app) {
             var updatedFields = {};
             lib.processReqField(req, property, 'address', updatedFields);
 
-            if (!isEmptyObject(updatedFields)) {
+            if (!lib.isEmptyObject(updatedFields)) {
                 app.collection.property.update({_id: ObjectID(pid)}, {'$set': updatedFields}, function (err, updatedProp) {
                     if (err) {
                         next(err);

@@ -46,10 +46,6 @@ function saltedHash(original) {
     return newHash;
 }
 
-function isEmptyObject(obj) {
-    return !Object.keys(obj).length;
-}
-
 function reportError(err) {
     if (!process.env.OPENSHIFT_NODEJS_IP) {
         console.log(err);
@@ -316,7 +312,7 @@ app.post('/profile', lib.ensureAuthenticated, function (req, res, next) {
         }
     );
 
-    if (!isEmptyObject(updatedFields)) { // $set does not like empty!
+    if (!lib.isEmptyObject(updatedFields)) { // $set does not like empty!
         app.collection.agent.update({_id: req.user._id}, {'$set': updatedFields}, function (err, updatedUser) {
             if (err) {
                 next(err);
