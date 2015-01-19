@@ -9,15 +9,29 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var bcrypt = require('bcrypt');
 var cookieParser = require('cookie-parser');
-var fs = require('fs');
-var multer = require('multer');
-var AWS = require('aws-sdk');
 var lib = require('./lib');
 var tourController = require('./controllers/tours');
 var leadController = require('./controllers/leads');
 var apiController = require('./controllers/api')
 var nodemailer = require('nodemailer');
-var awsMailer = nodemailer.createTransport({
+
+var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
+var ipaddress = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
+var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
+
+
+
+var app = express();
+app.collection = {};
+app.fs = require('fs');
+app.multer = require('multer');
+app.AWS = require('aws-sdk');
+app.AWS.config.update({
+    accessKeyId: 'AKIAJZUHGBIVMAN6BKSA',
+    secretAccessKey: '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',
+    region: 'us-east-1'
+});
+app.awsMailer = nodemailer.createTransport({
     service: 'SES',
     auth: {
         user: 'AKIAIZSWZHH37TQL4JSQ',
@@ -26,19 +40,6 @@ var awsMailer = nodemailer.createTransport({
 });
 
 
-var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
-var ipaddress = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
-var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
-
-
-AWS.config.update({
-    accessKeyId: 'AKIAJZUHGBIVMAN6BKSA',
-    secretAccessKey: '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',
-    region: 'us-east-1'
-});
-
-var app = express();
-app.collection = {};
 
 function saltedHash(original) {
     var salt = bcrypt.genSaltSync(10);
@@ -52,7 +53,7 @@ function reportError(err) {
         console.log(err.stack);
     }
     else {
-        awsMailer.sendMail({
+        app.awsMailer.sendMail({
             from: 'noreply@virtualvizzit.com',
             to: 'shikolay@gmail.com',
             subject: 'Virtualvizzit errors',
@@ -121,7 +122,7 @@ app.use(function(req, res, next){
     next();
 });
 
-app.use(multer({
+app.use(app.multer({
     dest: __dirname,
     limits: {
         fileSize: 0.8e9
@@ -185,7 +186,7 @@ tourController.addTourRoutes(app);
 leadController.addLeadRoutes(app);
 app.leadHeartbeatInterval = leadController.getHeartbeatInterval();
 
-apiController.addAPIRoutes(app, awsMailer);
+apiController.addAPIRoutes(app, app.awsMailer);
 
 app.get('/login', function (req, res) {
     res.render('login');
@@ -233,7 +234,7 @@ app.post('/resetpass', function (req, res, next) {
                         next(err);
                     }
 
-                    awsMailer.sendMail({
+                    app.awsMailer.sendMail({
                         from: 'noreply@virtualvizzit.com',
                         to: reqMail,
                         subject: 'Virtualvizzit password reset',

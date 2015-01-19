@@ -55,14 +55,14 @@ exports.addTourRoutes = function (app) {
             }
 
             if (req.files.videoFile) {
-                var fileStream = fs.createReadStream(req.files.videoFile.path);
+                var fileStream = app.fs.createReadStream(req.files.videoFile.path);
                 fileStream.on('error', function (err) {
                     if (err) {
                         reportError(err);
                     }
                 });
                 fileStream.on('open', function () {
-                    var s3 = new AWS.S3();
+                    var s3 = new app.AWS.S3();
                     s3.putObject({
                         Bucket: 'vizzitupload',
                         Key: req.files.videoFile.name,
@@ -72,14 +72,14 @@ exports.addTourRoutes = function (app) {
                             reportError(err);
                         }
 
-                        fs.unlink(req.files.videoFile.path, function (del_err) {
+                        app.fs.unlink(req.files.videoFile.path, function (del_err) {
                             if (del_err) {
                                 reportError(del_err);
                             }
                         });
 
 
-                        var transcoder = new AWS.ElasticTranscoder();
+                        var transcoder = new app.AWS.ElasticTranscoder();
                         transcoder.createJob(
                             {
                                 PipelineId: '1419791970323-1aherg',
@@ -236,7 +236,7 @@ exports.addTourRoutes = function (app) {
     app.post('/tour/:pid/share', lib.ensureAuthenticated, function (req, res, next) {
         var reqEmail = req.body['email'];
         var pid = req.param('pid');
-        awsMailer.sendMail({
+        app.awsMailer.sendMail({
             from: 'noreply@virtualvizzit.com',
             to: reqEmail,
             subject: 'VirtualVizzit tour invitation',
