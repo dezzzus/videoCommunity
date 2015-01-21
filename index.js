@@ -48,19 +48,21 @@ function saltedHash(original) {
 }
 
 function reportError(err) {
-    if (!process.env.OPENSHIFT_NODEJS_IP) {
-        console.log(err);
-        console.log(err.stack);
-    }
-    else {
+    // Always dump for logging:
+    console.log("Error found: " + err);
+    console.log("Eurrent time: " + new Date());
+    console.log("Stack\n" + err.stack);
+    
+    if (process.env.OPENSHIFT_NODEJS_IP){
         app.awsMailer.sendMail({
             from: 'noreply@virtualvizzit.com',
             to: 'shikolay@gmail.com',
             subject: 'Virtualvizzit errors',
             text: JSON.stringify(err) + '\n' + err.stack
         }, function (email_err, info) {
-            // always log anyway, for later review if needed.
-            console.log(email_err);
+            if (email_err) {
+                console.log("Can't email due to " + email_err);
+            }
         });
     }
 }

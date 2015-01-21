@@ -76,7 +76,7 @@ vvzzt.chat.textChatRegistration = function(chatBoxSelector, outputSelector, inpu
     var agentDelayedTitle = "Apologies, this is taking a little longer than expected. ";
     var agentDelayedMsg = "If you'd like the Agent to get back to you, please send via this chat your contact info" +
     ' and anything else you would like the Agent to know about your needs. ' + 
-    '<br>  Thank you!';
+    'Thank you!';
     
     // When the selector is first shown to viewer, show alert
     if (!isPresenting && !leadID) {
