@@ -8,39 +8,25 @@
 <script src="/js/vv_misc_ui.js"></script>
 <script src="/js/vv_chat.js"></script>
 </head>
-<body>
+<body class="dark">
 <div class="wrapper">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="agent_photo">
-                    <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
-                </div>
-                <div class="agent_name_box">
-                    <div class="agent_name">
-                        <%= agent.name %>
-                    </div>
-                    <div class="agent_agency">
-                        <%= agent.agency || 'Video tour' %>
-                    </div>
-                    <div class="agent_phone">
-                        <i class="fa fa-phone"></i> <%= agent.phone || '' %>
-                    </div>
-                </div>
-            </div>
+    <div class="">
+        <div class="row service-block-dark">
             <div class="col-md-6">
                 <div class="property_address_box">
                     <div class="property_address">
                         <%= property.address %>
                     </div>
-                    <a target="_blank" href="https://www.google.com/maps/place/<%= mapQuery %>">View on map</a>
+                    <div class="property_map_link">
+                      <a target="_blank" href="https://www.google.com/maps/place/<%= mapQuery %>">View on map</a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="row">
+        <div class="row row-no-margins">
 
-            <div class="col-md-9 video_section panel-body">
+            <div class="col-md-9 video_section panel-body service-block service-block-dark-blue">
                 <div class="tenant_info">Your client currently on:
                     <div class="tenant_time"></div>
                     sec of video
@@ -54,8 +40,24 @@
                 <% include player/flowplayer.ejs %>
                 <% } %>
             </div>
-            <div class="col-md-3">
-                <div id="lead_chat" class="chat_box funny-boxes funny-boxes-left-green" style="display: none;">
+            <div class="col-md-3 box-low-padding">
+                <div class="agent_name_box">
+                    <div class="agent_name">
+                        <%= agent.name %>
+                    </div>
+                    <div class="agent_agency">
+                        <%= agent.agency || 'Video tour' %>
+                    </div>
+                    <div class="agent_phone">
+                        <i class="fa fa-phone"></i> <%= agent.phone || '' %>
+                    </div>
+                </div>
+                <div class="agent_photo">
+                    <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
+                </div>
+                
+            
+                <div id="lead_chat" class="chat_box service-block-light" style="display: none;">
                     <div class="voice_chat alert alert-success">
                         Voice chat activated. Feel free to talk with your agent.
                     </div>
