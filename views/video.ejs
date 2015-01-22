@@ -73,6 +73,16 @@
                     <div><input id="chat_input" placeholder="enter chat message"/></div>
 
                 </div>
+                
+                <% if (isAgent && !agentInteractive) { %>
+                
+                  <div class="chat_box service-block-light">
+                  This session is not interacting with any clients.  <br> If you'd like to communicate with a lead, 
+                  please connect via your lead notification, or open from <a href="/lead">My Leads</a> page.
+                  </div>
+                  
+                <% } %>
+                
             </div>
         </div>
         <% if (isAgent) { %>
@@ -83,7 +93,7 @@
                 </div>
             </div>
             <div class="col-md-6">
-
+                <% if (agentInteractive) { %>
                 <div class="form-group">
                     <label for="tour_select">Switch to another tour:</label>
                     <select class="form-control" id="tour_select" name="tour">
@@ -98,6 +108,7 @@
                         <% } %>
                     </select>
                 </div>
+                <% } %>
 
             </div>
         </div>
@@ -109,9 +120,15 @@
         var vv_pubnub_room_id = "SyncVideo" + "<%= property._id %>";
 
         $(function () {
-            vvzzt.ui.tourSwitchRegistration("#tour_select", 'video');
-
-            <% include text_chat.ejs %>
+            <% if (!isAgent || agentInteractive) { %>
+            
+              vvzzt.ui.tourSwitchRegistration("#tour_select", 'video');
+  
+              <% include text_chat.ejs %>
+              
+              $('#lead_chat').show();
+            
+            <% } %>
 
             var jqDiv = $(".fplayer");
             jqDiv.flowplayer({
@@ -130,7 +147,6 @@
             var jqHeartBeat = $('.tenant_time');
             var jqJumpTo = $('.jump_to');
 
-            $('#lead_chat').show();
             vvzzt.sync.listenHeartBeat(jqHeartBeat, $('.tenant_info'), playerWrapper);
 
             jqJumpTo.on('click', function () {

@@ -43,7 +43,8 @@ vvzzt.ui.tourSwitchRegistration = function(elemSelector, typeOfPage) {
             return; // does not apply to us
         }
         if (m.type === 'redirect_tour') {
-            var leadArg = vvzzt.chat ? "?lead=" + vvzzt.chat.leadId : "";
+            var hasLead = vvzzt.chat && vvzzt.chat.leadId && vvzzt.chat.leadId != "null";
+            var leadArg = hasLead ? "?lead=" + vvzzt.chat.leadId : "";
             window.location.href = "/" + typeOfPage + "/" + m.tour + leadArg;
         }
     });
