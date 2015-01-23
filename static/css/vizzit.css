@@ -8,7 +8,7 @@
 }
 
 .agent_name_box {
-	padding-left: 3px;
+    padding-left: 3px;
     text-align: left;
     font-size: 18px;
     float: left;
@@ -35,14 +35,14 @@
 }
 
 .box-low-padding {
-	padding-left: 3px;
-	padding-right: 3px;
-	padding-top: 3px;
-	padding-bottom: 3px;
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-top: 3px;
+    padding-bottom: 3px;
 }
 
 .chat_box {
-	margin-top: 3px;
+    margin-top: 3px;
     clear: both;
     float: left;
 }
@@ -98,18 +98,18 @@
 }
 
 .property_address {
-	float: left;
-	margin-left: 5px;
+    float: left;
+    margin-left: 5px;
 }
 
 .property_map_link {
-	float: left;
-	margin-left: 15px;
+    float: left;
+    margin-left: 15px;
 }
 
 .row-no-margins {
-	margin-left: 0;
-	margin-right: 0;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .team_pic {
@@ -121,10 +121,6 @@
     margin-top: 30px;
     padding: 15px;
     border: 1px solid #e7e7e7;
-}
-
-.submit_tour i {
-    display: none;
 }
 
 .terms_of_use {
@@ -190,6 +186,10 @@
     display: none;
 }
 
-.tenant_time{
+.tenant_time {
     display: inline-block;
+}
+
+#tour_form .progress {
+    display: none;
 }
