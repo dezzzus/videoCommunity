@@ -1,4 +1,5 @@
 <% include head_begin.ejs %>
+<script src="http://malsup.github.com/jquery.form.js"></script>
 <% include head_end.ejs %>
 <script>
     _gaq.push(['_setCustomVar',
@@ -48,31 +49,33 @@
                         (tenant's will not see it)
                         <input type="text" class="form-control" id="note_input" name="note"/>
                     </div>
-                    
+
                     <% if (agent.superuser) { %>
-                        <div class="form-group">
-                            <label for="agent_select">Agent:</label>
-                            <select class="form-control" id="agent_select" name="agent">
-                                <% for (var i = 0; i < agents.length;i++) { %>
-                                    <option value="<%= agents[i]._id %>"
-                                    
-                                    <% if (agent._id.toHexString() === agents[i]._id.toHexString()) { %>
-                                       selected="selected"
-                                    <% } %>
-                                    
-                                    > <%= agents[i].name %> </option>
-                                <% } %>
-                            </select>
-                        </div>
-                    <% } else { %>
-                       <input type="hidden" name="agent" value="<%= agent._id %>">
-                    <% } %>
-                    
                     <div class="form-group">
-                        <div class="submit_tour btn btn-success">
-                            <i class="fa fa-refresh fa-spin"></i>
-                            Submit
+                        <label for="agent_select">Agent:</label>
+                        <select class="form-control" id="agent_select" name="agent">
+                            <% for (var i = 0; i < agents.length;i++) { %>
+                            <option value="<%= agents[i]._id %>"
+
+                                    <% if (agent._id.toHexString() === agents[i]._id.toHexString()) { %>
+                                    selected="selected"
+                                    <% } %>
+
+                                    > <%= agents[i].name %> </option>
+                            <% } %>
+                        </select>
+                    </div>
+                    <% } else { %>
+                    <input type="hidden" name="agent" value="<%= agent._id %>">
+                    <% } %>
+
+                    <div class="form-group">
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 0;">
+                                0%
+                            </div>
                         </div>
+                        <input type="submit" value="Submit" class="submit_tour btn btn-success">
                     </div>
                 </form>
             </div>
@@ -85,18 +88,33 @@
                 'tour', // category of activity
                 'submit_new', // Action
             ]);
-            var submitBtn = $('.submit_tour');
-            submitBtn.on('click', function () {
-                submitBtn.find('i').show();
-                $('#tour_form').submit();
-            });
+
+            var jqTourForm = $('#tour_form');
+            var bar = $('.progress-bar');
+
+            var formOptions = {
+                beforeSubmit: function () {
+                    $('.progress').show();
+                },
+                success: function () {
+                    document.location.reload(true);
+                },
+                uploadProgress: function (event, position, total, percentComplete) {
+                    var percentVal = percentComplete + '%';
+                    bar.width(percentVal)
+                    bar.html(percentVal);
+                }
+            };
+
+            jqTourForm.ajaxForm(formOptions);
         });
     </script>
 
 
     <h1>All videos:</h1>
-    
-    To present a tour to your client, please click on the link below.  Once that page opens, share its full address with your client via email or text message.
+
+    To present a tour to your client, please click on the link below. Once that page opens, share its full address with
+    your client via email or text message.
 
     <table class="table table-hover">
         <thead>
@@ -113,8 +131,9 @@
             <td><a href="/video/<%= tours[i]._id %>"><%= tours[i].address %></a></td>
             <td><a class="btn btn-primary" href="/tour/<%= tours[i]._id %>">open guided</a></td>
             <td><a class="btn btn-primary" href="/tour/<%= tours[i]._id %>/edit">edit</a></td>
-            <td><a class="btn btn-danger" onclick='vvzzt.ui.followURLAfterConfirm("Are you sure you want to delete " + "<%= tours[i].address %>" + "?",
-                "/tour/<%= tours[i]._id %>/del")'>delete</a></td>
+            <td><a class="btn btn-danger"
+                   onclick='vvzzt.ui.followURLAfterConfirm("Are you sure you want to delete " + "<%= tours[i].address %>" + "?",
+                           "/tour/<%= tours[i]._id %>/del")'>delete</a></td>
         </tr>
         <% } %>
         </tbody>
