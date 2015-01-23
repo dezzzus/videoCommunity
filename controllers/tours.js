@@ -47,7 +47,8 @@ exports.addTourRoutes = function (app) {
         var newProperty = {
             playerType: 'flowplayer',
             address: req.body['address'],
-            agent: req.body['agent']
+            agent: req.body['agent'],
+            note: req.body['note']
         };
         app.collection.property.insert(newProperty, function (err, dbProp) {
             if (err) {
@@ -122,8 +123,8 @@ exports.addTourRoutes = function (app) {
         res.redirect('/tour');
     });
 
-    function renderDetails(templateName, res, property, agent, 
-                                isAgent, allAgentProperties, leadID, agentInteractive) {
+    function renderDetails(templateName, res, property, agent,
+                           isAgent, allAgentProperties, leadID, agentInteractive) {
         res.render(templateName, {
             property: property,
             mapQuery: property.address.split(' ').join('+'),
@@ -131,9 +132,9 @@ exports.addTourRoutes = function (app) {
             allProperties: allAgentProperties,
             isAgent: isAgent,
             videoID: property.videoID || property._id,
-            leadID : leadID || null,
-            leadHeartbeatInterval : app.leadHeartbeatInterval || null,
-            agentInteractive : agentInteractive
+            leadID: leadID || null,
+            leadHeartbeatInterval: app.leadHeartbeatInterval || null,
+            agentInteractive: agentInteractive
         });
     }
 
@@ -153,7 +154,7 @@ exports.addTourRoutes = function (app) {
                                     if (allprop_err) {
                                         next(allprop_err);
                                     }
-                                    renderDetails(templateName, res, property, agent, 
+                                    renderDetails(templateName, res, property, agent,
                                         isAgent, tours, leadID, agentInteractive);
                                 });
                         }
@@ -180,11 +181,11 @@ exports.addTourRoutes = function (app) {
     app.get('/video/:pid', function (req, res, next) {
         handlePropertyDetails(req, res, next, 'video', false);
     });
-    
+
     app.get('/video_lead/:pid', lib.ensureAuthenticated, function (req, res, next) {
         handlePropertyDetails(req, res, next, 'video', false);
     });
-    
+
 
     function tourManageAction(req, res, next, actionFunc) {
         var pid = req.param('pid');
