@@ -10,7 +10,7 @@
 </head>
 <body class="dark">
 <div class="wrapper">
-    <div class="">
+    <div>
         <div class="row service-block-dark">
             <div class="col-md-6">
                 <div class="property_address_box">
@@ -20,6 +20,11 @@
                     <div class="property_map_link">
                       <a target="_blank" href="https://www.google.com/maps/place/<%= mapQuery %>">View on map</a>
                     </div>
+                    <% if(isAgent){ %>
+                    <div>
+                        <%= property.note %>
+                    </div>
+                    <% } %>
                 </div>
             </div>
         </div>
