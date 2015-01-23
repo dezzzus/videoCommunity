@@ -1,6 +1,8 @@
 var lib = require('../lib');
 var mongodb = require('mongodb');
 var ObjectID = mongodb.ObjectID;
+var Busboy = require('busboy');
+
 
 exports.addTourRoutes = function (app) {
     function processAgentTours(req, res, next, agent) {
@@ -44,83 +46,71 @@ exports.addTourRoutes = function (app) {
     });
 
     app.post('/tour', lib.ensureAuthenticated, function (req, res, next) {
-        var newProperty = {
-            playerType: 'flowplayer',
-            address: req.body['address'],
-            agent: req.body['agent'],
-            note: req.body['note']
-        };
-        app.collection.property.insert(newProperty, function (err, dbProp) {
-            if (err) {
-                next(err);
-            }
 
-            if (req.files.videoFile) {
-                var fileStream = app.fs.createReadStream(req.files.videoFile.path);
-                fileStream.on('error', function (err) {
-                    if (err) {
-                        reportError(err);
-                    }
-                });
-                fileStream.on('open', function () {
-                    var s3 = new app.AWS.S3();
-                    s3.putObject({
-                        Bucket: 'vizzitupload',
-                        Key: req.files.videoFile.name,
-                        Body: fileStream
-                    }, function (err) {
-                        if (err) {
-                            reportError(err);
+        var busboy = new Busboy({headers: req.headers});
+
+        busboy.on('file', function (fieldname, file, filename) {
+            req.session.lastVideoId = req.user._id.toHexString() + filename.replace(/\W+/g, '-').toLowerCase() + Date.now();
+
+            var upload = app.s3Stream.upload({
+                Bucket: 'vizzitupload',
+                Key: req.session.lastVideoId
+            });
+
+            upload.on('uploaded', function () {
+                var transcoder = new app.AWS.ElasticTranscoder();
+                transcoder.createJob(
+                    {
+                        PipelineId: '1419791970323-1aherg',
+                        Input: {
+                            Key: req.session.lastVideoId
+                        },
+                        Output: {
+                            Key: req.session.lastVideoId + '.mp4',
+                            PresetId: '1351620000001-100070'
                         }
+                    },
+                    function (err) {
+                        if (err) {
+                            lib.reportError(err);
+                        }
+                    }
+                );
+            });
 
-                        app.fs.unlink(req.files.videoFile.path, function (del_err) {
-                            if (del_err) {
-                                reportError(del_err);
-                            }
-                        });
+            upload.on('error', function (err) {
+                if (err) {
+                    lib.reportError(err);
+                }
+            });
 
-
-                        var transcoder = new app.AWS.ElasticTranscoder();
-                        transcoder.createJob(
-                            {
-                                PipelineId: '1419791970323-1aherg',
-                                Input: {
-                                    Key: req.files.videoFile.name
-                                },
-                                Output: {
-                                    Key: dbProp[0]._id.toHexString() + '.mp4',
-                                    PresetId: '1351620000001-100070'
-                                }
-                            },
-                            function (err) {
-                                if (err) {
-                                    reportError(err);
-                                }
-                            }
-                        );
-
-                        transcoder.createJob(
-                            {
-                                PipelineId: '1419791970323-1aherg',
-                                Input: {
-                                    Key: req.files.videoFile.name
-                                },
-                                Output: {
-                                    Key: dbProp[0]._id.toHexString() + '.webm',
-                                    PresetId: '1420142016747-83m02n'
-                                }
-                            },
-                            function (err) {
-                                if (err) {
-                                    reportError(err);
-                                }
-                            }
-                        );
-                    });
-                });
-            }
+            file.pipe(upload);
         });
-        res.redirect('/tour');
+
+        busboy.on('field', function (fieldname, val) {
+            req.session.lastTour = req.session.lastTour || {};
+            req.session.lastTour[fieldname] = val;
+        });
+
+        busboy.on('finish', function () {
+            var newProperty = {
+                playerType: 'flowplayer',
+                address: req.session.lastTour['address'],
+                agent: req.session.lastTour['agent'],
+                note: req.session.lastTour['note'],
+                videoID: req.session.lastVideoId
+            };
+            app.collection.property.insert(newProperty, function (err, dbProp) {
+                if (err) {
+                    next(err);
+                }
+
+            });
+
+            res.redirect('/tour');
+        });
+
+        return req.pipe(busboy);
     });
 
     function renderDetails(templateName, res, property, agent,

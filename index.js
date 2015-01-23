@@ -24,7 +24,7 @@ var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
 var app = express();
 app.collection = {};
 app.fs = require('fs');
-app.multer = require('multer');
+
 app.AWS = require('aws-sdk');
 app.AWS.config.update({
     accessKeyId: 'AKIAJZUHGBIVMAN6BKSA',
@@ -38,33 +38,13 @@ app.awsMailer = nodemailer.createTransport({
         pass: 'Al622BfthhR2gRePM54XjwpXS6mnDaf45SdbjOQJ+k7s'
     }
 });
-
+app.s3Stream = require('s3-upload-stream')(new app.AWS.S3());
 
 
 function saltedHash(original) {
     var salt = bcrypt.genSaltSync(10);
     var newHash = bcrypt.hashSync(original, salt);
     return newHash;
-}
-
-function reportError(err) {
-    // Always dump for logging:
-    console.log("Error found: " + err);
-    console.log("Eurrent time: " + new Date());
-    console.log("Stack\n" + err.stack);
-    
-    if (process.env.OPENSHIFT_NODEJS_IP){
-        app.awsMailer.sendMail({
-            from: 'noreply@virtualvizzit.com',
-            to: 'shikolay@gmail.com',
-            subject: 'Virtualvizzit errors',
-            text: JSON.stringify(err) + '\n' + err.stack
-        }, function (email_err, info) {
-            if (email_err) {
-                console.log("Can't email due to " + email_err);
-            }
-        });
-    }
 }
 
 app.set('trust proxy', true);
@@ -123,13 +103,6 @@ app.use(function(req, res, next){
     }
     next();
 });
-
-app.use(app.multer({
-    dest: __dirname,
-    limits: {
-        fileSize: 0.8e9
-    }
-}));
 
 app.set('view engine', 'ejs');
 
@@ -334,7 +307,7 @@ app.get('*', function (req, res) {
 });
 
 app.use(function (err, req, res, next) {
-    reportError(err);
+    lib.reportError(err);
     res.status(500).render('500');
 });
 
