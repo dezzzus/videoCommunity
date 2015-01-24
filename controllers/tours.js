@@ -67,7 +67,7 @@ exports.addTourRoutes = function (app) {
                         },
                         Output: {
                             Key: req.session.lastVideoId + '.mp4',
-                            PresetId: '1351620000001-100070'
+                            PresetId: '1422061863164-aap2z3'
                         }
                     },
                     function (err) {
