@@ -14,6 +14,7 @@ var tourController = require('./controllers/tours');
 var leadController = require('./controllers/leads');
 var apiController = require('./controllers/api')
 var nodemailer = require('nodemailer');
+var aws_transcoder = require('./aws_transcode.js');
 
 var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
 var ipaddress = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
@@ -40,6 +41,7 @@ app.awsMailer = nodemailer.createTransport({
 });
 app.s3Stream = require('s3-upload-stream')(new app.AWS.S3());
 
+app.transcoder = aws_transcoder.getTranscoderFunctions(app);
 
 function saltedHash(original) {
     var salt = bcrypt.genSaltSync(10);

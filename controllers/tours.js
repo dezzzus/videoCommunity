@@ -50,7 +50,8 @@ exports.addTourRoutes = function (app) {
         var busboy = new Busboy({headers: req.headers});
 
         busboy.on('file', function (fieldname, file, filename) {
-            req.session.lastVideoId = req.user._id.toHexString() + filename.replace(/\W+/g, '-').toLowerCase() + Date.now();
+            var userId = req.user._id.toHexString();
+            req.session.lastVideoId = userId + filename.replace(/\W+/g, '-').toLowerCase() + Date.now();
 
             var upload = app.s3Stream.upload({
                 Bucket: 'vizzitupload',
@@ -58,24 +59,12 @@ exports.addTourRoutes = function (app) {
             });
 
             upload.on('uploaded', function () {
-                var transcoder = new app.AWS.ElasticTranscoder();
-                transcoder.createJob(
-                    {
-                        PipelineId: '1419791970323-1aherg',
-                        Input: {
-                            Key: req.session.lastVideoId
-                        },
-                        Output: {
-                            Key: req.session.lastVideoId + '.mp4',
-                            PresetId: '1422061863164-aap2z3'
-                        }
-                    },
+                app.transcoder.transcode(userId, req.session.lastVideoId, 
                     function (err) {
-                        if (err) {
-                            lib.reportError(err);
-                        }
+                    if (err) {
+                        lib.reportError(err);
                     }
-                );
+                });
             });
 
             upload.on('error', function (err) {
@@ -98,7 +87,8 @@ exports.addTourRoutes = function (app) {
                 address: req.session.lastTour['address'],
                 agent: req.session.lastTour['agent'],
                 note: req.session.lastTour['note'],
-                videoID: req.session.lastVideoId
+                videoID: req.session.lastVideoId,
+                creationDate: new Date()
             };
             app.collection.property.insert(newProperty, function (err, dbProp) {
                 if (err) {
