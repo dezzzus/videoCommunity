@@ -6,7 +6,7 @@
 
         <div class="col-md-4">
             <div class="formbox">
-                <form action="/signup" method="post">
+                <form action="/signup" method="post" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="email_input">Email:</label>
                         <input type="text" class="form-control" id="email_input" name="email"/>
@@ -23,9 +23,21 @@
                         <label for="agency_input">Agency:</label>
                         <input type="text" class="form-control" id="agency_input" name="agency"/>
                     </div>
+                    <%if (usePhotoFile) { %>
+                      <div class="form-group">
+                          <label for="photofile_input">Your photo:</label>
+                          <input type="file" class="form-control" id="photofile_input" name="photoFile"/>
+                      </div>
+                    <% } else { %>
+                      <div class="form-group">
+                          <label for="photo_input">Photo URL:</label>
+                          <input type="text" class="form-control" id="photo_input" name="photoURL"/>
+                      </div>
+                    <% } %>
+                    
                     <div class="form-group">
-                        <label for="photo_input">Photo URL:</label>
-                        <input type="text" class="form-control" id="photo_input" name="photoURL"/>
+                        <label for="logofile_input">Logo to embed in your videos (optional): </label>
+                        <input type="file" class="form-control" id="logofile_input" name="logoFile"/>
                     </div>
                     <div class="form-group">
                         <label for="password_input">Password:</label>

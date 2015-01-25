@@ -24,8 +24,8 @@ module.exports = {
 
     },
 
-    processReqField: function (req, obj, fieldName, updatedFields, conditionFunc, setFunc) {
-        var reqValue = req.body[fieldName];
+    processReqField: function (reqMap, obj, fieldName, updatedFields, conditionFunc, setFunc) {
+        var reqValue = reqMap[fieldName];
         if (reqValue !== '' &&
             (!conditionFunc && reqValue !== obj[fieldName] ||
             conditionFunc && conditionFunc(obj, reqValue))) {
@@ -61,7 +61,16 @@ module.exports = {
                 }
             });
         }
+    },
+    
+    randomInt: function (low, high) {
+        return Math.floor(Math.random() * (high - low) + low);
+    },
+    
+    fixupAgentPhotoURL: function(agent) {
+        if (!agent.photoURL || agent.photoURL === '') {
+            agent.photoURL = 'http://cdn.virtualvizzit.com/' + agent.photoFileId;
+        }
     }
-
 
 };

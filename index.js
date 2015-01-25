@@ -14,12 +14,15 @@ var tourController = require('./controllers/tours');
 var leadController = require('./controllers/leads');
 var apiController = require('./controllers/api')
 var nodemailer = require('nodemailer');
+var aws_transcoder = require('./aws_transcode.js');
+var Busboy = require('busboy');
+
 
 var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
 var ipaddress = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
 var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
 
-
+var usePhotoFileInsteadOfURL = true;
 
 var app = express();
 app.collection = {};
@@ -40,6 +43,7 @@ app.awsMailer = nodemailer.createTransport({
 });
 app.s3Stream = require('s3-upload-stream')(new app.AWS.S3());
 
+app.transcoder = aws_transcoder.getTranscoderFunctions(app);
 
 function saltedHash(original) {
     var salt = bcrypt.genSaltSync(10);
@@ -230,75 +234,128 @@ app.post('/resetpass', function (req, res, next) {
 });
 
 app.get('/signup', function (req, res) {
-    res.render('signup');
+    res.render('signup', {usePhotoFile : usePhotoFileInsteadOfURL});
 });
 
-app.post('/signup', function (req, res, next) {
-    if (req.body['terms']) {
-        lib.safeFindOne(app.collection.agent, {email: req.body['email']}, function (user) {
-            if (user) {
-                res.redirect('/signup');
-            }
-            else {
-                var hash = saltedHash(req.body['password']);
-                app.collection.agent.insert({
-                    email: req.body['email'],
-                    name: req.body['name'],
-                    phone: req.body['phone'],
-                    agency: req.body['agency'],
-                    photoURL: req.body['photoURL'],
-                    passwordHash: hash,
-                    superuser: false, // for now, every new user is NOT a super user unless manually changed in DB
-                    approved: false // every user must be approved in order to access functions.  When not approved, 
-                                    // we are just collecting them for future engagement.
-                }, function (err, agent) {
-                    if (err) {
-                        next(err);
-                    }
+var createBusboyForAgent = function(req, res, next) {
+    var busboy = new Busboy({headers: req.headers});
+    busboy.currentAgent = {}; // safer to keep here than in session
 
-                    res.redirect('/login');
-                });
+    busboy.on('file', function (fieldname, file, filename) {
+        if (fieldname !== 'photoFile' && fieldname !== 'logoFile') {
+            lib.reportError('unknown file field in agent: ' + fieldname);
+            return;
+        }
+        
+        var photoFileType = fieldname + 'Id';
+        var photoFileName = !filename || filename === '' ? 
+            '' : photoFileType + lib.randomInt(10000, 99999) + Date.now() + filename.toLowerCase();
+        busboy.currentAgent[photoFileType] = photoFileName;
+
+        var upload = app.s3Stream.upload({
+            Bucket: fieldname === 'photoFile' ? 'vizzitvideo' : 'vizzitupload',
+            Key: photoFileName
+        });
+
+        upload.on('error', function (err) {
+            if (err) {
+                lib.reportError(err);
             }
-        }, next);
-    }
-    else {
-        res.redirect('/signup');
-    }
+        });
+
+        file.pipe(upload);
+    });
+
+    busboy.on('field', function (fieldname, val) {
+        busboy.currentAgent[fieldname] = val;
+    });
+    return busboy;
+};
+
+app.post('/signup', function (req, res, next) {
+    var busboy = createBusboyForAgent(req, res, next);
+    busboy.on('finish', function () {
+        if (!busboy.currentAgent['terms']) {
+            res.redirect('/signup');
+        }
+        else {
+            lib.safeFindOne(app.collection.agent, {email: busboy.currentAgent['email']}, function (user) {
+                if (user) {
+                    res.redirect('/signup');
+                }
+                else {
+                    var hash = saltedHash(busboy.currentAgent['password']);
+                    app.collection.agent.insert({
+                        email: busboy.currentAgent['email'],
+                        name: busboy.currentAgent['name'],
+                        phone: busboy.currentAgent['phone'],
+                        agency: busboy.currentAgent['agency'],
+                        photoFileId: busboy.currentAgent['photoFileId'],
+                        photoURL: req.body['photoURL'],
+                        logoFileId: busboy.currentAgent['logoFileId'],
+                        passwordHash: hash,
+                        superuser: false, // new user is NOT a super user unless manually changed in DB
+                        approved: false, // every user must be approved in order to access functions.  When not approved, 
+                                         // we are just collecting them for future engagement.
+                        creationDate: new Date() // for ease of tracking
+                    }, function (err, agent) {
+                        if (err) {
+                            next(err);
+                        }
+
+                        res.redirect('/login');
+                    });
+                }
+            }, next);
+        }
+    });
+
+    return req.pipe(busboy);
 });
 
 app.get('/profile', lib.ensureAuthenticated, function (req, res) {
-    res.render('profile');
+    lib.fixupAgentPhotoURL(req.user);
+    res.render('profile', {usePhotoFile : usePhotoFileInsteadOfURL});
 });
 
 app.post('/profile', lib.ensureAuthenticated, function (req, res, next) {
-    var updatedFields = {};
-    lib.processReqField(req, req.user, 'name', updatedFields);
-    lib.processReqField(req, req.user, 'email', updatedFields);
-    lib.processReqField(req, req.user, 'phone', updatedFields);
-    lib.processReqField(req, req.user, 'agency', updatedFields);
-    lib.processReqField(req, req.user, 'photoURL', updatedFields);
-    lib.processReqField(req, req.user, 'password', updatedFields,
-        function (user, reqPassword) {
-            return !bcrypt.compareSync(reqPassword, user.passwordHash);
-        },
-        function (fields, reqPassword) {
-            console.log("setting new password: " + reqPassword);
-            var newHash = saltedHash(reqPassword);
-            fields.passwordHash = newHash;
-        }
-    );
-
-    if (!lib.isEmptyObject(updatedFields)) { // $set does not like empty!
-        app.collection.agent.update({_id: req.user._id}, {'$set': updatedFields}, function (err, updatedUser) {
-            if (err) {
-                next(err);
+    var busboy = createBusboyForAgent(req, res, next);
+    busboy.on('finish', function () {
+        var updatedFields = {};
+        lib.processReqField(busboy.currentAgent, req.user, 'name', updatedFields);
+        lib.processReqField(busboy.currentAgent, req.user, 'email', updatedFields);
+        lib.processReqField(busboy.currentAgent, req.user, 'phone', updatedFields);
+        lib.processReqField(busboy.currentAgent, req.user, 'agency', updatedFields);
+        lib.processReqField(busboy.currentAgent, req.user, 'photoFileId', updatedFields);
+        lib.processReqField(busboy.currentAgent, req.user, 'photoURL', updatedFields);
+        lib.processReqField(busboy.currentAgent, req.user, 'logoFileId', updatedFields);
+        lib.processReqField(busboy.currentAgent, req.user, 'password', updatedFields,
+            function (user, reqPassword) {
+                return !bcrypt.compareSync(reqPassword, user.passwordHash);
+            },
+            function (fields, reqPassword) {
+                console.log("setting new password: " + reqPassword);
+                var newHash = saltedHash(reqPassword);
+                fields.passwordHash = newHash;
             }
+        );
+
+        if (!lib.isEmptyObject(updatedFields)) { // $set does not like empty!
+            app.collection.agent.update({_id: req.user._id}, {'$set': updatedFields}, function (err, updatedUser) {
+                if (err) {
+                    next(err);
+                }
+                res.redirect('/profile');
+            })
+        }
+        else {
             res.redirect('/profile');
-        })
-    }
-    else {
-        res.redirect('/profile');
-    }
+        }
+    });
+
+    return req.pipe(busboy);
+
+    
 });
 
 //404 route should be always be last route
