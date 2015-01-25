@@ -12,7 +12,7 @@ module.exports = {
         
         var getAgentWatermarkName = function(agentId, callback) {
             lib.safeFindOne(app.collection.agent, {'_id': ObjectID(agentId)}, function (agent) {
-                callback("logo.jpg");
+                callback(agent.logoFileId);
             });
         };
         
@@ -108,9 +108,20 @@ module.exports = {
         
         return {
             transcode: function(agentId, videoId, onError) {
-                getAgentWatermarkName(agentId, function(watermark){
-                    getPresetForWatermark(true, function(presetName) {
+                getAgentWatermarkName(agentId, function(watermarkName){
+                    
+                    var forcePresetRecreation = false; // Set to true if playing with watermark settings
+                    
+                    getPresetForWatermark(forcePresetRecreation, function(presetName) {
                         console.log("transcoding: " + presetName);
+                        watermarks = [];
+                        if (watermarkName && watermarkName !== '') {
+                            watermarks.push({
+                                InputKey: watermarkName,
+                                PresetWatermarkId: watermarkId
+                            });
+                        }
+                        
                         transcoder.createJob(
                             {
                                 PipelineId: '1419791970323-1aherg',
@@ -120,10 +131,7 @@ module.exports = {
                                 Output: {
                                     Key: videoId + '.mp4',
                                     PresetId: presetName,
-                                    Watermarks: [{
-                                        InputKey: watermark,
-                                        PresetWatermarkId: watermarkId
-                                    }]
+                                    Watermarks: watermarks
                                 }
                             },
                             onError

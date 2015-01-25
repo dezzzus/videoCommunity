@@ -20,7 +20,9 @@ exports.addTourRoutes = function (app) {
                         }
                         res.render('tour', {
                             tours: tours.sort(function (a, b) {
-                                return a.address.localeCompare(b.address);
+                                var aStr = a.address || "";
+                                var bStr = b.address || "";
+                                return aStr.localeCompare(bStr);
                             }),
                             agent: agent,
                             agents: agent.superuser ? agents : [agent]
@@ -105,6 +107,7 @@ exports.addTourRoutes = function (app) {
 
     function renderDetails(templateName, res, property, agent,
                            isAgent, allAgentProperties, leadID, agentInteractive) {
+        lib.fixupAgentPhotoURL(agent);
         res.render(templateName, {
             property: property,
             mapQuery: property.address.split(' ').join('+'),
@@ -201,7 +204,7 @@ exports.addTourRoutes = function (app) {
     app.post('/tour/:pid/edit', lib.ensureAuthenticated, function (req, res, next) {
         tourManageAction(req, res, next, function (property, pid) {
             var updatedFields = {};
-            lib.processReqField(req, property, 'address', updatedFields);
+            lib.processReqField(req.body, property, 'address', updatedFields);
 
             if (!lib.isEmptyObject(updatedFields)) {
                 app.collection.property.update({_id: ObjectID(pid)}, {'$set': updatedFields}, function (err, updatedProp) {
