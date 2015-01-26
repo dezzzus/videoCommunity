@@ -4,6 +4,8 @@
  * For now, both viewer and presenter modes implementations are in one place.
  * In a way, it's easier to comprehend it that way, to see both sides in one place.
  * In the future, when it all works well, we can separate into common code and two subclasses.
+ * 
+ * Note: this depends on vvzzt.chat namespace
  *
  * @param roomId
  * @param player
@@ -27,22 +29,25 @@ vvzzt.sync.syncHeartBeat = false;
 
 vvzzt.sync.publishHeartBeat = function (player) {
     setInterval(function () {
-        player.api('getCurrentTime', function (curPos) {
-            player.api('paused', function (isPaused) {
-                // If this is the presenter, and either enough position changed or state changed, publish!
-                vvzzt.pubnub.pubnubPublish({
-                    type: 'heartbeat',
-                    position: curPos,
-                    isPlaying: !isPaused
+        if (vvzzt.chat.leadId) {
+            player.api('getCurrentTime', function (curPos) {
+                player.api('paused', function (isPaused) {
+                    // If this is the presenter, and either enough position changed or state changed, publish!
+                    vvzzt.pubnub.pubnubPublish({
+                        type: 'heartbeat',
+                        position: curPos,
+                        isPlaying: !isPaused,
+                        leadId: vvzzt.chat.leadId
+                    });
                 });
             });
-        });
+        }
     }, 1000);
 };
 
 vvzzt.sync.listenHeartBeat = function (jqBeatEl, jqNotifEl, player) {
     vvzzt.pubnub.pubnubSubscribe(function (msg) {
-        if (msg.type == 'heartbeat') {
+        if (msg.type == 'heartbeat' && vvzzt.chat.leadId === msg.leadId) {
             if (msg.position > 0) {
                 if (!jqNotifEl.is(':visible')) {
                     jqNotifEl.show();
