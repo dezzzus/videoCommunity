@@ -26,7 +26,7 @@ vvzzt.chat.addToChatOutput = function(coutput, first, uname, msg, fromMe) {
     }
     coutput.html( prev + '<div class="oneChatMsg"><div class="'+nameClass+'">'+uname+':&nbsp;</div>'+ 
         '<div class="'+msgClass+'">' + (''+msg).replace( /[<>]/g, '' ) + '</div></div>' );
-    coutput.scrollTop(coutput.height());
+    coutput.scrollTop(coutput[0].scrollHeight);
   
 };
 
