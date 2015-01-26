@@ -32,15 +32,18 @@
         <div class="row row-no-margins">
 
             <div class="col-md-9 video_section panel-body service-block service-block-dark-blue">
-                <div class="tenant_info">Your client currently on:
-                    <div class="tenant_time"></div>
-                    sec of video
-                    <a class="jump_to">Sync my player</a>
-
-                    <div>
-                        <input type="checkbox" class="always_sync"/> Keep in sync
-                    </div>
-                </div>
+                <%if (agentInteractive) { %>
+                  <div class="tenant_info">Your client currently on:
+                      <div class="tenant_time"></div>
+                      sec of video
+                      <a class="jump_to">Sync my player</a>
+  
+                      <div>
+                          <input type="checkbox" class="always_sync"/> Keep in sync
+                      </div>
+                  </div>
+                <% } %>
+                
                 <% if(property.playerType == 'flowplayer'){ %>
                 <% include player/flowplayer.ejs %>
                 <% } %>
