@@ -98,11 +98,11 @@ passport.use(new LocalStrategy({
 
 app.use(express.static(__dirname + '/static'));
 
-app.use(function(req, res, next){
-    if(req.user){
+app.use(function (req, res, next) {
+    if (req.user) {
         app.locals.user = req.user;
     }
-    else{
+    else {
         app.locals.user = null;
     }
     next();
@@ -171,14 +171,20 @@ app.get('/login', function (req, res) {
     res.render('login');
 });
 
-app.post('/login', function(req, res, next) {
-    passport.authenticate('local', function(err, user, info) {
-        if (err) { return next(err); }
+app.post('/login', function (req, res, next) {
+    passport.authenticate('local', function (err, user, info) {
+        if (err) {
+            return next(err);
+        }
         // Redirect if it fails
-        if (!user) { return res.redirect('/login'); }
-        req.logIn(user, function(err) {
-            if (err) { return next(err); }
-            
+        if (!user) {
+            return res.redirect('/login');
+        }
+        req.logIn(user, function (err) {
+            if (err) {
+                return next(err);
+            }
+
             // Redirect if it succeeds
             return res.redirect(req.session.returnTo || '/tour');
         });
@@ -234,10 +240,10 @@ app.post('/resetpass', function (req, res, next) {
 });
 
 app.get('/signup', function (req, res) {
-    res.render('signup', {usePhotoFile : usePhotoFileInsteadOfURL});
+    res.render('signup', {usePhotoFile: usePhotoFileInsteadOfURL});
 });
 
-var createBusboyForAgent = function(req, res, next) {
+var createBusboyForAgent = function (req, res, next) {
     var busboy = new Busboy({headers: req.headers});
     busboy.currentAgent = {}; // safer to keep here than in session
 
@@ -246,9 +252,9 @@ var createBusboyForAgent = function(req, res, next) {
             lib.reportError('unknown file field in agent: ' + fieldname);
             return;
         }
-        
+
         var photoFileType = fieldname + 'Id';
-        var photoFileName = !filename || filename === '' ? 
+        var photoFileName = !filename || filename === '' ?
             '' : photoFileType + lib.randomInt(10000, 99999) + Date.now() + filename.toLowerCase();
         busboy.currentAgent[photoFileType] = photoFileName;
 
@@ -315,7 +321,7 @@ app.post('/signup', function (req, res, next) {
 
 app.get('/profile', lib.ensureAuthenticated, function (req, res) {
     lib.fixupAgentPhotoURL(req.user);
-    res.render('profile', {usePhotoFile : usePhotoFileInsteadOfURL});
+    res.render('profile', {usePhotoFile: usePhotoFileInsteadOfURL});
 });
 
 app.post('/profile', lib.ensureAuthenticated, function (req, res, next) {
@@ -355,7 +361,44 @@ app.post('/profile', lib.ensureAuthenticated, function (req, res, next) {
 
     return req.pipe(busboy);
 
-    
+
+});
+
+app.get('/approve', lib.ensureAuthenticated, function (req, res, next) { //Will blow up if we will have tons of agents
+    if (req.user.superuser) {
+        app.collection.agent.find({}).toArray(
+            function(err, agents){
+                if(err){
+                    next(err);
+                    return false;
+                }
+
+                res.render('approve',{
+                    agents: agents
+                });
+            }
+        );
+    }
+    else {
+        res.status(404).render('404');
+    }
+});
+
+app.get('/approve/:aid', lib.ensureAuthenticated, function (req, res, next) {
+    if (req.user.superuser) {
+        var aid = req.param('aid');
+        app.collection.agent.update({_id: ObjectID(aid)}, {'$set':{approved:true}}, function(err){
+            if(err){
+                next(err);
+                return false;
+            }
+            res.redirect('/approve');
+        });
+
+    }
+    else {
+        res.status(404).render('404');
+    }
 });
 
 //404 route should be always be last route
