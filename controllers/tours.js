@@ -66,7 +66,7 @@ exports.addTourRoutes = function (app) {
                     if (err) {
                         lib.reportError(err);
                     }
-                });
+                }, next);
             });
 
             upload.on('error', function (err) {
