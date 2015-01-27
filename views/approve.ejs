@@ -6,19 +6,27 @@
         <tr>
             <th>Email</th>
             <th></th>
+            <th>Tours</th>
         </tr>
         </thead>
         <tbody>
         <% for (var i = 0; i < agents.length;i++){ %>
         <tr>
             <td><%= agents[i].email %></td>
-            <td>
-                <% if(!agents[i].approved){ %>
-                <a href="/approve/<%= agents[i]._id %>" class="btn btn-success">Approve</a>
-                <% }else{ %>
-                Approved
-                <% } %>
-            </td>
+            <% if(!agents[i].approved){ %>
+	            <td>
+	                <a href="/approve/<%= agents[i]._id %>" class="btn btn-success">Approve</a>
+	            </td>
+	            <td>
+	            </td>
+            <% }else{ %>
+                <td>
+                    Approved
+                </td>
+	            <td>
+	                <a href="/tour?userid=<%= agents[i]._id %>">Tours page</a>
+	            </td>
+            <% } %>
         </tr>
         <% } %>
         </tbody>
