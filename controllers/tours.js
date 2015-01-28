@@ -205,6 +205,7 @@ exports.addTourRoutes = function (app) {
         tourManageAction(req, res, next, function (property, pid) {
             var updatedFields = {};
             lib.processReqField(req.body, property, 'address', updatedFields);
+            lib.processReqField(req.body, property, 'note', updatedFields);
 
             if (!lib.isEmptyObject(updatedFields)) {
                 app.collection.property.update({_id: ObjectID(pid)}, {'$set': updatedFields}, function (err, updatedProp) {
