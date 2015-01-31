@@ -1,13 +1,41 @@
 <% include head_begin.ejs %>
+<script>
+    var _gaq = _gaq || [];
+
+    _gaq.push(['_setCustomVar',
+        1,
+        'IsAgent',
+        '<%= isAgent %>',
+        3 // page level
+    ]);
+    _gaq.push(['_setCustomVar',
+        2,
+        'AgentId',
+        '<%= agent._id %>',
+        3 // page level
+    ]);
+    _gaq.push(['_setCustomVar',
+        3,
+        'Address',
+        '<%= property.address %>',
+        3 // page level
+    ]);
+</script>
+
+
 <% if (isAgent) { %>
 <% include head_end.ejs %>
+<% } else { %>
+<% include head_ga.ejs %>
 <% } %>
+
 <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
 <script src="/js/vv_pubnub.js"></script>
 <script src="/js/vv_sync.js"></script>
 <script src="/js/vv_misc_ui.js"></script>
 <script src="/js/vv_chat.js"></script>
 </head>
+
 <body>
 <div class="wrapper">
     <div>
