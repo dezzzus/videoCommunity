@@ -154,7 +154,8 @@ exports.addTourRoutes = function (app) {
                                         
                                         renderDetails(templateName, res, property, agent,
                                             isAgent, null, leadID, agentInteractive, 
-                                            tours.filter(function(t){return !t._id.equals(property._id);}));
+                                            tours.filter(function(t){return !t._id.equals(property._id);})
+                                                .sort(tourAlphaComp));
                                     }
                                 });
                             
