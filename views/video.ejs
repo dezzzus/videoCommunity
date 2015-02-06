@@ -149,6 +149,23 @@
             </div>
         </div>
         <% } %>
+        
+        <div class="row">
+          <% if (otherGroupProperties.length > 0) { %>
+            
+            <div class="col-md-6">
+            Other similar properties:
+                <% for (var i = 0; i < otherGroupProperties.length;i++) { %>
+                <div>
+
+
+                    <a href="<%="/video/"+otherGroupProperties[i]._id.toHexString() %>"> <%=otherGroupProperties[i].address %></a>
+                </div>
+                <% } %>
+            </div>
+          <% } %>
+        </div>
+        
     </div>
     <script type="application/javascript">
         // global needed to be set before onLoad stuff happens
