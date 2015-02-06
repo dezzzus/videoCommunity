@@ -73,7 +73,8 @@ module.exports = {
                                 Output: {
                                     Key: videoId + '.mp4',
                                     PresetId: presetName,
-                                    Watermarks: watermarks
+                                    Watermarks: watermarks,
+                                    ThumbnailPattern : videoId + "-thumb-{count}"
                                 }
                             },
                             onError

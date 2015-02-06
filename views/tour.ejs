@@ -124,6 +124,7 @@
     <table class="table table-hover">
         <thead>
         <tr>
+            <td></td>
             <td>Address</td>
             <td>Note</td>
             <td>Group</td>
@@ -135,6 +136,14 @@
         <tbody>
         <% for (var i = 0; i < tours.length;i++){ %>
         <tr>
+            <td>
+              <% if (tours[i].hasThumb) { %>
+              <a href="<%="http://cdn.virtualvizzit.com/"+ tours[i].videoID+"-thumb-00001.png"%>">
+                <img class="tour_thumb" alt="Thumbnail" src="<%="http://cdn.virtualvizzit.com/"+ tours[i].videoID+
+                "-thumb-00001.png"%>">
+              </a>
+              <% } %>
+            </td>
             <td><a href="/video/<%= tours[i]._id %>"><%= tours[i].address %></a></td>
             <td><div class="tour_note"><%= tours[i].note%></div></td>
             <td><div class="tour_note"><%= tours[i].group || ''%></div></td>
