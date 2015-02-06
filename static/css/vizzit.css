@@ -7,6 +7,10 @@
     max-height: 90px;
 }
 
+.tour_thumb {
+    max-width: 40px;
+}
+
 .agent_name_box {
     padding-left: 3px;
     text-align: left;

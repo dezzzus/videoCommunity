@@ -91,6 +91,7 @@ exports.addTourRoutes = function (app) {
                 note: req.session.lastTour['note'],
                 group: req.session.lastTour['group'],
                 videoID: req.session.lastVideoId,
+                hasThumb : true, // from this point on, all videos have thumbnails
                 creationDate: new Date()
             };
             app.collection.property.insert(newProperty, function (err, dbProp) {
