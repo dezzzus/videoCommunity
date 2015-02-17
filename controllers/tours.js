@@ -2,7 +2,11 @@ var lib = require('../lib');
 var mongodb = require('mongodb');
 var ObjectID = mongodb.ObjectID;
 var Busboy = require('busboy');
-
+var tourAlphaComp = function (a, b) {
+    var aStr = a.address || "";
+    var bStr = b.address || "";
+    return aStr.localeCompare(bStr);
+};
 
 exports.addTourRoutes = function (app) {
     function processAgentTours(req, res, next, agent) {
@@ -19,11 +23,7 @@ exports.addTourRoutes = function (app) {
                             return false;
                         }
                         res.render('tour', {
-                            tours: tours.sort(function (a, b) {
-                                var aStr = a.address || "";
-                                var bStr = b.address || "";
-                                return aStr.localeCompare(bStr);
-                            }),
+                            tours: tours.sort(tourAlphaComp),
                             agent: agent,
                             agents: agent.superuser ? agents : [agent]
                         });
@@ -89,7 +89,9 @@ exports.addTourRoutes = function (app) {
                 address: req.session.lastTour['address'],
                 agent: req.session.lastTour['agent'],
                 note: req.session.lastTour['note'],
+                group: req.session.lastTour['group'],
                 videoID: req.session.lastVideoId,
+                hasThumb : true, // from this point on, all videos have thumbnails
                 creationDate: new Date()
             };
             app.collection.property.insert(newProperty, function (err, dbProp) {
@@ -106,7 +108,7 @@ exports.addTourRoutes = function (app) {
     });
 
     function renderDetails(templateName, res, property, agent,
-                           isAgent, allAgentProperties, leadID, agentInteractive) {
+                           isAgent, allAgentProperties, leadID, agentInteractive, otherGroupProperties) {
         lib.fixupAgentPhotoURL(agent);
         res.render(templateName, {
             property: property,
@@ -117,7 +119,8 @@ exports.addTourRoutes = function (app) {
             videoID: property.videoID || property._id,
             leadID: leadID || null,
             leadHeartbeatInterval: app.leadHeartbeatInterval || null,
-            agentInteractive: agentInteractive
+            agentInteractive: agentInteractive,
+            otherGroupProperties: otherGroupProperties || []
         });
     }
 
@@ -140,6 +143,23 @@ exports.addTourRoutes = function (app) {
                                     renderDetails(templateName, res, property, agent,
                                         isAgent, tours, leadID, agentInteractive);
                                 });
+                        }
+                        else if (property.group && property.group !== '') {
+                            // Find and send in all tours in the same group, for cross-selling:
+                            app.collection.property.find({'group': property.group}).toArray(
+                                function (allprop_err, tours) {
+                                    if (allprop_err) {
+                                        next(allprop_err);
+                                    }
+                                    else {
+                                        
+                                        renderDetails(templateName, res, property, agent,
+                                            isAgent, null, leadID, agentInteractive, 
+                                            tours.filter(function(t){return !t._id.equals(property._id);})
+                                                .sort(tourAlphaComp));
+                                    }
+                                });
+                            
                         }
                         else {
                             renderDetails(templateName, res, property, agent, isAgent, null, leadID,
@@ -205,6 +225,8 @@ exports.addTourRoutes = function (app) {
         tourManageAction(req, res, next, function (property, pid) {
             var updatedFields = {};
             lib.processReqField(req.body, property, 'address', updatedFields);
+            lib.processReqField(req.body, property, 'note', updatedFields);
+            lib.processReqField(req.body, property, 'group', updatedFields);
 
             if (!lib.isEmptyObject(updatedFields)) {
                 app.collection.property.update({_id: ObjectID(pid)}, {'$set': updatedFields}, function (err, updatedProp) {

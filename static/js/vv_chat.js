@@ -156,6 +156,9 @@ vvzzt.chat.textChatRegistration = function(chatBoxSelector, outputSelector, inpu
     cinput.bind( 'keyup', function(e) {
         (e.keyCode || e.charCode) === 13 && function() {
             var msg = cinput.val();
+            if (msg === '') {
+                return; // ignore empty
+            }
             vvzzt.pubnub.pubnubPublish({
                 type : 'textchat', text : msg }, 
                 function() { 

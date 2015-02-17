@@ -45,9 +45,14 @@
                         <input type="text" class="form-control" id="address_input" name="address"/>
                     </div>
                     <div class="form-group">
-                        <label for="address_input">Agent note's:</label>
+                        <label for="note_input">Agent note's:</label>
                         (prospective tenants will not see it)
                         <input type="text" class="form-control" id="note_input" name="note"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="group_input">Group:</label>
+                        (Videos in the same group will be referenced on the same page)
+                        <input type="text" class="form-control" id="group_input" name="group"/>
                     </div>
 
                     <% if (agent.superuser) { %>
@@ -119,7 +124,10 @@
     <table class="table table-hover">
         <thead>
         <tr>
+            <td></td>
             <td>Address</td>
+            <td>Note</td>
+            <td>Group</td>
             <td></td>
             <td></td>
             <td></td>
@@ -128,7 +136,17 @@
         <tbody>
         <% for (var i = 0; i < tours.length;i++){ %>
         <tr>
+            <td>
+              <% if (tours[i].hasThumb) { %>
+              <a href="<%="http://cdn.virtualvizzit.com/"+ tours[i].videoID+"-thumb-00001.png"%>">
+                <img class="tour_thumb" alt="Thumbnail" src="<%="http://cdn.virtualvizzit.com/"+ tours[i].videoID+
+                "-thumb-00001.png"%>">
+              </a>
+              <% } %>
+            </td>
             <td><a href="/video/<%= tours[i]._id %>"><%= tours[i].address %></a></td>
+            <td><div class="tour_note"><%= tours[i].note%></div></td>
+            <td><div class="tour_note"><%= tours[i].group || ''%></div></td>
             <td><a class="btn btn-primary" href="/tour/<%= tours[i]._id %>">open guided</a></td>
             <td><a class="btn btn-primary" href="/tour/<%= tours[i]._id %>/edit">edit</a></td>
             <td><a class="btn btn-danger"
