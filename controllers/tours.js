@@ -49,6 +49,9 @@ exports.addTourRoutes = function (app) {
 
     app.post('/tour', lib.ensureAuthenticated, function (req, res, next) {
 
+        // reset last one:
+        req.session.lastVideoId = null;
+        
         var busboy = new Busboy({headers: req.headers});
 
         busboy.on('file', function (fieldname, file, filename) {
