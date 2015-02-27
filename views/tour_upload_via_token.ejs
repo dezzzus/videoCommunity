@@ -1,0 +1,60 @@
+<% include head_begin.ejs %>
+<script src="http://malsup.github.com/jquery.form.js"></script>
+<% include head_ga.ejs %>
+<div class="container">
+    <div class="row">
+        <h1>Upload your video:</h1>
+
+        <div class="col-md-4">
+            <div class="formbox">
+                <form action="/tour/<%=tour._id.toHexString() %>/upload_via_token/<%=tour.uploadToken %>/<%=tour.agent %>" id="tour_form" enctype="multipart/form-data" method="post">
+                    <div class="form-group">
+                        <label for="videofile_input">Video file:</label>
+                        <input type="file" class="form-control" id="videofile_input" name="videoFile"/>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 0;">
+                                0%
+                            </div>
+                        </div>
+                    
+                        <input type="submit" class="btn btn-success" value="Submit"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+    <script type="application/javascript">
+        $(function () {
+            _gaq.push(['_trackEvent',
+                'tour', // category of activity
+                'submit_via_token', // Action
+            ]);
+
+            var jqTourForm = $('#tour_form');
+            var bar = $('.progress-bar');
+
+            var formOptions = {
+                beforeSubmit: function () {
+                    $('.progress').show();
+                },
+                success: function () {
+                    document.location.reload(true);
+                },
+                uploadProgress: function (event, position, total, percentComplete) {
+                    var percentVal = percentComplete + '%';
+                    bar.width(percentVal)
+                    bar.html(percentVal);
+                }
+            };
+
+            jqTourForm.ajaxForm(formOptions);
+        });
+    </script>
+
+<% include foot.ejs %>

@@ -131,6 +131,7 @@
             <td></td>
             <td></td>
             <td></td>
+            <td></td>
         </tr>
         </thead>
         <tbody>
@@ -152,6 +153,11 @@
             <td><a class="btn btn-danger"
                    onclick='vvzzt.ui.followURLAfterConfirm("Are you sure you want to delete " + "<%= tours[i].address %>" + "?",
                            "/tour/<%= tours[i]._id %>/del")'>delete</a></td>
+            <td>
+              <% if (tours[i].uploadToken) { %>
+                <a class="btn btn-primary" href="/tour/<%= tours[i]._id %>/upload_via_token/<%= tours[i].uploadToken %>">upload link</a>
+              <% } %>
+            </td>
         </tr>
         <% } %>
         </tbody>
