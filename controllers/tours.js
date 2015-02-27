@@ -91,6 +91,7 @@ exports.addTourRoutes = function (app) {
                 note: req.session.lastTour['note'],
                 group: req.session.lastTour['group'],
                 videoID: req.session.lastVideoId,
+                uploadToken: req.session.lastVideoId ? null : (new ObjectID()).toHexString(),
                 hasThumb : true, // from this point on, all videos have thumbnails
                 creationDate: new Date()
             };
@@ -190,12 +191,13 @@ exports.addTourRoutes = function (app) {
     });
 
 
-    function tourManageAction(req, res, next, actionFunc) {
+    function tourManageAction(req, res, next, actionFunc, uploadToken) {
         var pid = req.param('pid');
         lib.safeFindOne(app.collection.property, {'_id': ObjectID(pid)}, function (property) {
             if (property) {
-                if (req.user._id.toHexString() == property.agent) {
-                    actionFunc(property, pid);
+                if (req.user && req.user._id.toHexString() == property.agent ||
+                    uploadToken && property.uploadToken === uploadToken) {
+                    actionFunc(property, pid, property.agent);
                 }
                 else {
                     res.redirect('/tour');
@@ -240,6 +242,84 @@ exports.addTourRoutes = function (app) {
                 res.redirect('/tour');
             }
         });
+    });
+    
+    app.get('/tour/:pid/upload_via_token/:token', function (req, res, next) {
+        tourManageAction(req, res, next, function (property, pid) {
+            res.render('tour_upload_via_token', {tour: property});
+        }, req.param('token'));
+    });
+
+    app.post('/tour/:pid/upload_via_token/:token/:agent', function (req, res, next) {
+        var uploadToken = req.param('token');
+        var pid = req.param('pid');
+        var agentId = req.param('agent');
+
+        var busboy = new Busboy({headers: req.headers});
+
+        busboy.on('file', function (fieldname, file, filename) {
+            var userId = agentId || req.user._id.toHexString();
+            req.session.lastVideoId = userId + filename.replace(/\W+/g, '-').toLowerCase() + Date.now();
+
+            var upload = app.s3Stream.upload({
+                Bucket: 'vizzitupload',
+                Key: req.session.lastVideoId
+            });
+
+            upload.on('uploaded', function () {
+                app.transcoder.transcode(userId, req.session.lastVideoId, 
+                    function (err) {
+                    if (err) {
+                        lib.reportError(err);
+                    }
+                }, next);
+            });
+
+            upload.on('error', function (err) {
+                if (err) {
+                    lib.reportError(err);
+                }
+            });
+
+            file.pipe(upload);
+        });
+
+        busboy.on('field', function (fieldname, val) {
+            req.session.lastTour = req.session.lastTour || {};
+            req.session.lastTour[fieldname] = val;
+        });
+
+        busboy.on('finish', function () {
+            lib.safeFindOne(app.collection.property, {'_id': ObjectID(pid)}, function (property) {
+                if (property) {
+                    if (req.user && req.user._id.toHexString() === property.agent ||
+                        uploadToken && property.uploadToken === uploadToken) {
+                        var updatedFields = {
+                            videoID: req.session.lastVideoId,
+                            uploadToken: req.session.lastVideoId ? null : (new ObjectID()).toHexString()
+                        };
+                        app.collection.property.update({_id: ObjectID(pid)}, {'$set': updatedFields}, function (err, updatedProp) {
+                            if (err) {
+                                next(err);
+                            }
+                            
+                            res.redirect('/');
+                        });
+
+                    }
+                    else {
+                        res.redirect('/tour');
+                    }
+                }
+                else {
+                    res.redirect('/tour');
+                }
+            }, next);
+
+            
+        });
+
+        return req.pipe(busboy);
     });
 
     app.post('/tour/:pid/share', lib.ensureAuthenticated, function (req, res, next) {
