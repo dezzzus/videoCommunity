@@ -127,6 +127,11 @@
     border: 1px solid #e7e7e7;
 }
 
+.formbox_nomargin {
+    padding: 5px;
+    border: 1px solid #e7e7e7;
+}
+
 .terms_of_use {
     font-weight: 400;
 }
