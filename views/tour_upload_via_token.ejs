@@ -9,7 +9,7 @@
       
       <p>This is a brand new concept that we hope will revolutionize the rental market and add to the sharing economy. BTW, your home will not be openly published, and only shown to a few prequalified prospective tenants, who would otherwise show up anyway.</p>
       
-      <p>If interested, please watch this sample video taken, by one of our current tenants. </p>
+      <p>If interested, please watch <a href="/video/54f8bbb78415cfd440b897d2">this sample video</a> taken, by one of our current tenants. </p>
       
       <p>Then to take your video,  
         <br>1. Make sure your place is well lit, preferably in day time. 
@@ -67,7 +67,7 @@
                     $('.progress').show();
                 },
                 success: function () {
-                    document.location.reload(true);
+                    document.location = "/video/<%=tour._id.toHexString() %>";
                 },
                 uploadProgress: function (event, position, total, percentComplete) {
                     var percentVal = percentComplete + '%';

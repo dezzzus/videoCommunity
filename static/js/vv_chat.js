@@ -94,12 +94,13 @@ vvzzt.chat.textChatRegistration = function(chatBoxSelector, outputSelector, inpu
                 firstChatAlertShown = true;
                 
                 setTimeout(function(){
-                    vvzzt.chat.showChatAlert(
-                        '<h1>' + firstMsgTitle + '</h1>' +
-                        '<p>' +
-                        firstMsgText +
-                        '</p>',
-                        5000);
+                    // Alert disabled
+//                    vvzzt.chat.showChatAlert(
+//                        '<h1>' + firstMsgTitle + '</h1>' +
+//                        '<p>' +
+//                        firstMsgText +
+//                        '</p>',
+//                        5000);
 
                     setTimeout(function() {
                         coutput.show();
@@ -183,12 +184,12 @@ vvzzt.chat.textChatRegistration = function(chatBoxSelector, outputSelector, inpu
                             // If after enough time, no response, suggest to leave contact info
                             setTimeout(function(){
                                 if (!receivedResponses) {
-                                    vvzzt.chat.showChatAlert(
-                                        '<h1>' + agentDelayedTitle + '</h1>' +
-                                        '<p>' +
-                                        agentDelayedMsg +
-                                        '</p>',
-                                        6000);
+//                                    vvzzt.chat.showChatAlert(
+//                                        '<h1>' + agentDelayedTitle + '</h1>' +
+//                                        '<p>' +
+//                                        agentDelayedMsg +
+//                                        '</p>',
+//                                        6000);
                                     vvzzt.chat.addToChatOutput(coutput, false, 
                                         "auto-response", agentDelayedTitle + agentDelayedMsg, false);
                                 }
