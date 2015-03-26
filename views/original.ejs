@@ -1,0 +1,40 @@
+<% include head_begin.ejs %>
+<% include head_end.ejs %>
+
+<body>
+<div class="wrapper">
+    <div class="row row-no-margins">
+
+        <div class="col-md-9 video_section panel-body service-block-dark-blue">
+            <% if(property.playerType == 'flowplayer'){ %>
+            <% include player/flowplayer.ejs %>
+            <% } %>
+        </div>
+        <div class="col-md-3 box-low-padding">
+            Tenant? You can share this page with every agent, who bother you with visits.
+        </div>
+        <div class="col-md-3 box-low-padding">
+            Real estate agent? Want to put your contacts data with this video. just do it.
+
+        </div>
+    </div>
+
+    <script type="application/javascript">
+        // global needed to be set before onLoad stuff happens
+        // TODO: remove this global, and set this asynchronously, and registration should happen lazily when this is set.
+        var vv_pubnub_room_id = "SyncVideo" + "<%= property._id %>";
+
+        $(function () {
+
+            var jqDiv = $(".fplayer");
+            jqDiv.flowplayer({
+                errors: ['', 'Video loading aborted', 'Network error',
+                    'Video not properly encoded', 'Video file is optimizing for web now, wait two minutes and reload a page']
+            });
+            flowplayer(jqDiv);
+
+        });
+    </script>
+
+
+<% include foot.ejs %>

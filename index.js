@@ -167,6 +167,26 @@ app.leadHeartbeatInterval = leadController.getHeartbeatInterval();
 
 apiController.addAPIRoutes(app, app.awsMailer);
 
+app.get('/original/:vid', function (req, res, next) {
+    var vid = req.param('vid');
+    if (vid.length >= 12) {
+        lib.safeFindOne(app.collection.property, {'videoID': vid}, function (property) {
+            if (property) {
+                res.render('original', {
+                    property: property,
+                    videoID: property.videoID
+                });
+            }
+            else {
+                res.status(404).render('404');
+            }
+        }, next);
+    }
+    else {
+        res.status(404).render('404');
+    }
+});
+
 app.get('/login', function (req, res) {
     res.render('login');
 });
@@ -367,13 +387,13 @@ app.post('/profile', lib.ensureAuthenticated, function (req, res, next) {
 app.get('/approve', lib.ensureAuthenticated, function (req, res, next) { //Will blow up if we will have tons of agents
     if (req.user.superuser) {
         app.collection.agent.find({}).toArray(
-            function(err, agents){
-                if(err){
+            function (err, agents) {
+                if (err) {
                     next(err);
                     return false;
                 }
 
-                res.render('approve',{
+                res.render('approve', {
                     agents: agents
                 });
             }
@@ -387,8 +407,8 @@ app.get('/approve', lib.ensureAuthenticated, function (req, res, next) { //Will 
 app.get('/approve/:aid', lib.ensureAuthenticated, function (req, res, next) {
     if (req.user.superuser) {
         var aid = req.param('aid');
-        app.collection.agent.update({_id: ObjectID(aid)}, {'$set':{approved:true}}, function(err){
-            if(err){
+        app.collection.agent.update({_id: ObjectID(aid)}, {'$set': {approved: true}}, function (err) {
+            if (err) {
                 next(err);
                 return false;
             }
