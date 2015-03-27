@@ -187,6 +187,17 @@ app.get('/original/:vid', function (req, res, next) {
     }
 });
 
+function claimVideo(videoID, agentID){
+    
+}
+
+app.get('/original/:vid/claim', lib.ensureAuthenticated, function(req, res, next){
+    var vid = req.params['vid'];
+    claimVideo(vid, req.user._id, function(){
+        res.redirect('/tour');
+    });
+});
+
 app.get('/login', function (req, res) {
     res.render('login');
 });
