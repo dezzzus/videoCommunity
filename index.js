@@ -187,15 +187,34 @@ app.get('/original/:vid', function (req, res, next) {
     }
 });
 
-function claimVideo(videoID, agentID){
-    
+function claimVideo(videoID, agentID, callback, next) {
+    lib.safeFindOne(app.collection.property, {'videoID': videoID}, function (property) {
+        var newProperty = {
+            'playerType': property.playerType,
+            'address': property.address,
+            'agent': agentID,
+            'note': '',
+            'group': '',
+            'videoID': videoID,
+            'hasThumb': property.hasThumb,
+            'creationDate': new Date()
+        };
+        app.collection.property.insert(newProperty, function (err, dbProp) {
+            if (err) {
+                next(err);
+            }
+            else {
+                callback();
+            }
+        });
+    }, next);
 }
 
-app.get('/original/:vid/claim', lib.ensureAuthenticated, function(req, res, next){
+app.get('/original/:vid/claim', lib.ensureAuthenticated, function (req, res, next) {
     var vid = req.params['vid'];
-    claimVideo(vid, req.user._id, function(){
+    claimVideo(vid, req.user._id.toHexString(), function () {
         res.redirect('/tour');
-    });
+    }, next);
 });
 
 app.get('/login', function (req, res) {
