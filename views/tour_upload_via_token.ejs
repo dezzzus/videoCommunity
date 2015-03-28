@@ -66,8 +66,8 @@
                 beforeSubmit: function () {
                     $('.progress').show();
                 },
-                success: function () {
-                    document.location = "/video/<%=tour._id.toHexString() %>";
+                success: function (response) {
+                    document.location = "/original/"+response.videoID;
                 },
                 uploadProgress: function (event, position, total, percentComplete) {
                     var percentVal = percentComplete + '%';

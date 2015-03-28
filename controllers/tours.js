@@ -51,7 +51,7 @@ exports.addTourRoutes = function (app) {
 
         // reset last one:
         req.session.lastVideoId = null;
-        
+
         var busboy = new Busboy({headers: req.headers});
 
         busboy.on('file', function (fieldname, file, filename) {
@@ -64,12 +64,12 @@ exports.addTourRoutes = function (app) {
             });
 
             upload.on('uploaded', function () {
-                app.transcoder.transcode(userId, req.session.lastVideoId, 
+                app.transcoder.transcode(userId, req.session.lastVideoId,
                     function (err) {
-                    if (err) {
-                        lib.reportError(err);
-                    }
-                }, next);
+                        if (err) {
+                            lib.reportError(err);
+                        }
+                    }, next);
             });
 
             upload.on('error', function (err) {
@@ -95,7 +95,7 @@ exports.addTourRoutes = function (app) {
                 group: req.session.lastTour['group'],
                 videoID: req.session.lastVideoId,
                 uploadToken: req.session.lastVideoId ? null : (new ObjectID()).toHexString(),
-                hasThumb : true, // from this point on, all videos have thumbnails
+                hasThumb: true, // from this point on, all videos have thumbnails
                 creationDate: new Date()
             };
             app.collection.property.insert(newProperty, function (err, dbProp) {
@@ -156,14 +156,16 @@ exports.addTourRoutes = function (app) {
                                         next(allprop_err);
                                     }
                                     else {
-                                        
+
                                         renderDetails(templateName, res, property, agent,
-                                            isAgent, null, leadID, agentInteractive, 
-                                            tours.filter(function(t){return !t._id.equals(property._id);})
+                                            isAgent, null, leadID, agentInteractive,
+                                            tours.filter(function (t) {
+                                                return !t._id.equals(property._id);
+                                            })
                                                 .sort(tourAlphaComp));
                                     }
                                 });
-                            
+
                         }
                         else {
                             renderDetails(templateName, res, property, agent, isAgent, null, leadID,
@@ -246,7 +248,7 @@ exports.addTourRoutes = function (app) {
             }
         });
     });
-    
+
     app.get('/tour/:pid/upload_via_token/:token', function (req, res, next) {
         tourManageAction(req, res, next, function (property, pid) {
             res.render('tour_upload_via_token', {tour: property});
@@ -270,12 +272,12 @@ exports.addTourRoutes = function (app) {
             });
 
             upload.on('uploaded', function () {
-                app.transcoder.transcode(userId, req.session.lastVideoId, 
+                app.transcoder.transcode(userId, req.session.lastVideoId,
                     function (err) {
-                    if (err) {
-                        lib.reportError(err);
-                    }
-                }, next);
+                        if (err) {
+                            lib.reportError(err);
+                        }
+                    }, next);
             });
 
             upload.on('error', function (err) {
@@ -305,8 +307,8 @@ exports.addTourRoutes = function (app) {
                             if (err) {
                                 next(err);
                             }
-                            
-                            res.redirect('/');
+
+                            res.json({'videoID': req.session.lastVideoId});
                         });
 
                     }
@@ -319,7 +321,7 @@ exports.addTourRoutes = function (app) {
                 }
             }, next);
 
-            
+
         });
 
         return req.pipe(busboy);
