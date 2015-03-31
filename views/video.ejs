@@ -127,6 +127,9 @@
                 <div class="btn  btn-primary send_tour">
                     <i class="fa fa-envelope-o"></i>Send tour to client
                 </div>
+                <div class="btn  btn-primary buddy_tour">
+                    <i class="fa fa-envelope-o"></i>Copy tour to other agent
+                </div>
             </div>
             <div class="col-md-6">
                 <% if (agentInteractive) { %>
@@ -216,6 +219,23 @@
                 else {
                     jqJumpTo.show();
                 }
+            });
+
+            $('.buddy_tour').on('click', function () {
+                var agentMail = prompt('Enter agent email');
+                $.ajax({
+                    type: 'POST',
+                    url: '/tour/<%= videoID %>/buddy',
+                    data: {
+                        email: agentMail
+                    },
+                    success: function () {
+                        alert('Tour successfully shared.');
+                    },
+                    error: function () {
+                        alert('Tour could not be shared due to error.  Please try again.');
+                    }
+                });
             });
             <%}%>
 

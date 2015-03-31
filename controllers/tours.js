@@ -346,4 +346,66 @@ exports.addTourRoutes = function (app) {
 
     });
 
+    function claimVideo(videoID, agentID, callback, next) {
+        lib.safeFindOne(app.collection.property, {'videoID': videoID}, function (property) {
+            var newProperty = {
+                'playerType': property.playerType,
+                'address': property.address,
+                'agent': agentID,
+                'note': '',
+                'group': '',
+                'videoID': videoID,
+                'hasThumb': property.hasThumb,
+                'creationDate': new Date()
+            };
+            app.collection.property.insert(newProperty, function (err, dbProp) {
+                if (err) {
+                    next(err);
+                }
+                else {
+                    callback();
+                }
+            });
+        }, next);
+    }
+
+
+    app.post('/tour/:vid/buddy', lib.ensureAuthenticated, function (req, res, next) {
+        var buddyEmail = req.body['email'];
+        var vid = req.param('vid');
+        lib.safeFindOne(app.collection.agent, {'email': buddyEmail}, function (agent) {
+            claimVideo(vid, agent._id.toHexString(), function () {
+                res.send({'status': 'OK'});
+            }, next);
+        }, next);
+    });
+
+    app.get('/original/:vid', function (req, res, next) {
+        var vid = req.param('vid');
+        if (vid.length >= 12) {
+            lib.safeFindOne(app.collection.property, {'videoID': vid}, function (property) {
+                if (property) {
+                    res.render('original', {
+                        property: property,
+                        videoID: property.videoID
+                    });
+                }
+                else {
+                    res.status(404).render('404');
+                }
+            }, next);
+        }
+        else {
+            res.status(404).render('404');
+        }
+    });
+
+    app.get('/original/:vid/claim', lib.ensureAuthenticated, function (req, res, next) {
+        var vid = req.params['vid'];
+        claimVideo(vid, req.user._id.toHexString(), function () {
+            res.redirect('/tour');
+        }, next);
+    });
+
+
 };
