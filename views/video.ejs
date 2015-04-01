@@ -91,7 +91,8 @@
                 <div class="agent_photo">
                     <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
                 </div>
-                
+
+
             
                 <div id="lead_chat" class="chat_box service-block-light" style="display: none;">
                     <div class="voice_chat alert alert-success">
@@ -109,7 +110,7 @@
                     <div><input id="chat_input" placeholder="enter chat message"/></div>
 
                 </div>
-                
+
                 <% if (isAgent && !agentInteractive) { %>
                 
                   <div class="chat_box service-block-light">
@@ -119,6 +120,11 @@
                   
                 <% } %>
                 
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-offset-1 col-md-11 box-low-padding">
+                This video was produced by a budding, yet still an amateur videographer as a curtsey before your visit
             </div>
         </div>
         <% if (isAgent) { %>
@@ -152,7 +158,7 @@
             </div>
         </div>
         <% } %>
-        
+
         <div class="row">
           <% if (otherGroupProperties.length > 0) { %>
             
