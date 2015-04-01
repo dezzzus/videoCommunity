@@ -387,7 +387,29 @@ exports.addTourRoutes = function (app) {
                 if (property) {
                     res.render('original', {
                         property: property,
-                        videoID: property.videoID
+                        videoID: property.videoID,
+                        isAgent: false
+                    });
+                }
+                else {
+                    res.status(404).render('404');
+                }
+            }, next);
+        }
+        else {
+            res.status(404).render('404');
+        }
+    });
+
+    app.get('/original/:vid/agent', function (req, res, next) {
+        var vid = req.param('vid');
+        if (vid.length >= 12) {
+            lib.safeFindOne(app.collection.property, {'videoID': vid}, function (property) {
+                if (property) {
+                    res.render('original', {
+                        property: property,
+                        videoID: property.videoID,
+                        isAgent: true
                     });
                 }
                 else {

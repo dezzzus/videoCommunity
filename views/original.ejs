@@ -3,23 +3,41 @@
 
 <body>
 <div class="wrapper">
-    <div class="row row-no-margins">
-
-        <div class="col-md-9 video_section panel-body service-block-dark-blue">
-            <% if(property.playerType == 'flowplayer'){ %>
-            <% include player/flowplayer.ejs %>
-            <% } %>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-11 col-md-offset-1">
+                <% if(isAgent){ %>
+                <div>
+                    Are you a real estate professional? What to use this video?
+                    <div>If so, please <a href="/signup" target="_blank">sign up</a> and than
+                        <a href="/original/<%= videoID %>/claim">click here</a></div>
+                </div>
+                <% }else{ %>
+                <div>
+                    Thank you for the upload, your video will now be transcoded and sent to agent who invite you to
+                    upload this video.
+                    Please hold for 2-5 minutes, refresh the page and review video below.
+                </div>
+                <div>
+                    Psst, if you are contacted by another agent, please feel free to send them this same video for their
+                    clients. Just copy the link below.
+                    <div>
+                        <a href="/original/<%= videoID %>/agent">www.virtualvizzit.com/original/<%= videoID %>
+                            /agent</a>
+                    </div>
+                </div>
+                <% } %>
+            </div>
         </div>
-        <div class="col-md-3 box-low-padding">
-
+        <div class="row row-no-margins">
+            <div class="col-md-offset-1 col-md-11 video_section panel-body service-block-dark-blue">
+                <% if(property.playerType == 'flowplayer'){ %>
+                <% include player/flowplayer.ejs %>
+                <% } %>
+            </div>
         </div>
     </div>
-
     <script type="application/javascript">
-        // global needed to be set before onLoad stuff happens
-        // TODO: remove this global, and set this asynchronously, and registration should happen lazily when this is set.
-        var vv_pubnub_room_id = "SyncVideo" + "<%= property._id %>";
-
         $(function () {
 
             var jqDiv = $(".fplayer");
