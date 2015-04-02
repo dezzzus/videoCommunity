@@ -2,7 +2,7 @@ module.exports = {
     ensureAuthenticated: function (req, res, next) {
         req.session.returnTo = req.url;
         if (req.isAuthenticated()) {
-            if (req.user && req.user.approved) {
+            if (req.user) {
                 return next();
             }
             else {

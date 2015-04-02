@@ -426,7 +426,7 @@ exports.addTourRoutes = function (app) {
         projectId: "551846dd90e4bd27ef7a38c1",
         writeKey: "a80d8e5c8619073fb5152dfd7b9ea506b24977114880fecdeac0efd5b95aa92b89ac04b0b25bbbe050d2e33aadb1be3b9c4a40040da43834e0b407480869adcf2377725236d49dc853fe5ccb62d8cb908d4543f51352d3c32aee0b80e7b91d952c8eac795315108f39b8ca5b3fef9329"
     });
-    
+
 
     app.get('/original/:vid/claim', lib.ensureAuthenticated, function (req, res, next) {
         var vid = req.params['vid'];
