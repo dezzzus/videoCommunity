@@ -10,20 +10,18 @@
                 <div>
                     Are you a real estate professional? What to use this video?
                     <div>If so, please <a href="/signup" target="_blank">sign up</a> and than
-                        <a href="/original/<%= videoID %>/claim">click here</a></div>
+                        <a href="/original/<%=videoID%>/claim">click here</a></div>
                 </div>
                 <% }else{ %>
                 <div>
-                    Thank you for the upload, your video will now be transcoded and sent to agent who invite you to
-                    upload this video.
+                    Thank you for the upload, your video will now be transcoded and sent to agent.
                     Please hold for 2-5 minutes, refresh the page and review video below.
                 </div>
                 <div>
-                    Psst, if you are contacted by another agent, please feel free to send them this same video for their
-                    clients. Just copy the link below.
+                    Psst, and just between us, if you are contacted by another agent to do showings,
+                    please feel free to send them this same video for their clients. Just copy the link below.
                     <div>
-                        <a href="/original/<%= videoID %>/agent">www.virtualvizzit.com/original/<%= videoID %>
-                            /agent</a>
+                        <a href="/original/<%=videoID%>/agent">www.virtualvizzit.com/original/<%=videoID%>/agent</a>
                     </div>
                 </div>
                 <% } %>
