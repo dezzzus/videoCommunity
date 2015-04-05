@@ -3,24 +3,31 @@
 <% include head_end.ejs %>
 <div class="container">
     <h1>Dear current tenant at <%= tour.address %></h1>
+
     <div>
-      <p>You&rsquo;ve landed on this page, because your real estate agency wants a video of your apartment and are too lazy to get it themselves. With that said, our research has shown that simple cell phone videos can greatly reduce and often eliminate intrusive showings. We will make sure that Agent will share this recording with each prospective client prior to scheduling any showing with you. Some clients will reject your place outright (no offence), and some out of state or international students will rent without even visiting.</p>
-      
-      <p>And just so that you know, we will not openly publish this video, instead it will be sent only to a few prequalified prospective tenants, who would otherwise show up with the agent anyway.</p>
-      
-      <p>If you’d like to participate, please watch <a href="/video/55088930493fcba90836518f">this sample video</a> taken, by one of our current tenants. </p>
-      
-      <p>Then to take your video,  
-        <br>1. Make sure your place is well lit, preferably in day time. 
-        <br>2. Hold your phone horizontally, slowly slowly, and start at the entrance door.  
-        <br>3. Narrate what we are looking at. Make it fun to watch; Surprise us ;). 
-        <br>4. Spend a bit more time to detail the kitchen, closets, and bathroom 
-        <br>5. Make it between 1 and 3 minutes long.
-      </p>
-      
-      <p>Then just use the button below, right from your phone to upload.</p>
-      
-      <p>Thanks for helping us make renting process less stressful.</p>
+        <p>You&rsquo;ve landed on this page, because your real estate agency wants a video of your apartment and are too
+            lazy to get it themselves. With that said, our research has shown that simple cell phone videos can greatly
+            reduce and often eliminate intrusive showings. We will make sure that Agent will share this recording with
+            each prospective client prior to scheduling any showing with you. Some clients will reject your place
+            outright (no offence), and some out of state or international students will rent without even visiting.</p>
+
+        <p>And just so that you know, we will not openly publish this video, instead it will be sent only to a few
+            prequalified prospective tenants, who would otherwise show up with the agent anyway.</p>
+
+        <p>If you’d like to participate, please watch <a href="/video/55088930493fcba90836518f">this sample video</a>
+            taken, by one of our current tenants. </p>
+
+        <p>Then to take your video,
+            <br>1. Make sure your place is well lit, preferably in day time.
+            <br>2. Hold your phone horizontally, slowly slowly, and start at the entrance door.
+            <br>3. Narrate what we are looking at. Make it fun to watch; Surprise us ;).
+            <br>4. Spend a bit more time to detail the kitchen, closets, and bathroom
+            <br>5. Make it between 1 and 3 minutes long.
+        </p>
+
+        <p>Then just use the button below, right from your phone to upload.</p>
+
+        <p>Thanks for helping us make renting process less stressful.</p>
     </div>
 
 
@@ -29,19 +36,20 @@
 
         <div class="col-md-4">
             <div class="formbox_nomargin">
-                <form action="/tour/<%=tour._id.toHexString() %>/upload_via_token/<%=tour.uploadToken %>/<%=tour.agent %>" id="tour_form" enctype="multipart/form-data" method="post">
+                <form action="/tour/<%= tour._id.toHexString() %>/upload_via_token/<%= tour.uploadToken %>/<%= tour.agent %>"
+                      id="tour_form" enctype="multipart/form-data" method="post">
                     <div class="form-group">
                         <label for="videofile_input">Video file:</label>
                         <input type="file" class="form-control" id="videofile_input" name="videoFile"/>
                     </div>
-                    
+
                     <div class="form-group">
                         <div class="progress">
                             <div class="progress-bar" style="width: 0;">
                                 0%
                             </div>
                         </div>
-                    
+
                         <input type="submit" class="btn btn-success" value="Submit"/>
                     </div>
                 </form>
@@ -51,37 +59,43 @@
 
 </div>
 
-    <script type="application/javascript">
-        $(function () {
-            _gaq.push(['_trackEvent',
-                'tour', // category of activity
-                'submit_via_token' // Action
-            ]);
+<script type="application/javascript">
+    $(function () {
+        _gaq.push(['_trackEvent',
+            'tour', // category of activity
+            'submit_via_token' // Action
+        ]);
 
-            var jqTourForm = $('#tour_form');
-            var bar = $('.progress-bar');
-
-            var formOptions = {
-                beforeSubmit: function () {
-                    $('.progress').show();
-                },
-                success: function (response) {
-                    keenClient.addEvent('tenant_uploads', {
-                        'videoID': response.videoID,
-                        'sourceAgent': '<%=tour.agent %>'
-                    }, function(){
-                        document.location = "/original/"+response.videoID;
-                    });
-                },
-                uploadProgress: function (event, position, total, percentComplete) {
-                    var percentVal = percentComplete + '%';
-                    bar.width(percentVal)
-                    bar.html(percentVal);
-                }
-            };
-
-            jqTourForm.ajaxForm(formOptions);
+        keenClient.addEvent('tenant_token_pageview', {
+            'tourID': '<%=tour._id.toHexString() %>',
+            'sourceAgent': '<%=tour.agent %>'
+        }, function () {
         });
-    </script>
+
+        var jqTourForm = $('#tour_form');
+        var bar = $('.progress-bar');
+
+        var formOptions = {
+            beforeSubmit: function () {
+                $('.progress').show();
+            },
+            success: function (response) {
+                keenClient.addEvent('tenant_uploads', {
+                    'videoID': response.videoID,
+                    'sourceAgent': '<%=tour.agent %>'
+                }, function () {
+                    document.location = "/original/" + response.videoID;
+                });
+            },
+            uploadProgress: function (event, position, total, percentComplete) {
+                var percentVal = percentComplete + '%';
+                bar.width(percentVal)
+                bar.html(percentVal);
+            }
+        };
+
+        jqTourForm.ajaxForm(formOptions);
+    });
+</script>
 
 <% include foot.ejs %>

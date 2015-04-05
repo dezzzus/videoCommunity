@@ -75,6 +75,9 @@
                 <% if(property.playerType == 'flowplayer'){ %>
                 <% include player/flowplayer.ejs %>
                 <% } %>
+                <% if(property.playerType == 'youtube'){ %>
+                <% include player/youtube.ejs %>
+                <% } %>
             </div>
             <div class="col-md-3 box-low-padding">
                 <div class="agent_name_box">
