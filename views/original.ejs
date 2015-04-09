@@ -1,52 +1,67 @@
 <% include head_begin.ejs %>
 <% include head_end.ejs %>
 
-<body>
-<div class="wrapper">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-11 col-md-offset-1">
-                <% if(isAgent){ %>
-                <div>
-                    Are you a real estate professional? What to use this video?
-                    <div>If so, please <a href="/signup" target="_blank">sign up</a> and than
-                        <a href="/original/<%=videoID%>/claim">click here</a></div>
-                </div>
-                <% }else{ %>
-                <div>
-                    Thank you for the upload, your video will now be transcoded and sent to agent.
-                    Please hold for 2-5 minutes, refresh the page and review video below.
-                </div>
-                <div>
-                    Psst, and just between us, if you are contacted by another agent to do showings,
-                    please feel free to send them this same video for their clients. Just copy the link below.
-                    <div>
-                        <a href="/original/<%=videoID%>/agent">www.virtualvizzit.com/original/<%=videoID%>/agent</a>
-                    </div>
-                </div>
-                <% } %>
-            </div>
-        </div>
-        <div class="row row-no-margins">
-            <div class="col-md-offset-1 col-md-11 video_section panel-body service-block-dark-blue">
-                <% if(property.playerType == 'flowplayer'){ %>
-                <% include player/flowplayer.ejs %>
-                <% } %>
-            </div>
+<div class="container-fluid">
+    <% if(isAgent){ %>
+    <div class="row textbox">
+        <div class="col-md-offset-3 col-md-6">
+            This video was produced by a budding, yet still an amateur videographer as a courtesy before your visit
         </div>
     </div>
-    <script type="application/javascript">
-        $(function () {
+    <% } %>
+    <% if(!isAgent){ %>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
 
-            var jqDiv = $(".fplayer");
-            jqDiv.flowplayer({
-                errors: ['', 'Video loading aborted', 'Network error',
-                    'Video not properly encoded', 'Video file is optimizing for web now, wait two minutes and reload a page']
-            });
-            flowplayer(jqDiv);
+            <div>
+                Thank you for the upload, your video will now be transcoded and sent to agent.
+                Please hold for 2-5 minutes, refresh the page and review video below.
+            </div>
+            <div>
+                Psst, and just between us, if you are contacted by another agent to do showings,
+                please feel free to send them this same video for their clients. Just copy the link below.
+                <div>
+                    <a href="/original/<%= videoID %>/agent">www.virtualvizzit.com/original/<%= videoID %>/agent</a>
+                </div>
+            </div>
 
+        </div>
+    </div>
+    <% } %>
+    <div class="row">
+        <div class="col-md-offset-3 col-md-6 video_section panel-body service-block-dark-blue">
+            <% if(property.playerType == 'flowplayer'){ %>
+            <% include player/flowplayer.ejs %>
+            <% } %>
+        </div>
+    </div>
+    <% if(isAgent){ %>
+    <div class="row textbox">
+        <div class="col-md-offset-3 col-md-6">
+            If you are a real estate professional, and would like to import this video, please click <a
+                    href="/signup" target="_blank">here</a> to create an account.
+            Than return to this page and click <a href="/original/<%= videoID %>/claim">import</a>.
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+            Any questions, comments or concerns, please email, info@virtualvizzit.com
+        </div>
+    </div>
+    <% } %>
+</div>
+<script type="application/javascript">
+    $(function () {
+
+        var jqDiv = $(".fplayer");
+        jqDiv.flowplayer({
+            errors: ['', 'Video loading aborted', 'Network error',
+                'Video not properly encoded', 'Video file is optimizing for web now, wait two minutes and reload a page']
         });
-    </script>
+        flowplayer(jqDiv);
+
+    });
+</script>
 
 
 <% include foot.ejs %>

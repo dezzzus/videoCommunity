@@ -202,3 +202,8 @@
 #tour_form .progress {
     display: none;
 }
+
+.textbox{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
