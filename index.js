@@ -301,8 +301,6 @@ app.post('/signup', function (req, res, next) {
                         logoFileId: busboy.currentAgent['logoFileId'],
                         passwordHash: hash,
                         superuser: false, // new user is NOT a super user unless manually changed in DB
-                        approved: false, // every user must be approved in order to access functions.  When not approved, 
-                                         // we are just collecting them for future engagement.
                         creationDate: new Date() // for ease of tracking
                     }, function (err, agent) {
                         if (err) {
@@ -378,23 +376,6 @@ app.get('/approve', lib.ensureAuthenticated, function (req, res, next) { //Will 
                 });
             }
         );
-    }
-    else {
-        res.status(404).render('404');
-    }
-});
-
-app.get('/approve/:aid', lib.ensureAuthenticated, function (req, res, next) {
-    if (req.user.superuser) {
-        var aid = req.param('aid');
-        app.collection.agent.update({_id: ObjectID(aid)}, {'$set': {approved: true}}, function (err) {
-            if (err) {
-                next(err);
-                return false;
-            }
-            res.redirect('/approve');
-        });
-
     }
     else {
         res.status(404).render('404');
