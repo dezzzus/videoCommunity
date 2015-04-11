@@ -126,34 +126,10 @@ app.get('/useterms', function (req, res) {
     res.render('useterms');
 });
 
-app.get('/beta_not_yet', function (req, res) {
-    res.render('not_yet_approved');
-});
-
 app.get('/early_adopter', function (req, res) {
     res.render('early_adopter');
 });
 
-// The stuff below is to handle special pages for promotion to advisors.
-// Dictionary key is the page name that is enabled and value is the formal name to use in the page.
-// Can put in DB if needed over time.  Or in the future these will 
-// likely not be needed once we are in the next phase.
-var advisors = {
-    'jen': 'Jennifer'
-};
-
-app.get('/advisor/:advname', function (req, res, next) {
-    var advname = req.param('advname');
-    if (advname && (advname in advisors)) {
-        res.render('advisor', {
-            noindex: true,
-            advisorFormalName: advisors[advname]
-        });
-    }
-    else {
-        res.redirect('/');
-    }
-});
 
 app.get('/logout', function (req, res) {
     req.logout();
@@ -360,26 +336,6 @@ app.post('/profile', lib.ensureAuthenticated, function (req, res, next) {
     return req.pipe(busboy);
 
 
-});
-
-app.get('/approve', lib.ensureAuthenticated, function (req, res, next) { //Will blow up if we will have tons of agents
-    if (req.user.superuser) {
-        app.collection.agent.find({}).toArray(
-            function (err, agents) {
-                if (err) {
-                    next(err);
-                    return false;
-                }
-
-                res.render('approve', {
-                    agents: agents
-                });
-            }
-        );
-    }
-    else {
-        res.status(404).render('404');
-    }
 });
 
 //404 route should be always be last route

@@ -2,13 +2,7 @@ module.exports = {
     ensureAuthenticated: function (req, res, next) {
         req.session.returnTo = req.url;
         if (req.isAuthenticated()) {
-            if (req.user) {
-                return next();
-            }
-            else {
-                res.redirect('/beta_not_yet');
-                return;
-            }
+            return next();
         }
         res.redirect('/login');
     },
