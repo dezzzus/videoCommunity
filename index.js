@@ -80,7 +80,7 @@ passport.use(new LocalStrategy({
         usernameField: 'email'
     },
     function (email, password, done) {
-        app.collection.agent.findOne({email: email}, function (err, user) {
+        app.collection.agent.findOne({email: email.toLowerCase()}, function (err, user) {
             if (err) {
                 return done(err);
             }
