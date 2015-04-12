@@ -261,14 +261,14 @@ app.post('/signup', function (req, res, next) {
             res.redirect('/signup');
         }
         else {
-            lib.safeFindOne(app.collection.agent, {email: busboy.currentAgent['email']}, function (user) {
+            lib.safeFindOne(app.collection.agent, {email: busboy.currentAgent['email'].toLowerCase()}, function (user) {
                 if (user) {
                     res.redirect('/signup');
                 }
                 else {
                     var hash = saltedHash(busboy.currentAgent['password']);
                     app.collection.agent.insert({
-                        email: busboy.currentAgent['email'],
+                        email: busboy.currentAgent['email'].toLowerCase(),
                         name: busboy.currentAgent['name'],
                         phone: busboy.currentAgent['phone'],
                         agency: busboy.currentAgent['agency'],
