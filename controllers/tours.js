@@ -376,20 +376,23 @@ exports.addTourRoutes = function (app) {
     });
 
     app.post('/tour/:vid/buddy', lib.ensureAuthenticated, function (req, res, next) {
-        var buddyEmail = req.body['email'];
+        var buddyEmails = req.body['email'].toLowerCase().split(',');
         var vid = req.param('vid');
-        lib.safeFindOne(app.collection.agent, {'email': buddyEmail}, function (agent) {
-            claimVideo(vid, agent._id.toHexString(), function () {
-                keenClient.addEvent('agent_buddy', {
-                    'videoID': vid,
-                    'source_agentID': req.user._id.toHexString(),
-                    'dest_agentID': agent._id.toHexString()
-                }, function () {
-                });
 
-                res.send({'status': 'OK'});
+        for (var i = 0; i < buddyEmails.length; i++) {
+            var buddyEmail = buddyEmails[i];
+            lib.safeFindOne(app.collection.agent, {'email': buddyEmail}, function (agent) {
+                claimVideo(vid, agent._id.toHexString(), function () {
+                    keenClient.addEvent('agent_buddy', {
+                        'videoID': vid,
+                        'source_agentID': req.user._id.toHexString(),
+                        'dest_agentID': agent._id.toHexString()
+                    }, function () {
+                    });
+                }, next);
             }, next);
-        }, next);
+        }
+        res.send({'status': 'OK'});
     });
 
     app.get('/original/:vid', function (req, res, next) {
