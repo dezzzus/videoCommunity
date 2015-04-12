@@ -1,3 +1,6 @@
+var mongodb = require('mongodb');
+var ObjectID = mongodb.ObjectID;
+
 module.exports = {
     ensureAuthenticated: function (req, res, next) {
         req.session.returnTo = req.url;
@@ -56,15 +59,25 @@ module.exports = {
             });
         }
     },
-    
+
     randomInt: function (low, high) {
         return Math.floor(Math.random() * (high - low) + low);
     },
-    
-    fixupAgentPhotoURL: function(agent) {
+
+    fixupAgentPhotoURL: function (agent) {
         if (!agent.photoURL || agent.photoURL === '') {
             agent.photoURL = 'http://cdn.virtualvizzit.com/' + agent.photoFileId;
         }
+    },
+
+    getRightId: function (source) {
+        if (source.length == 24) {
+            return ObjectID(source)
+        }
+        else {
+            return source;
+        }
+
     }
 
 };

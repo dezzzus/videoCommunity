@@ -3,6 +3,8 @@ var mongodb = require('mongodb');
 var ObjectID = mongodb.ObjectID;
 var Busboy = require('busboy');
 var Keen = require('keen-js');
+var shortid = require('shortid');
+
 var tourAlphaComp = function (a, b) {
     var aStr = a.address || "";
     var bStr = b.address || "";
@@ -57,7 +59,7 @@ exports.addTourRoutes = function (app) {
 
         busboy.on('file', function (fieldname, file, filename) {
             var userId = req.user._id.toHexString();
-            req.session.lastVideoId = userId + filename.replace(/\W+/g, '-').toLowerCase() + Date.now();
+            req.session.lastVideoId = shortid.generate();
 
             var upload = app.s3Stream.upload({
                 Bucket: 'vizzitupload',
@@ -89,13 +91,14 @@ exports.addTourRoutes = function (app) {
 
         busboy.on('finish', function () {
             var newProperty = {
+                _id: shortid.generate(),
                 playerType: 'flowplayer',
                 address: req.session.lastTour['address'],
                 agent: req.session.lastTour['agent'],
                 note: req.session.lastTour['note'],
                 group: req.session.lastTour['group'],
                 videoID: req.session.lastVideoId,
-                uploadToken: req.session.lastVideoId ? null : (new ObjectID()).toHexString(),
+                uploadToken: req.session.lastVideoId ? null : shortid.generate(),
                 hasThumb: true, // from this point on, all videos have thumbnails
                 creationDate: new Date()
             };
@@ -133,55 +136,52 @@ exports.addTourRoutes = function (app) {
         var leadID = req.param('lead');
         var agentInteractive = alwaysInteractive || !!leadID;
         var pid = req.param('pid');
-        if (pid.length >= 12) {
-            lib.safeFindOne(app.collection.property, {'_id': ObjectID(pid)}, function (property) {
-                if (property) {
-                    lib.safeFindOne(app.collection.agent, {'_id': ObjectID(property.agent)}, function (agent) {
-                        var isAgent = req.isAuthenticated() && agent._id.equals(req.user._id);
-                        if (isAgent) {
-                            // Find and send in all agent's tours, to allow redirect
-                            app.collection.property.find({'agent': agent._id.toHexString()}).toArray(
-                                function (allprop_err, tours) {
-                                    if (allprop_err) {
-                                        next(allprop_err);
-                                    }
+
+        lib.safeFindOne(app.collection.property, {'_id': lib.getRightId(pid)}, function (property) {
+            if (property) {
+                lib.safeFindOne(app.collection.agent, {'_id': ObjectID(property.agent)}, function (agent) {
+                    var isAgent = req.isAuthenticated() && agent._id.equals(req.user._id);
+                    if (isAgent) {
+                        // Find and send in all agent's tours, to allow redirect
+                        app.collection.property.find({'agent': agent._id.toHexString()}).toArray(
+                            function (allprop_err, tours) {
+                                if (allprop_err) {
+                                    next(allprop_err);
+                                }
+                                renderDetails(templateName, res, property, agent,
+                                    isAgent, tours, leadID, agentInteractive);
+                            });
+                    }
+                    else if (property.group && property.group !== '') {
+                        // Find and send in all tours in the same group, for cross-selling:
+                        app.collection.property.find({'group': property.group}).toArray(
+                            function (allprop_err, tours) {
+                                if (allprop_err) {
+                                    next(allprop_err);
+                                }
+                                else {
+
                                     renderDetails(templateName, res, property, agent,
-                                        isAgent, tours, leadID, agentInteractive);
-                                });
-                        }
-                        else if (property.group && property.group !== '') {
-                            // Find and send in all tours in the same group, for cross-selling:
-                            app.collection.property.find({'group': property.group}).toArray(
-                                function (allprop_err, tours) {
-                                    if (allprop_err) {
-                                        next(allprop_err);
-                                    }
-                                    else {
+                                        isAgent, null, leadID, agentInteractive,
+                                        tours.filter(function (t) {
+                                            return !t._id.equals(property._id);
+                                        })
+                                            .sort(tourAlphaComp));
+                                }
+                            });
 
-                                        renderDetails(templateName, res, property, agent,
-                                            isAgent, null, leadID, agentInteractive,
-                                            tours.filter(function (t) {
-                                                return !t._id.equals(property._id);
-                                            })
-                                                .sort(tourAlphaComp));
-                                    }
-                                });
+                    }
+                    else {
+                        renderDetails(templateName, res, property, agent, isAgent, null, leadID,
+                            agentInteractive);
+                    }
+                }, next);
+            }
+            else {
+                res.status(404).render('404');
+            }
+        }, next);
 
-                        }
-                        else {
-                            renderDetails(templateName, res, property, agent, isAgent, null, leadID,
-                                agentInteractive);
-                        }
-                    }, next);
-                }
-                else {
-                    res.status(404).render('404');
-                }
-            }, next);
-        }
-        else {
-            res.status(404).render('404');
-        }
     }
 
     app.get('/tour/:pid', function (req, res, next) {
@@ -199,7 +199,7 @@ exports.addTourRoutes = function (app) {
 
     function tourManageAction(req, res, next, actionFunc, uploadToken) {
         var pid = req.param('pid');
-        lib.safeFindOne(app.collection.property, {'_id': ObjectID(pid)}, function (property) {
+        lib.safeFindOne(app.collection.property, {'_id': lib.getRightId(pid)}, function (property) {
             if (property) {
                 if (req.user && req.user._id.toHexString() == property.agent ||
                     uploadToken && property.uploadToken === uploadToken) {
@@ -265,7 +265,7 @@ exports.addTourRoutes = function (app) {
 
         busboy.on('file', function (fieldname, file, filename) {
             var userId = agentId || req.user._id.toHexString();
-            req.session.lastVideoId = userId + filename.replace(/\W+/g, '-').toLowerCase() + Date.now();
+            req.session.lastVideoId = shortid.generate();
 
             var upload = app.s3Stream.upload({
                 Bucket: 'vizzitupload',
@@ -296,7 +296,7 @@ exports.addTourRoutes = function (app) {
         });
 
         busboy.on('finish', function () {
-            lib.safeFindOne(app.collection.property, {'_id': ObjectID(pid)}, function (property) {
+            lib.safeFindOne(app.collection.property, {'_id': lib.getRightId(pid)}, function (property) {
                 if (property) {
                     if (req.user && req.user._id.toHexString() === property.agent ||
                         uploadToken && property.uploadToken === uploadToken) {
@@ -304,7 +304,7 @@ exports.addTourRoutes = function (app) {
                             videoID: req.session.lastVideoId,
                             uploadToken: req.session.lastVideoId ? null : (new ObjectID()).toHexString()
                         };
-                        app.collection.property.update({_id: ObjectID(pid)}, {'$set': updatedFields}, function (err, updatedProp) {
+                        app.collection.property.update({_id: lib.getRightId(pid)}, {'$set': updatedFields}, function (err, updatedProp) {
                             if (err) {
                                 next(err);
                             }
@@ -397,44 +397,36 @@ exports.addTourRoutes = function (app) {
 
     app.get('/original/:vid', function (req, res, next) {
         var vid = req.param('vid');
-        if (vid.length >= 12) {
-            lib.safeFindOne(app.collection.property, {'videoID': vid}, function (property) {
-                if (property) {
-                    res.render('original', {
-                        property: property,
-                        videoID: property.videoID,
-                        isAgent: false
-                    });
-                }
-                else {
-                    res.status(404).render('404');
-                }
-            }, next);
-        }
-        else {
-            res.status(404).render('404');
-        }
+
+        lib.safeFindOne(app.collection.property, {'videoID': vid}, function (property) {
+            if (property) {
+                res.render('original', {
+                    property: property,
+                    videoID: property.videoID,
+                    isAgent: false
+                });
+            }
+            else {
+                res.status(404).render('404');
+            }
+        }, next);
+
     });
 
     app.get('/original/:vid/agent', function (req, res, next) {
         var vid = req.param('vid');
-        if (vid.length >= 12) {
-            lib.safeFindOne(app.collection.property, {'videoID': vid}, function (property) {
-                if (property) {
-                    res.render('original', {
-                        property: property,
-                        videoID: property.videoID,
-                        isAgent: true
-                    });
-                }
-                else {
-                    res.status(404).render('404');
-                }
-            }, next);
-        }
-        else {
-            res.status(404).render('404');
-        }
+        lib.safeFindOne(app.collection.property, {'videoID': vid}, function (property) {
+            if (property) {
+                res.render('original', {
+                    property: property,
+                    videoID: property.videoID,
+                    isAgent: true
+                });
+            }
+            else {
+                res.status(404).render('404');
+            }
+        }, next);
     });
 
     app.get('/original/:vid/claim', lib.ensureAuthenticated, function (req, res, next) {

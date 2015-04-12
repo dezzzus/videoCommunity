@@ -111,7 +111,7 @@
                     <% for (var i = 0; i < allProperties.length;i++) { %>
                     <option value="<%= allProperties[i]._id %>"
 
-                            <% if (property._id.toHexString() === allProperties[i]._id.toHexString()) { %>
+                            <% if (property._id === allProperties[i]._id) { %>
                             selected="selected"
                             <% } %>
 
