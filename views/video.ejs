@@ -231,7 +231,7 @@
             });
 
             $('.buddy_tour').on('click', function () {
-                var agentMail = prompt('Enter agent email');
+                var agentMail = prompt('Enter agent emails, separated by comma');
                 $.ajax({
                     type: 'POST',
                     url: '/tour/<%= videoID %>/buddy',
