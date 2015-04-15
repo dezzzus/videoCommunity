@@ -97,6 +97,7 @@ exports.addTourRoutes = function (app) {
                 agent: req.session.lastTour['agent'],
                 note: req.session.lastTour['note'],
                 group: req.session.lastTour['group'],
+                price: req.session.lastTour['price'],
                 videoID: req.session.lastVideoId,
                 uploadToken: req.session.lastVideoId ? null : shortid.generate(),
                 hasThumb: true, // from this point on, all videos have thumbnails
@@ -235,6 +236,7 @@ exports.addTourRoutes = function (app) {
             lib.processReqField(req.body, property, 'address', updatedFields);
             lib.processReqField(req.body, property, 'note', updatedFields);
             lib.processReqField(req.body, property, 'group', updatedFields);
+            lib.processReqField(req.body, property, 'price', updatedFields);
 
             if (!lib.isEmptyObject(updatedFields)) {
                 app.collection.property.update({_id: ObjectID(pid)}, {'$set': updatedFields}, function (err, updatedProp) {

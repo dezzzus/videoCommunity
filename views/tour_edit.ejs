@@ -14,6 +14,13 @@
                     </div>
 
                     <div class="form-group">
+                        <label>Price:</label>
+                        <input type="text" class="form-control" value="<%= tour.price || ''%>"
+                               name="price"/>
+                    </div>
+
+
+                    <div class="form-group">
                         <label for="note_input">Note:</label>
                         <input type="text" class="form-control" id="note_input" value="<%= tour.note %>"
                                name="note"/>
