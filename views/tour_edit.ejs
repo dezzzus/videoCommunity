@@ -6,7 +6,7 @@
 
         <div class="col-md-4">
             <div class="formbox">
-                <form action="/tour/<%=tour._id.toHexString() %>/edit" method="post">
+                <form action="/tour/<%=tour._id %>/edit" method="post">
                     <div class="form-group">
                         <label for="address_input">Address:</label>
                         <input type="text" class="form-control" id="address_input" value="<%= tour.address %>"
@@ -30,6 +30,26 @@
                         <label for="note_input">Group:</label>
                         <input type="text" class="form-control" id="group_input" value="<%= tour.group || '' %>"
                                name="group"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Bedrooms:</label>
+                        <input type="text" class="form-control" value="<%= tour.beds?tour.beds:'' %>" name="beds"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Bathrooms:</label>
+                        <input type="text" class="form-control" value="<%= tour.baths?tour.baths:'' %>" name="baths"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Description:</label>
+                        <input type="text" class="form-control" value="<%= tour.description?tour.description:'' %>" name="description"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Landlord (hidden from tenat):</label>
+                        <input type="text" class="form-control" value="<%= tour.landlord?tour.landlord:'' %>" name="landlord"/>
+                    </div>
+                    <div class="form-group">
+                        <label>General area:</label>
+                        <input type="text" class="form-control" value="<%= tour.area?tour.area:'' %>" name="area"/>
                     </div>
                     
                     <div class="form-group">

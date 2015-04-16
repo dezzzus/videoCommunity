@@ -58,30 +58,35 @@ exports.addTourRoutes = function (app) {
         var busboy = new Busboy({headers: req.headers});
 
         busboy.on('file', function (fieldname, file, filename) {
-            var userId = req.user._id.toHexString();
-            req.session.lastVideoId = shortid.generate();
+            if (filename) {
+                var userId = req.user._id.toHexString();
+                req.session.lastVideoId = shortid.generate();
 
-            var upload = app.s3Stream.upload({
-                Bucket: 'vizzitupload',
-                Key: req.session.lastVideoId
-            });
+                var upload = app.s3Stream.upload({
+                    Bucket: 'vizzitupload',
+                    Key: req.session.lastVideoId
+                });
 
-            upload.on('uploaded', function () {
-                app.transcoder.transcode(userId, req.session.lastVideoId,
-                    function (err) {
-                        if (err) {
-                            lib.reportError(err);
-                        }
-                    }, next);
-            });
+                upload.on('uploaded', function () {
+                    app.transcoder.transcode(req.session.lastVideoId,
+                        function (err) {
+                            if (err) {
+                                lib.reportError(err);
+                            }
+                        }, next);
+                });
 
-            upload.on('error', function (err) {
-                if (err) {
-                    lib.reportError(err);
-                }
-            });
+                upload.on('error', function (err) {
+                    if (err) {
+                        lib.reportError(err);
+                    }
+                });
 
-            file.pipe(upload);
+                file.pipe(upload);
+            }
+            else{
+                file.resume();
+            }
         });
 
         busboy.on('field', function (fieldname, val) {
@@ -98,6 +103,11 @@ exports.addTourRoutes = function (app) {
                 note: req.session.lastTour['note'],
                 group: req.session.lastTour['group'],
                 price: req.session.lastTour['price'],
+                beds: req.session.lastTour['beds'],
+                baths: req.session.lastTour['baths'],
+                description: req.session.lastTour['description'],
+                landlord: req.session.lastTour['landlord'],
+                area: req.session.lastTour['area'],
                 videoID: req.session.lastVideoId,
                 uploadToken: req.session.lastVideoId ? null : shortid.generate(),
                 hasThumb: true, // from this point on, all videos have thumbnails
@@ -237,9 +247,15 @@ exports.addTourRoutes = function (app) {
             lib.processReqField(req.body, property, 'note', updatedFields);
             lib.processReqField(req.body, property, 'group', updatedFields);
             lib.processReqField(req.body, property, 'price', updatedFields);
+            lib.processReqField(req.body, property, 'beds', updatedFields);
+            lib.processReqField(req.body, property, 'baths', updatedFields);
+            lib.processReqField(req.body, property, 'description', updatedFields);
+            lib.processReqField(req.body, property, 'landlord', updatedFields);
+            lib.processReqField(req.body, property, 'area', updatedFields);
+
 
             if (!lib.isEmptyObject(updatedFields)) {
-                app.collection.property.update({_id: ObjectID(pid)}, {'$set': updatedFields}, function (err, updatedProp) {
+                app.collection.property.update({_id: lib.getRightId(pid)}, {'$set': updatedFields}, function (err, updatedProp) {
                     if (err) {
                         next(err);
                     }
@@ -275,7 +291,7 @@ exports.addTourRoutes = function (app) {
             });
 
             upload.on('uploaded', function () {
-                app.transcoder.transcode(userId, req.session.lastVideoId,
+                app.transcoder.transcode(req.session.lastVideoId,
                     function (err) {
                         if (err) {
                             lib.reportError(err);

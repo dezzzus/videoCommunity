@@ -30,7 +30,7 @@
     </div>
 
 
-    <h1>Add video:</h1>
+    <h1>Add video(all fields are optional):</h1>
 
     <div class="row">
         <div class="col-md-4">
@@ -58,6 +58,28 @@
                         (Videos in the same group will be referenced on the same page)
                         <input type="text" class="form-control" id="group_input" name="group"/>
                     </div>
+                    <div class="form-group">
+                        <label>Bedrooms:</label>
+                        <input type="text" class="form-control" name="beds"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Bathrooms:</label>
+                        <input type="text" class="form-control" name="baths"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Description:</label>
+                        <input type="text" class="form-control" name="description"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Landlord (hidden from tenat):</label>
+                        <input type="text" class="form-control" name="landlord"/>
+                    </div>
+                    <div class="form-group">
+                        <label>General area:</label>
+                        <input type="text" class="form-control" name="area"/>
+                    </div>
+
+
 
                     <% if (agent.superuser) { %>
                     <div class="form-group">

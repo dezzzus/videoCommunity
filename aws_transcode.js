@@ -30,7 +30,7 @@ module.exports = {
         };
 
         return {
-            transcode: function (agentId, videoId, onError, next) {
+            transcode: function (videoId, onError, next) {
                 var presetName = 'vv-current-preset';
                 findPresetByName(presetName, function (presetId) {
                     if (!presetId) {
