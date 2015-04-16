@@ -61,11 +61,6 @@
 
 <script type="application/javascript">
     $(function () {
-        _gaq.push(['_trackEvent',
-            'tour', // category of activity
-            'submit_via_token' // Action
-        ]);
-
         keenClient.addEvent('tenant_token_pageview', {
             'tourID': '<%=tour._id %>',
             'sourceAgent': '<%=tour.agent %>'

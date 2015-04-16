@@ -16,7 +16,7 @@
                     <div class="property_address">
                         <%= property.address %>
                         <% if (property.price) { %>
-                            <%=property.price %>$
+                            <%= property.price %>$
                         <% } %>
                     </div>
                     <div class="property_map_link">
@@ -144,7 +144,7 @@
                 <div>
 
 
-                    <a href="<%= "/video/"+otherGroupProperties[i]._id.toHexString() %>"> <%= otherGroupProperties[i].address %></a>
+                    <a href="<%= "/video/" + otherGroupProperties[i]._id %>"> <%= otherGroupProperties[i].address %></a>
                 </div>
                 <% } %>
             </div>
@@ -176,12 +176,14 @@
             var flplayer = flowplayer(jqDiv);
 
             var playerWrapper = new SyncWrapper(flplayer);
-            <%if(!isAgent){%>
+
+            <% if(!isAgent){ %>
             vvzzt.sync.publishHeartBeat(playerWrapper);
             setTimeout(function () {
                 $('#lead_chat').show();
             }, <%= leadID == null ? 10000 : 0 %>);
-            <%}else{%>
+            <% }else{ %>
+
             var jqHeartBeat = $('.tenant_time');
             var jqJumpTo = $('.jump_to');
 
@@ -220,6 +222,15 @@
                 });
             });
             <%}%>
+            setTimeout(function(){
+                keenClient.addEvent('video_engaged_pageview', {
+                    'tourID': '<%=property._id %>',
+                    'sourceAgent': '<%=property.agent %>',
+                    'browser': navigator.userAgent
+                }, function () {
+                });
+            }, 1000);
+
 
 
         });
