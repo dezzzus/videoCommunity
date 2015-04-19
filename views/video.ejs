@@ -7,233 +7,231 @@
 
 <% include head_end.ejs %>
 
-<body>
-<div class="wrapper">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="property_address_box">
-                    <div class="property_address">
-                        <%= property.address %>
-                        <% if (property.price) { %>
-                            <%= property.price %>$
-                        <% } %>
-                    </div>
-                    <div class="property_map_link">
-                        <a target="_blank" href="https://www.google.com/maps/place/<%= mapQuery %>">View on map</a>
-                    </div>
-                    <% if(isAgent){ %>
-                    <div>
-                        <%= property.note %>
-                    </div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="property_address_box">
+                <div class="property_address">
+                    <%= property.address %>
+                    <% if (property.price) { %>
+                    <%= property.price %>$
                     <% } %>
                 </div>
+                <div class="property_map_link">
+                    <a target="_blank" href="https://www.google.com/maps/place/<%= mapQuery %>">View on map</a>
+                </div>
+                <% if(isAgent){ %>
+                <div>
+                    <%= property.note %>
+                </div>
+                <% } %>
             </div>
         </div>
+    </div>
 
-        <div class="row row-no-margins">
+    <div class="row row-no-margins">
 
-            <div class="col-md-9 video_section panel-body service-block-dark-blue">
-                <% if (agentInteractive) { %>
-                <div class="tenant_info">Your client currently on:
-                    <div class="tenant_time"></div>
-                    sec of video
-                    <a class="jump_to">Sync my player</a>
+        <div class="col-md-9 video_section panel-body service-block-dark-blue">
+            <% if (agentInteractive) { %>
+            <div class="tenant_info">Your client currently on:
+                <div class="tenant_time"></div>
+                sec of video
+                <a class="jump_to">Sync my player</a>
 
-                    <div>
-                        <input type="checkbox" class="always_sync"/> Keep in sync
-                    </div>
+                <div>
+                    <input type="checkbox" class="always_sync"/> Keep in sync
                 </div>
-                <% } %>
-
-                <% if(property.playerType == 'flowplayer'){ %>
-                <% include player/flowplayer.ejs %>
-                <% } %>
-                <% if(property.playerType == 'youtube'){ %>
-                <% include player/youtube.ejs %>
-                <% } %>
             </div>
-            <div class="col-md-3 box-low-padding">
-                <div class="agent_name_box">
-                    <div class="agent_name">
-                        <%= agent.name %>
-                    </div>
-                    <div class="agent_agency">
-                        <%= agent.agency || 'Video tour' %>
-                    </div>
-                    <div class="agent_phone">
-                        <i class="fa fa-phone"></i> <%= agent.phone || '' %>
+            <% } %>
+
+            <% if(property.playerType == 'flowplayer'){ %>
+            <% include player/flowplayer.ejs %>
+            <% } %>
+            <% if(property.playerType == 'youtube'){ %>
+            <% include player/youtube.ejs %>
+            <% } %>
+        </div>
+        <div class="col-md-3 box-low-padding">
+            <div class="agent_name_box">
+                <div class="agent_name">
+                    <%= agent.name %>
+                </div>
+                <div class="agent_agency">
+                    <%= agent.agency || 'Video tour' %>
+                </div>
+                <div class="agent_phone">
+                    <i class="fa fa-phone"></i> <%= agent.phone || '' %>
+                </div>
+            </div>
+            <div class="agent_photo">
+                <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
+            </div>
+
+
+            <div id="lead_chat" class="chat_box service-block-light" style="display: none;">
+                <div class="voice_chat alert alert-success">
+                    Voice chat activated. Feel free to talk with your agent.
+                </div>
+                <video id="local_video"></video>
+                <div id="remote_video"></div>
+
+                <div class="chat_output_panel">
+                    <div id="chat_output" class="panel-body" style="display: none;">
                     </div>
                 </div>
-                <div class="agent_photo">
-                    <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
-                </div>
 
+                To send a chat message, type and press Enter:
+                <div><input id="chat_input" placeholder="enter chat message"/></div>
 
-                <div id="lead_chat" class="chat_box service-block-light" style="display: none;">
-                    <div class="voice_chat alert alert-success">
-                        Voice chat activated. Feel free to talk with your agent.
-                    </div>
-                    <video id="local_video"></video>
-                    <div id="remote_video"></div>
+            </div>
 
-                    <div class="chat_output_panel">
-                        <div id="chat_output" class="panel-body" style="display: none;">
-                        </div>
-                    </div>
+            <% if (isAgent && !agentInteractive) { %>
 
-                    To send a chat message, type and press Enter:
-                    <div><input id="chat_input" placeholder="enter chat message"/></div>
+            <div class="chat_box service-block-light">
+                This session is not interacting with any clients. <br> If you'd like to communicate with a lead,
+                please connect via your lead notification, or open from <a href="/lead">My Leads</a> page.
+            </div>
 
-                </div>
+            <% } %>
 
-                <% if (isAgent && !agentInteractive) { %>
-
-                <div class="chat_box service-block-light">
-                    This session is not interacting with any clients. <br> If you'd like to communicate with a lead,
-                    please connect via your lead notification, or open from <a href="/lead">My Leads</a> page.
-                </div>
-
-                <% } %>
-
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-offset-1 col-md-11 box-low-padding">
+            This video was produced by a budding, yet still an amateur videographer as a courtesy before your visit
+        </div>
+    </div>
+    <% if (isAgent) { %>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="btn  btn-primary send_tour">
+                <i class="fa fa-envelope-o"></i>Send tour to client
+            </div>
+            <div class="btn  btn-primary buddy_tour">
+                <i class="fa fa-envelope-o"></i>Copy tour to other agent
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-offset-1 col-md-11 box-low-padding">
-                This video was produced by a budding, yet still an amateur videographer as a courtesy before your visit
+        <div class="col-md-6">
+            <% if (agentInteractive) { %>
+            <div class="form-group">
+                <label for="tour_select">Switch to another tour:</label>
+                <select class="form-control" id="tour_select" name="tour">
+                    <% for (var i = 0; i < allProperties.length;i++) { %>
+                    <option value="<%= allProperties[i]._id %>"
+
+                            <% if (property._id.toHexString() === allProperties[i]._id.toHexString()) { %>
+                            selected="selected"
+                            <% } %>
+
+                            > <%= allProperties[i].address %> </option>
+                    <% } %>
+                </select>
             </div>
+            <% } %>
+
         </div>
-        <% if (isAgent) { %>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="btn  btn-primary send_tour">
-                    <i class="fa fa-envelope-o"></i>Send tour to client
-                </div>
-                <div class="btn  btn-primary buddy_tour">
-                    <i class="fa fa-envelope-o"></i>Copy tour to other agent
-                </div>
+    </div>
+    <% } %>
+
+    <div class="row">
+        <% if (otherGroupProperties.length > 0) { %>
+
+        <div class="col-md-6">
+            Tours of other similar properties:
+            <% for (var i = 0; i < otherGroupProperties.length;i++) { %>
+            <div>
+
+
+                <a href="<%= "/video/" + otherGroupProperties[i]._id %>"> <%= otherGroupProperties[i].address %></a>
             </div>
-            <div class="col-md-6">
-                <% if (agentInteractive) { %>
-                <div class="form-group">
-                    <label for="tour_select">Switch to another tour:</label>
-                    <select class="form-control" id="tour_select" name="tour">
-                        <% for (var i = 0; i < allProperties.length;i++) { %>
-                        <option value="<%= allProperties[i]._id %>"
-
-                                <% if (property._id.toHexString() === allProperties[i]._id.toHexString()) { %>
-                                selected="selected"
-                                <% } %>
-
-                                > <%= allProperties[i].address %> </option>
-                        <% } %>
-                    </select>
-                </div>
-                <% } %>
-
-            </div>
+            <% } %>
         </div>
         <% } %>
-
-        <div class="row">
-            <% if (otherGroupProperties.length > 0) { %>
-
-            <div class="col-md-6">
-                Tours of other similar properties:
-                <% for (var i = 0; i < otherGroupProperties.length;i++) { %>
-                <div>
-
-
-                    <a href="<%= "/video/" + otherGroupProperties[i]._id %>"> <%= otherGroupProperties[i].address %></a>
-                </div>
-                <% } %>
-            </div>
-            <% } %>
-        </div>
-
     </div>
-    <script type="application/javascript">
-        // global needed to be set before onLoad stuff happens
-        // TODO: remove this global, and set this asynchronously, and registration should happen lazily when this is set.
-        var vv_pubnub_room_id = "SyncVideo" + "<%= property._id %>";
 
-        $(function () {
-            <% if (!isAgent || agentInteractive) { %>
+</div>
+<script type="application/javascript">
+    // global needed to be set before onLoad stuff happens
+    // TODO: remove this global, and set this asynchronously, and registration should happen lazily when this is set.
+    var vv_pubnub_room_id = "SyncVideo" + "<%= property._id %>";
 
-            vvzzt.ui.tourSwitchRegistration("#tour_select", 'video');
+    $(function () {
+        <% if (!isAgent || agentInteractive) { %>
 
-            <% include text_chat.ejs %>
+        vvzzt.ui.tourSwitchRegistration("#tour_select", 'video');
 
-            $('#lead_chat').show();
+        <% include text_chat.ejs %>
 
-            <% } %>
+        $('#lead_chat').show();
 
-            var jqDiv = $(".fplayer");
-            jqDiv.flowplayer({
-                errors: ['', 'Video loading aborted', 'Network error',
-                    'Video not properly encoded', 'Video file is optimizing for web now, wait two minutes and reload a page']
-            });
-            var flplayer = flowplayer(jqDiv);
+        <% } %>
 
-            var playerWrapper = new SyncWrapper(flplayer);
-
-            <% if(!isAgent){ %>
-            vvzzt.sync.publishHeartBeat(playerWrapper);
-            setTimeout(function () {
-                $('#lead_chat').show();
-            }, <%= leadID == null ? 10000 : 0 %>);
-            <% }else{ %>
-
-            var jqHeartBeat = $('.tenant_time');
-            var jqJumpTo = $('.jump_to');
-
-            vvzzt.sync.listenHeartBeat(jqHeartBeat, $('.tenant_info'), playerWrapper);
-
-            jqJumpTo.on('click', function () {
-                playerWrapper.api('seekTo', jqHeartBeat.text())
-            });
-
-            var jqCheckBox = $('.always_sync');
-            jqCheckBox.on('change', function () {
-                var isChecked = jqCheckBox.is(':checked');
-                vvzzt.sync.syncHeartBeat = isChecked;
-                if (isChecked) {
-                    jqJumpTo.hide();
-                }
-                else {
-                    jqJumpTo.show();
-                }
-            });
-
-            $('.buddy_tour').on('click', function () {
-                var agentMail = prompt('Enter agent emails, separated by comma');
-                $.ajax({
-                    type: 'POST',
-                    url: '/tour/<%= videoID %>/buddy',
-                    data: {
-                        email: agentMail
-                    },
-                    success: function () {
-                        alert('Tour successfully shared.');
-                    },
-                    error: function () {
-                        alert('Tour could not be shared due to error.  Please try again.');
-                    }
-                });
-            });
-            <%}%>
-            setTimeout(function(){
-                keenClient.addEvent('video_engaged_pageview', {
-                    'tourID': '<%=property._id %>',
-                    'sourceAgent': '<%=property.agent %>',
-                    'browser': navigator.userAgent
-                }, function () {
-                });
-            }, 1600);
-
-
-
+        var jqDiv = $(".fplayer");
+        jqDiv.flowplayer({
+            errors: ['', 'Video loading aborted', 'Network error',
+                'Video not properly encoded', 'Video file is optimizing for web now, wait two minutes and reload a page']
         });
-    </script>
+        var flplayer = flowplayer(jqDiv);
 
-    <% include foot.ejs %>
+        var playerWrapper = new SyncWrapper(flplayer);
+
+        <% if(!isAgent){ %>
+        vvzzt.sync.publishHeartBeat(playerWrapper);
+        setTimeout(function () {
+            $('#lead_chat').show();
+        }, <%= leadID == null ? 10000 : 0 %>);
+        <% }else{ %>
+
+        var jqHeartBeat = $('.tenant_time');
+        var jqJumpTo = $('.jump_to');
+
+        vvzzt.sync.listenHeartBeat(jqHeartBeat, $('.tenant_info'), playerWrapper);
+
+        jqJumpTo.on('click', function () {
+            playerWrapper.api('seekTo', jqHeartBeat.text())
+        });
+
+        var jqCheckBox = $('.always_sync');
+        jqCheckBox.on('change', function () {
+            var isChecked = jqCheckBox.is(':checked');
+            vvzzt.sync.syncHeartBeat = isChecked;
+            if (isChecked) {
+                jqJumpTo.hide();
+            }
+            else {
+                jqJumpTo.show();
+            }
+        });
+
+        $('.buddy_tour').on('click', function () {
+            var agentMail = prompt('Enter agent emails, separated by comma');
+            $.ajax({
+                type: 'POST',
+                url: '/tour/<%= videoID %>/buddy',
+                data: {
+                    email: agentMail
+                },
+                success: function () {
+                    alert('Tour successfully shared.');
+                },
+                error: function () {
+                    alert('Tour could not be shared due to error.  Please try again.');
+                }
+            });
+        });
+        <%}%>
+        setTimeout(function () {
+            keenClient.addEvent('video_engaged_pageview', {
+                'tourID': '<%=property._id %>',
+                'sourceAgent': '<%=property.agent %>',
+                'browser': navigator.userAgent
+            }, function () {
+            });
+        }, 1600);
+
+
+    });
+</script>
+
+<% include foot.ejs %>

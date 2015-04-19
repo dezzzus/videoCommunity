@@ -3,7 +3,8 @@
 .header-v3 {
 	z-index: 99;
 	position: relative;
-	border-bottom: solid 2px #eee;
+	border-bottom: solid 1px #d4d4d4;
+	box-shadow: 0 2px 3px 0 #e6e6e6;
 }
 
 .header-v3 .navbar {
@@ -16,8 +17,7 @@
 }
 
 /*Navbar Brand*/
-.header-v3 .navbar-brand { 
-	top: 10px;
+.header-v3 .navbar-brand {
 	z-index: 1;
 	padding: 10px;
 	position: relative;
@@ -232,7 +232,7 @@
 
 	.header-v3 .navbar-default .navbar-nav > li > a {
 		font-size: 13px;
-		padding: 30px 30px 26px 20px;
+		padding: 21px 9px 21px 9px;
 	}
 	
 	.header-v3 .navbar-default .navbar-nav > li > a,
