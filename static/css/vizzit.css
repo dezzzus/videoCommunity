@@ -111,9 +111,8 @@
     margin-left: 15px;
 }
 
-.row-no-margins {
-    margin-left: 0;
-    margin-right: 0;
+.row-big-top-margin{
+    margin-top: 52px;
 }
 
 .team_pic {

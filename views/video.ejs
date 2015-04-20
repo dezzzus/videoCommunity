@@ -8,31 +8,10 @@
 <% include head_end.ejs %>
 
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="property_address_box">
-                <div class="property_address">
-                    <%= property.address %>
-                    <% if (property.price) { %>
-                    <%= property.price %>$
-                    <% } %>
-                </div>
-                <div class="property_map_link">
-                    <a target="_blank" href="https://www.google.com/maps/place/<%= mapQuery %>">View on map</a>
-                </div>
-                <% if(isAgent){ %>
-                <div>
-                    <%= property.note %>
-                </div>
-                <% } %>
-            </div>
-        </div>
-    </div>
+<div class="container">
+    <div class="row row-big-top-margin">
 
-    <div class="row row-no-margins">
-
-        <div class="col-md-9 video_section panel-body service-block-dark-blue">
+        <div class="col-md-8">
             <% if (agentInteractive) { %>
             <div class="tenant_info">Your client currently on:
                 <div class="tenant_time"></div>
@@ -52,7 +31,7 @@
             <% include player/youtube.ejs %>
             <% } %>
         </div>
-        <div class="col-md-3 box-low-padding">
+        <div class="col-md-4 box-low-padding">
             <div class="agent_name_box">
                 <div class="agent_name">
                     <%= agent.name %>
@@ -94,6 +73,23 @@
             </div>
 
             <% } %>
+
+            <div class="property_address_box">
+                <div class="property_address">
+                    <%= property.address %>
+                    <% if (property.price) { %>
+                    <%= property.price %>$
+                    <% } %>
+                </div>
+                <div class="property_map_link">
+                    <a target="_blank" href="https://www.google.com/maps/place/<%= mapQuery %>">View on map</a>
+                </div>
+                <% if(isAgent){ %>
+                <div>
+                    <%= property.note %>
+                </div>
+                <% } %>
+            </div>
 
         </div>
     </div>
