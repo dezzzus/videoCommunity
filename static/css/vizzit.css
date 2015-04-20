@@ -1,10 +1,19 @@
-.agent_photo {
-    float: right;
+.agent-box{
+    position: relative;
+    border-top: 3px solid #d64521;
+    border-right: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+    border-left: 1px solid #e0e0e0;
+    padding: 27px 15px;
+    box-shadow: 0 0 2px 1px #ededed;
 }
 
 .agent_photo img {
-    max-width: 120px;
+    max-width: 90px;
     max-height: 90px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 0 3px 1px #e0e0e0;
+    border-radius: 5px;
 }
 
 .tour_thumb {
@@ -12,10 +21,11 @@
 }
 
 .agent_name_box {
-    padding-left: 3px;
+    position: absolute;
+    top: 29px;
+    left: 115px;
     text-align: left;
     font-size: 18px;
-    float: left;
 }
 
 .property_address_box {
@@ -29,7 +39,6 @@
 }
 
 .agent_phone {
-    float: left;
     font-style: italic;
     text-align: left;
 }
@@ -47,8 +56,6 @@
 
 .chat_box {
     margin-top: 3px;
-    clear: both;
-    float: left;
 }
 
 .chat_box .panel-body {

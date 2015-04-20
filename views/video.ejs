@@ -31,48 +31,50 @@
             <% include player/youtube.ejs %>
             <% } %>
         </div>
-        <div class="col-md-4 box-low-padding">
-            <div class="agent_name_box">
-                <div class="agent_name">
-                    <%= agent.name %>
+        <div class="col-md-4">
+            <div class="agent-box">
+                <div class="agent_photo">
+                    <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
                 </div>
-                <div class="agent_agency">
-                    <%= agent.agency || 'Video tour' %>
-                </div>
-                <div class="agent_phone">
-                    <i class="fa fa-phone"></i> <%= agent.phone || '' %>
-                </div>
-            </div>
-            <div class="agent_photo">
-                <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
-            </div>
 
-
-            <div id="lead_chat" class="chat_box service-block-light" style="display: none;">
-                <div class="voice_chat alert alert-success">
-                    Voice chat activated. Feel free to talk with your agent.
-                </div>
-                <video id="local_video"></video>
-                <div id="remote_video"></div>
-
-                <div class="chat_output_panel">
-                    <div id="chat_output" class="panel-body" style="display: none;">
+                <div class="agent_name_box">
+                    <div class="agent_name">
+                        <%= agent.name %>
+                    </div>
+                    <div class="agent_agency">
+                        <%= agent.agency || 'Video tour' %>
+                    </div>
+                    <div class="agent_phone">
+                        <i class="fa fa-phone"></i> <%= agent.phone || '' %>
                     </div>
                 </div>
 
-                To send a chat message, type and press Enter:
-                <div><input id="chat_input" placeholder="enter chat message"/></div>
+                <div id="lead_chat" class="chat_box service-block-light" style="display: none;">
+                    <div class="voice_chat alert alert-success">
+                        Voice chat activated. Feel free to talk with your agent.
+                    </div>
+                    <video id="local_video"></video>
+                    <div id="remote_video"></div>
+
+                    <div class="chat_output_panel">
+                        <div id="chat_output" class="panel-body" style="display: none;">
+                        </div>
+                    </div>
+
+                    To send a chat message, type and press Enter:
+                    <div><input id="chat_input" placeholder="enter chat message"/></div>
+
+                </div>
+                <% if (isAgent && !agentInteractive) { %>
+
+                <div class="chat_box service-block-light">
+                    This session is not interacting with any clients. <br> If you'd like to communicate with a lead,
+                    please connect via your lead notification, or open from <a href="/lead">My Leads</a> page.
+                </div>
+
+                <% } %>
 
             </div>
-
-            <% if (isAgent && !agentInteractive) { %>
-
-            <div class="chat_box service-block-light">
-                This session is not interacting with any clients. <br> If you'd like to communicate with a lead,
-                please connect via your lead notification, or open from <a href="/lead">My Leads</a> page.
-            </div>
-
-            <% } %>
 
             <div class="property_address_box">
                 <div class="property_address">
