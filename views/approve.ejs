@@ -1,0 +1,23 @@
+<% include head_begin.ejs %>
+<% include head_end.ejs %>
+<div class="container">
+    <table class="table tablehover">
+        <thead>
+        <tr>
+            <th>Email</th>
+            <th>Tours</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% for (var i = 0; i < agents.length;i++){ %>
+        <tr>
+            <td><%= agents[i].email %></td>
+            <td>
+                <a href="/tour?userid=<%= agents[i]._id %>">Tours page</a>
+            </td>
+        </tr>
+        <% } %>
+        </tbody>
+    </table>
+</div>
+<% include foot.ejs %>
