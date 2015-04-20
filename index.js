@@ -338,6 +338,27 @@ app.post('/profile', lib.ensureAuthenticated, function (req, res, next) {
 
 });
 
+app.get('/approve', lib.ensureAuthenticated, function (req, res, next) { //Will blow up if we will have tons of agents
+    if (req.user.superuser) {
+        app.collection.agent.find({}).toArray(
+            function (err, agents) {
+                if (err) {
+                    next(err);
+                    return false;
+                }
+
+                res.render('approve', {
+                    agents: agents
+                });
+            }
+        );
+    }
+
+    else {
+        res.status(404).render('404');
+    }
+});
+
 //404 route should be always be last route
 app.get('*', function (req, res) {
     res.status(404).render('404');
