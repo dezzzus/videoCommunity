@@ -220,6 +220,24 @@
                 }
             });
         });
+
+        $('.send_tour').on('click', function () {
+            var clientMail = prompt('Enter client email');
+            $.ajax({
+                type: 'POST',
+                url: '/video/<%= property._id %>/share',
+                data: {
+                    email: clientMail
+                },
+                success: function () {
+                    alert('Tour invitation sent.');
+                },
+                error: function () {
+                    alert('Tour invitation could not be sent due to error.  Please copy the URL address from the browser and send manually.');
+                }
+            });
+        });
+
         <%}%>
         setTimeout(function () {
             keenClient.addEvent('video_engaged_pageview', {

@@ -48,7 +48,7 @@ module.exports = {
 
         if (process.env.OPENSHIFT_NODEJS_IP) {
             app.awsMailer.sendMail({
-                from: 'noreply@virtualvizzit.com',
+                from: 'info@virtualvizzit.com',
                 to: 'shikolay@gmail.com',
                 subject: 'Virtualvizzit errors',
                 text: JSON.stringify(err) + '\n' + err.stack

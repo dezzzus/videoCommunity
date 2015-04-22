@@ -350,10 +350,29 @@ exports.addTourRoutes = function (app) {
         var reqEmail = req.body['email'];
         var pid = req.param('pid');
         app.awsMailer.sendMail({
-            from: 'noreply@virtualvizzit.com',
+            from: 'info@virtualvizzit.com',
             to: reqEmail,
             subject: 'VirtualVizzit tour invitation',
             text: req.user.name + ' invited you to see virtual tour:\n http://virtualvizzit.com/tour/' + pid
+        }, function (err, info) {
+            if (err) {
+                next(err);
+            }
+            else {
+                res.send({'status': 'OK'});
+            }
+        });
+
+    });
+
+    app.post('/video/:pid/share', lib.ensureAuthenticated, function (req, res, next) {
+        var reqEmail = req.body['email'];
+        var pid = req.param('pid');
+        app.awsMailer.sendMail({
+            from: 'info@virtualvizzit.com',
+            to: reqEmail,
+            subject: 'VirtualVizzit tour invitation',
+            text: req.user.name + ' invited you to see virtual tour:\n http://virtualvizzit.com/video/' + pid
         }, function (err, info) {
             if (err) {
                 next(err);

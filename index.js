@@ -196,7 +196,7 @@ app.post('/resetpass', function (req, res, next) {
                     }
 
                     app.awsMailer.sendMail({
-                        from: 'noreply@virtualvizzit.com',
+                        from: 'info@virtualvizzit.com',
                         to: reqMail,
                         subject: 'Virtualvizzit password reset',
                         text: 'Your new password: ' + newPass

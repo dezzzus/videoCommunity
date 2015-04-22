@@ -46,7 +46,7 @@ var notifyAgentAboutLead = function(req, app, agentID, propID, leadID, firstMsg)
                     + '</a>'
                     + ' directly to start chatting.';
                 notifyMailer.sendMail({
-                    from: 'noreply@virtualvizzit.com',
+                    from: 'info@virtualvizzit.com',
                     to: agent.email,
                     subject: 'You have a new sales lead (Chat message: ' + firstMsg + ')',
                     html: msgText
