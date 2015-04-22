@@ -20,6 +20,10 @@
     max-width: 40px;
 }
 
+.agent_info{
+    min-height: 90px;
+}
+
 .agent_name_box {
     position: absolute;
     top: 29px;

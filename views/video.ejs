@@ -33,19 +33,21 @@
         </div>
         <div class="col-md-4">
             <div class="agent-box">
-                <div class="agent_photo">
-                    <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
-                </div>
+                <div class="agent_info">
+                    <div class="agent_photo">
+                        <img alt="<%= agent.name %>" src="<%= agent.photoURL %>">
+                    </div>
 
-                <div class="agent_name_box">
-                    <div class="agent_name">
-                        <%= agent.name %>
-                    </div>
-                    <div class="agent_agency">
-                        <%= agent.agency || 'Video tour' %>
-                    </div>
-                    <div class="agent_phone">
-                        <i class="fa fa-phone"></i> <%= agent.phone || '' %>
+                    <div class="agent_name_box">
+                        <div class="agent_name">
+                            <%= agent.name %>
+                        </div>
+                        <div class="agent_agency">
+                            <%= agent.agency || 'Video tour' %>
+                        </div>
+                        <div class="agent_phone">
+                            <i class="fa fa-phone"></i> <%= agent.phone || '' %>
+                        </div>
                     </div>
                 </div>
 
