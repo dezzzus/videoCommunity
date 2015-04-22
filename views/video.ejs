@@ -23,13 +23,38 @@
                 </div>
             </div>
             <% } %>
+            <div class="video_box">
+                <% if(property.playerType == 'flowplayer'){ %>
+                <% include player/flowplayer.ejs %>
+                <% } %>
+                <% if(property.playerType == 'youtube'){ %>
+                <% include player/youtube.ejs %>
+                <% } %>
 
-            <% if(property.playerType == 'flowplayer'){ %>
-            <% include player/flowplayer.ejs %>
-            <% } %>
-            <% if(property.playerType == 'youtube'){ %>
-            <% include player/youtube.ejs %>
-            <% } %>
+                <div class="property_info_box">
+                    <div class="property_beds_baths">
+                        <% if(property.beds) { %>
+                        <%= property.beds %> bd
+                        <% } %>
+                        <% if(property.beds && property.baths) { %>
+                        &bull;
+                        <% } %>
+                        <% if(property.baths) { %>
+                        <%= property.baths %> ba
+                        <% } %>
+                    </div>
+                    <div>
+                        <% if(property.area) { %>
+                        <%= property.area %>
+                        <% } %>
+
+                        <% if (property.price) { %>
+                        <%= property.price %>$
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
         </div>
         <div class="col-md-4">
             <div class="agent-box">
@@ -78,22 +103,15 @@
 
             </div>
 
-            <div class="property_address_box">
-                <div class="property_address">
-                    <%= property.address %>
-                    <% if (property.price) { %>
-                    <%= property.price %>$
-                    <% } %>
-                </div>
-                <div class="property_map_link">
-                    <a target="_blank" href="https://www.google.com/maps/place/<%= mapQuery %>">View on map</a>
-                </div>
-                <% if(isAgent){ %>
-                <div>
-                    <%= property.note %>
-                </div>
-                <% } %>
+            <div class="property_map_link">
+                <a target="_blank" href="https://www.google.com/maps/place/<%= mapQuery %>">View on map</a>
             </div>
+            <br>
+            <% if(isAgent){ %>
+            <div>
+                <%= property.note %>
+            </div>
+            <% } %>
 
         </div>
     </div>

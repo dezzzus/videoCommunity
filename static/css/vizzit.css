@@ -8,6 +8,12 @@
     box-shadow: 0 0 2px 1px #ededed;
 }
 
+.video_box{
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 0 2px 1px #ededed;
+    border-radius: 5px;
+}
+
 .agent_photo img {
     max-width: 90px;
     max-height: 90px;
@@ -29,11 +35,6 @@
     top: 29px;
     left: 115px;
     text-align: left;
-    font-size: 18px;
-}
-
-.property_address_box {
-    text-align: right;
     font-size: 18px;
 }
 
@@ -107,14 +108,17 @@
     height: 100px;
     float: right;
 }
+.property_info_box{
+    border-bottom: 1px solid #e0e0e0;
+    padding: 20px 16px;
+}
+
+.property_beds_baths{
+    font-size: 18px;
+}
 
 #local_video, #remote_video video, .voice_chat {
     display: none;
-}
-
-.property_address {
-    float: left;
-    margin-left: 5px;
 }
 
 .property_map_link {
