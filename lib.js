@@ -78,6 +78,15 @@ module.exports = {
             return source;
         }
 
+    },
+
+    compareIds: function(a, b){
+        if (a.toHexString && b.toHexString){
+            return a.equals(b);
+        }
+        else{
+            return a==b;
+        }
     }
 
 };
