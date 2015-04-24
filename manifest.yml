@@ -1,0 +1,4 @@
+applications:
+- name: vizzit
+  command: node index.js
+  memory: 128MB

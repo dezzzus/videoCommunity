@@ -19,8 +19,7 @@ var Busboy = require('busboy');
 
 
 var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
-var ipaddress = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
-var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
+var port = process.env.VCAP_APP_PORT || 3000;
 
 var usePhotoFileInsteadOfURL = true;
 
@@ -379,7 +378,7 @@ MongoClient.connect(mongoURI, function (dbErr, db) {
     app.collection.lead = db.collection('lead');
     app.collection.leadMsg = db.collection('leadMsg');
 
-    app.listen(port, ipaddress, function () {
+    app.listen(port, function () {
         console.log('Vizzit app listening at port:%s', port)
     });
 });

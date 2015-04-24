@@ -4,9 +4,6 @@
   "description": "vizzit web-site",
   "main": "index.js",
   "private": true,
-  "engines": {
-    "node": "0.10"
-  },
   "repository": {
     "type": "git",
     "url": "git@bitbucket.org:shikolay/vizzit.git"
