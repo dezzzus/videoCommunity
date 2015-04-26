@@ -16,6 +16,8 @@ var apiController = require('./controllers/api')
 var nodemailer = require('nodemailer');
 var aws_transcoder = require('./aws_transcode.js');
 var Busboy = require('busboy');
+//Monitoring
+require('newrelic');
 
 
 var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
