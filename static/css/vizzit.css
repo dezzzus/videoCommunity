@@ -111,10 +111,19 @@
 .property_info_box{
     border-bottom: 1px solid #e0e0e0;
     padding: 20px 16px;
+    position: relative;
 }
 
 .property_beds_baths{
     font-size: 18px;
+}
+
+.property_price{
+    font-size: 21px;
+    color: #d64521;
+    position: absolute;
+    right: 23px;
+    top: 24px;
 }
 
 #local_video, #remote_video video, .voice_chat {

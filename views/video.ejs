@@ -43,13 +43,14 @@
                         <%= property.baths %> ba
                         <% } %>
                     </div>
+                    <% if (property.price) { %>
+                    <div class="property_price">
+                        $<%= property.price %>
+                    </div>
+                    <% } %>
                     <div>
                         <% if(property.area) { %>
                         <%= property.area %>
-                        <% } %>
-
-                        <% if (property.price) { %>
-                        <%= property.price %>$
                         <% } %>
                     </div>
                 </div>
