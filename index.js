@@ -1,3 +1,6 @@
+//Monitoring
+require('newrelic');
+
 var express = require('express');
 var mongodb = require('mongodb');
 var bodyParser = require('body-parser');
@@ -16,9 +19,6 @@ var apiController = require('./controllers/api')
 var nodemailer = require('nodemailer');
 var aws_transcoder = require('./aws_transcode.js');
 var Busboy = require('busboy');
-//Monitoring
-require('newrelic');
-
 
 var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
 var port = process.env.VCAP_APP_PORT || 3000;
