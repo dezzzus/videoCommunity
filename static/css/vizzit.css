@@ -103,11 +103,6 @@
     clear: left;
 }
 
-.property_map {
-    width: 500px;
-    height: 100px;
-    float: right;
-}
 .property_info_box{
     border-bottom: 1px solid #e0e0e0;
     padding: 20px 16px;
@@ -134,9 +129,10 @@
     display: none;
 }
 
-.property_map_link {
+.property_map {
     float: left;
     margin-left: 15px;
+    margin-top: 40px;
 }
 
 .row-big-top-margin{

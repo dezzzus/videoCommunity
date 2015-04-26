@@ -129,9 +129,13 @@ exports.addTourRoutes = function (app) {
     function renderDetails(templateName, res, property, agent,
                            isAgent, allAgentProperties, leadID, agentInteractive, otherGroupProperties) {
         lib.fixupAgentPhotoURL(agent);
+        var mapQuery = '';
+        if (property.area){
+            mapQuery = property.area.split(' ').join('+');
+        }
         res.render(templateName, {
             property: property,
-            mapQuery: property.address.split(' ').join('+'),
+            mapQuery: mapQuery,
             agent: agent,
             allProperties: allAgentProperties,
             isAgent: isAgent,
