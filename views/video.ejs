@@ -30,7 +30,7 @@
                 <% if(property.playerType == 'youtube'){ %>
                 <% include player/youtube.ejs %>
                 <% } %>
-
+                <% if(property.beds || property.baths || property.price || property.area){ %>
                 <div class="property_info_box">
                     <div class="property_beds_baths">
                         <% if(property.beds) { %>
@@ -54,6 +54,12 @@
                         <% } %>
                     </div>
                 </div>
+                <% } %>
+                <% if (property.description) { %>
+                <div class="property_description">
+                    <%= property.description %>
+                </div>
+                <% } %>
             </div>
 
         </div>

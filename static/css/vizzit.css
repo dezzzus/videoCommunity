@@ -114,6 +114,10 @@
     position: relative;
 }
 
+.property_description{
+    padding: 20px 16px;
+}
+
 .property_beds_baths{
     font-size: 18px;
 }
