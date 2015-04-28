@@ -232,7 +232,7 @@ exports.addTourRoutes = function (app) {
 
     app.get('/tour/:pid/del', lib.ensureAuthenticated, function (req, res, next) {
         tourManageAction(req, res, next, function (property, pid) {
-            app.collection.property.remove({'_id': ObjectID(pid)}, function () {
+            app.collection.property.remove({'_id': lib.getRightId(pid)}, function () {
                 res.redirect('/tour');
             });
         });
