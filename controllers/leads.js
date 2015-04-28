@@ -18,7 +18,7 @@ exports.addLeadRoutes = function (app) {
     
     app.get('/lead', lib.ensureAuthenticated, function (req, res, next) {
         var archivedToggle = req.param('archivedToggle') === "true";
-        lib.safeFindOne(app.collection.agent, {'_id': ObjectID(req.user._id.toHexString())}, 
+        lib.safeFindOne(app.collection.agent, {'_id': req.user._id}, 
             function (agent) {
             app.collection.lead.find(
                 {
@@ -36,7 +36,7 @@ exports.addLeadRoutes = function (app) {
                     
                     var propIds = [];
                     leads.forEach(function(val, idx){
-                        propIds.push(ObjectID(val.property));
+                        propIds.push(lib.getRightId(val.property));
                     });
                     
                     app.collection.property.find(
@@ -48,7 +48,7 @@ exports.addLeadRoutes = function (app) {
                             if (!err) {
                                 var propAddresses = {};
                                 props.forEach(function(val, idx){
-                                    propAddresses[val._id.toHexString()] = val.address;
+                                    propAddresses[val._id] = val.address;
                                 });
                                 
                                 var allLeads = leads.sort(function (a, b) {
