@@ -46,7 +46,7 @@ module.exports = {
         console.log("Eurrent time: " + new Date());
         console.log("Stack\n" + err.stack);
 
-        if (process.env.VCAP_APP_PORT) {
+        /*if (process.env.VCAP_APP_PORT) {
             app.awsMailer.sendMail({
                 from: 'info@virtualvizzit.com',
                 to: 'shikolay@gmail.com',
@@ -57,7 +57,7 @@ module.exports = {
                     console.log("Can't email due to " + email_err);
                 }
             });
-        }
+        }*/
     },
 
     randomInt: function (low, high) {
