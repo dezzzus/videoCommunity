@@ -1,6 +1,3 @@
-//Monitoring
-require('newrelic');
-
 var express = require('express');
 var mongodb = require('mongodb');
 var bodyParser = require('body-parser');
