@@ -1,25 +1,6 @@
 <% include head_begin.ejs %>
 <script src="http://malsup.github.com/jquery.form.js"></script>
 <% include head_end.ejs %>
-<script>
-    _gaq.push(['_setCustomVar',
-        1,
-        'IsSuperuser',
-        '<%= agent.superuser %>',
-        3 // page level
-    ]);
-    _gaq.push(['_setCustomVar',
-        2,
-        'AgentId',
-        '<%= agent._id %>',
-        3 // page level
-    ]);
-    _gaq.push(['_trackEvent',
-        'tour', // category of activity
-        'pageview' // Action
-    ]);
-</script>
-
 <script src="/js/vv_misc_ui.js"></script>
 
 <div class="container">
@@ -41,7 +22,7 @@
                         <input type="file" class="form-control" id="videofile_input" name="videoFile"/>
                     </div>
                     <div class="form-group">
-                        <label for="address_input">Address(visible to tenant):</label>
+                        <label for="address_input">Exact Address(not visible to tenant):</label>
                         <input type="text" class="form-control" id="address_input" name="address"/>
                     </div>
                     <div class="form-group">
@@ -115,11 +96,6 @@
 
     <script type="application/javascript">
         $(function () {
-            _gaq.push(['_trackEvent',
-                'tour', // category of activity
-                'submit_new', // Action
-            ]);
-
             var jqTourForm = $('#tour_form');
             var bar = $('.progress-bar');
 

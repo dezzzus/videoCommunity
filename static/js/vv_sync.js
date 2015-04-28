@@ -78,11 +78,6 @@ function videoSync(presenterControl, player, isPresenter, onPresenterChange, cha
 
     var gaTrackPlayerEvent = function (event) {
         var eventPrefix = isPresenter ? "presenter" : "viewer";
-        _gaq.push(['_trackEvent',
-            'player',
-            eventPrefix + "_" + event,
-            (new Date()).toISOString()
-        ]);
     };
 
     /**
