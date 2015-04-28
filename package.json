@@ -30,7 +30,8 @@
     "passport": "^0.2.1",
     "passport-local": "^1.0.0",
     "s3-upload-stream": "^1.0.7",
-    "shortid": "^2.2.2"
+    "shortid": "^2.2.2",
+    "supervisor": "^0.6.0"
   },
   "devDependencies": {
     "csv": "^0.4.2",
