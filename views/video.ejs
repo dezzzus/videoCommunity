@@ -83,30 +83,16 @@
                     </div>
                 </div>
 
-                <div id="lead_chat" class="chat_box service-block-light" style="display: none;">
-                    <div class="voice_chat alert alert-success">
-                        Voice chat activated. Feel free to talk with your agent.
-                    </div>
-                    <video id="local_video"></video>
-                    <div id="remote_video"></div>
-
-                    <div class="chat_output_panel">
-                        <div id="chat_output" class="panel-body" style="display: none;">
-                        </div>
-                    </div>
-
-                    To send a chat message, type and press Enter:
-                    <div><input id="chat_input" placeholder="enter chat message"/></div>
-
+                <div class="agent_contact">
+                    <i class="fa fa-user"></i>
+                    <input type="text" placeholder="Name"/>
+                    <i class="fa fa-envelope-o"></i>
+                    <input type="text" placeholder="Email"/>
+                    <i class="fa fa-phone"></i>
+                    <input type="text" placeholder="Phone"/>
+                    <textarea name="" id="" cols="30" rows="10" placeholder="Your message for agent"></textarea>
+                    <input type="button" value="CONTACT PROPERTY AGENT"/>
                 </div>
-                <% if (isAgent && !agentInteractive) { %>
-
-                <div class="chat_box service-block-light">
-                    This session is not interacting with any clients. <br> If you'd like to communicate with a lead,
-                    please connect via your lead notification, or open from <a href="/lead">My Leads</a> page.
-                </div>
-
-                <% } %>
 
             </div>
             <% if (mapQuery){ %>
