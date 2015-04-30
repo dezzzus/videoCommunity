@@ -1,4 +1,4 @@
-.agent-box{
+.agent-box {
     position: relative;
     border-top: 3px solid #d64521;
     border-right: 1px solid #e0e0e0;
@@ -8,7 +8,7 @@
     box-shadow: 0 0 2px 1px #ededed;
 }
 
-.video_box{
+.video_box {
     border: 1px solid #e0e0e0;
     box-shadow: 0 0 2px 1px #ededed;
     border-radius: 5px;
@@ -26,7 +26,7 @@
     max-width: 40px;
 }
 
-.agent_info{
+.agent_info {
     min-height: 90px;
 }
 
@@ -52,6 +52,24 @@
     color: #3498db;
 }
 
+.agent_contact {
+    margin-top: 15px;
+}
+
+.email_input, .phone_input, .message_input, .contact_submit {
+    margin-top: 12px;
+}
+
+.phone_input input, .name_input input, .email_input input, .contact_submit {
+    width: 277px;
+    height: 28px;
+}
+
+.message_input {
+    width: 277px;
+    height: 100px;
+}
+
 .box-low-padding {
     padding-left: 3px;
     padding-right: 3px;
@@ -59,65 +77,21 @@
     padding-bottom: 3px;
 }
 
-.chat_box {
-    margin-top: 3px;
-}
-
-.chat_box .panel-body {
-    padding: 2px;
-    min-height: 200px;
-    max-height: 200px;
-    overflow: auto;
-}
-
-.chat_other_username {
-    font-weight: 800;
-    float: left;
-    color: blue;
-}
-
-.chat_other_user_content {
-    float: left;
-    font-weight: 400;
-    color: blue;
-}
-
-.chat_my_username {
-    font-weight: 800;
-    float: left;
-    color: green;
-}
-
-.chat_my_content {
-    float: left;
-    font-weight: 400;
-    color: green;
-}
-
-.chat_box, .chat_box input {
-    width: 100%;
-}
-
-.oneChatMsg {
-    float: left;
-    clear: left;
-}
-
-.property_info_box{
+.property_info_box {
     border-bottom: 1px solid #e0e0e0;
     padding: 20px 16px;
     position: relative;
 }
 
-.property_description{
+.property_description {
     padding: 20px 16px;
 }
 
-.property_beds_baths{
+.property_beds_baths {
     font-size: 18px;
 }
 
-.property_price{
+.property_price {
     font-size: 21px;
     color: #d64521;
     position: absolute;
@@ -135,7 +109,7 @@
     margin-top: 40px;
 }
 
-.row-big-top-margin{
+.row-big-top-margin {
     margin-top: 52px;
 }
 
@@ -226,7 +200,7 @@
     display: none;
 }
 
-.textbox{
+.textbox {
     margin-top: 10px;
     margin-bottom: 10px;
 }
