@@ -252,7 +252,12 @@
 
         $('.contact_submit').on('click', function () {
             var data = {
-                'name': $('.name_input input').val()
+                'name': $('.name_input input').val(),
+                'agent_email': '<%= agent.email %>',
+                'email':$('.email_input input').val(),
+                'phone':$('.phone_input input').val(),
+                'message':$('.message_input').val()
+
             };
             $.ajax({
                 type: 'POST',
@@ -262,7 +267,7 @@
                     alert('Your message send');
                 },
                 error: function(){
-                    alert('Error occured');
+                    alert('Error occurred');
                 }
             });
         });

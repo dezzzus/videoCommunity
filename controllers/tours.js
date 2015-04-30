@@ -208,9 +208,24 @@ exports.addTourRoutes = function (app) {
     });
 
     app.post('/video/:pid', function (req, res, next) {
-        console.log(req.body);
-        res.send({'status':'OK'});
-
+        var pid = req.params.pid;
+        app.awsMailer.sendMail({
+            from: 'info@virtualvizzit.com',
+            to: req.body['agent_email'],
+            subject: 'VirtualVizzit client message',
+            text: 'Name: ' + req.body['name'] + '\n' +
+            'Email: ' + req.body['email'] + '\n' +
+            'Phone: ' + req.body['phone'] + '\n' +
+            'Tour id: ' + pid + '\n' +
+            'Message: ' + req.body['message']
+        }, function (err, info) {
+            if (err) {
+                next(err);
+            }
+            else {
+                res.send({'status': 'OK'});
+            }
+        });
     });
 
     app.get('/video_lead/:pid', lib.ensureAuthenticated, function (req, res, next) {
