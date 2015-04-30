@@ -38,7 +38,7 @@ exports.addTourRoutes = function (app) {
 
     app.get('/tour', lib.ensureAuthenticated, function (req, res, next) {
         lib.safeFindOne(app.collection.agent, {'_id': ObjectID(req.user._id.toHexString())}, function (agent) {
-            if (agent.superuser && req.param('userid')) {
+            if (agent.superuser && req.params.userid) {
                 // super-user is asking for another agent's contents
                 lib.safeFindOne(app.collection.agent, {'_id': ObjectID(req.param('userid'))}, function (agent_override) {
                     processAgentTours(req, res, next, agent_override);
@@ -84,7 +84,7 @@ exports.addTourRoutes = function (app) {
 
                 file.pipe(upload);
             }
-            else{
+            else {
                 file.resume();
             }
         });
@@ -130,7 +130,7 @@ exports.addTourRoutes = function (app) {
                            isAgent, allAgentProperties, leadID, agentInteractive, otherGroupProperties) {
         lib.fixupAgentPhotoURL(agent);
         var mapQuery = '';
-        if (property.area){
+        if (property.area) {
             mapQuery = property.area.split(' ').join('+');
         }
         res.render(templateName, {
@@ -148,9 +148,9 @@ exports.addTourRoutes = function (app) {
     }
 
     function handlePropertyDetails(req, res, next, templateName, alwaysInteractive) {
-        var leadID = req.param('lead');
+        var leadID = req.params.lead;
         var agentInteractive = alwaysInteractive || !!leadID;
-        var pid = req.param('pid');
+        var pid = req.params.pid;
 
         lib.safeFindOne(app.collection.property, {'_id': lib.getRightId(pid)}, function (property) {
             if (property) {
@@ -207,13 +207,19 @@ exports.addTourRoutes = function (app) {
         handlePropertyDetails(req, res, next, 'video', false);
     });
 
+    app.post('/video/:pid', function (req, res, next) {
+        console.log(req.body);
+        res.send({'status':'OK'});
+
+    });
+
     app.get('/video_lead/:pid', lib.ensureAuthenticated, function (req, res, next) {
         handlePropertyDetails(req, res, next, 'video', false);
     });
 
 
     function tourManageAction(req, res, next, actionFunc, uploadToken) {
-        var pid = req.param('pid');
+        var pid = req.params.pid;
         lib.safeFindOne(app.collection.property, {'_id': lib.getRightId(pid)}, function (property) {
             if (property) {
                 if (req.user && req.user._id.toHexString() == property.agent ||

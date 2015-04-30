@@ -11,8 +11,6 @@ var bcrypt = require('bcrypt');
 var cookieParser = require('cookie-parser');
 var lib = require('./lib');
 var tourController = require('./controllers/tours');
-var leadController = require('./controllers/leads');
-var apiController = require('./controllers/api')
 var nodemailer = require('nodemailer');
 var aws_transcoder = require('./aws_transcode.js');
 var Busboy = require('busboy');
@@ -135,11 +133,6 @@ app.get('/logout', function (req, res) {
 });
 
 tourController.addTourRoutes(app);
-
-leadController.addLeadRoutes(app);
-app.leadHeartbeatInterval = leadController.getHeartbeatInterval();
-
-apiController.addAPIRoutes(app, app.awsMailer);
 
 app.get('/login', function (req, res) {
     res.render('login');
@@ -374,8 +367,6 @@ MongoClient.connect(mongoURI, function (dbErr, db) {
 
     app.collection.property = db.collection('property');
     app.collection.agent = db.collection('agent');
-    app.collection.lead = db.collection('lead');
-    app.collection.leadMsg = db.collection('leadMsg');
 
     app.listen(port, function () {
         console.log('Vizzit app listening at port:%s', port)

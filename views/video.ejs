@@ -1,9 +1,8 @@
 <% include head_begin.ejs %>
 <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
 <script src="/js/vv_pubnub.js"></script>
-<script src="/js/vv_sync.js"></script>
 <script src="/js/vv_misc_ui.js"></script>
-<script src="/js/vv_chat.js"></script>
+
 
 <% include head_end.ejs %>
 
@@ -181,10 +180,6 @@
 
         vvzzt.ui.tourSwitchRegistration("#tour_select", 'video');
 
-        <% include text_chat.ejs %>
-
-        $('#lead_chat').show();
-
         <% } %>
 
         var jqDiv = $(".fplayer");
@@ -196,12 +191,7 @@
 
         var playerWrapper = new SyncWrapper(flplayer);
 
-        <% if(!isAgent){ %>
-        vvzzt.sync.publishHeartBeat(playerWrapper);
-        setTimeout(function () {
-            $('#lead_chat').show();
-        }, <%= leadID == null ? 10000 : 0 %>);
-        <% }else{ %>
+        <% if(isAgent){ %>
 
         var jqHeartBeat = $('.tenant_time');
         var jqJumpTo = $('.jump_to');
@@ -259,6 +249,26 @@
         });
 
         <%}%>
+
+        $('.contact_submit').on('click', function () {
+            var data = {
+                'name': $('.name_input input').val()
+            };
+            $.ajax({
+                type: 'POST',
+                url: '/video/<%= property._id %>',
+                data: data,
+                success: function(){
+                    alert('Your message send');
+                },
+                error: function(){
+                    alert('Error occured');
+                }
+            });
+        });
+
+
+
         setTimeout(function () {
             keenClient.addEvent('video_engaged_pageview', {
                 'tourID': '<%=property._id %>',
