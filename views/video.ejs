@@ -196,7 +196,6 @@
         var jqHeartBeat = $('.tenant_time');
         var jqJumpTo = $('.jump_to');
 
-        vvzzt.sync.listenHeartBeat(jqHeartBeat, $('.tenant_info'), playerWrapper);
 
         jqJumpTo.on('click', function () {
             playerWrapper.api('seekTo', jqHeartBeat.text())
