@@ -4,7 +4,7 @@ var bodyParser = require('body-parser');
 var MongoClient = mongodb.MongoClient;
 var ObjectID = mongodb.ObjectID;
 var session = require('express-session');
-var MongoStore = require('connect-mongo')(session);
+var RedisStore = require('connect-redis')(session);
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var bcrypt = require('bcrypt');
@@ -55,8 +55,11 @@ app.use(session({
     secret: 'VizzitSessionSecret',
     resave: false,
     saveUninitialized: false,
-    store: new MongoStore({
-        url: mongoURI
+    store: new RedisStore({
+        host:'pub-redis-17390.us-east-1-3.4.ec2.garantiadata.com',
+        port:17390,
+        ttl:3600,
+        pass:'tizziv'
     })
 }));
 app.use(passport.initialize());
