@@ -56,14 +56,22 @@
     margin-top: 15px;
 }
 
-.email_input, .phone_input, .message_input, .contact_submit {
-    margin-top: 12px;
+.email_input, .phone_input, .message_input {
+    margin-top: -6px;
 }
 
 .phone_input input, .name_input input, .email_input input, .contact_submit {
     width: 277px;
     height: 28px;
     padding-left: 34px;
+}
+
+.contact_submit{
+    background: #d64521;
+    color: white;
+    width: 277px;
+    height: 32px;
+    background: url("/img/contact_button.gif");
 }
 
 .icon_box{
