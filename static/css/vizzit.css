@@ -63,6 +63,23 @@
 .phone_input input, .name_input input, .email_input input, .contact_submit {
     width: 277px;
     height: 28px;
+    padding-left: 34px;
+}
+
+.icon_box{
+    width: 24px;
+    height: 26px;
+    border-right: 1px solid #d9d9d9;
+    position: relative;
+    bottom: 27px;
+    padding-left: 6px;
+    padding-top: 3px;
+
+}
+
+.icon_phone{
+    padding-left: 7px;
+    padding-top: 4px;
 }
 
 .message_input {
