@@ -12,46 +12,54 @@
     To present a tour to your client, please click on the link below. Once that page opens, share its full address with
     your client via email or text message.
 
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <td></td>
-            <td>Address</td>
-            <td>Note</td>
-            <td>Group</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        </thead>
-        <tbody>
-        <% for (var i = 0; i < tours.length;i++){ %>
-        <tr>
-            <td>
-              <% if (tours[i].hasThumb) { %>
-              <a href="<%="http://cdn.virtualvizzit.com/"+ tours[i].videoID+"-thumb-00001.png"%>">
-                <img class="tour_thumb" alt="Thumbnail" src="<%="http://cdn.virtualvizzit.com/"+ tours[i].videoID+
-                "-thumb-00001.png"%>">
-              </a>
-              <% } %>
-            </td>
-            <td><a href="/video/<%= tours[i]._id %>"><%= tours[i].address %></a></td>
-            <td><div class="tour_note"><%= tours[i].note%></div></td>
-            <td><div class="tour_note"><%= tours[i].group || ''%></div></td>
-            <td><a class="btn btn-primary" href="/tour/<%= tours[i]._id %>">open guided</a></td>
-            <td><a class="btn btn-primary" href="/tour/<%= tours[i]._id %>/edit">edit</a></td>
-            <td><a class="btn btn-danger"
-                   onclick='vvzzt.ui.followURLAfterConfirm("Are you sure you want to delete " + "<%= tours[i].address %>" + "?",
-                           "/tour/<%= tours[i]._id %>/del")'>delete</a></td>
-            <td>
-              <% if (tours[i].uploadToken) { %>
-                <a class="btn btn-primary" href="/tour/<%= tours[i]._id %>/upload_via_token/<%= tours[i].uploadToken %>">upload link</a>
-              <% } %>
-            </td>
-        </tr>
-        <% } %>
-        </tbody>
-    </table>
+    <div class="row">
+        <div class="col-md-8">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <td></td>
+                    <td>Address</td>
+                    <td>Note</td>
+                    <td>Group</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                </thead>
+                <tbody>
+                <% for (var i = 0; i < tours.length;i++){ %>
+                <tr>
+                    <td>
+                        <% if (tours[i].hasThumb) { %>
+                        <a href="<%="http://cdn.virtualvizzit.com/"+ tours[i].videoID+"-thumb-00001.png"%>">
+                            <img class="tour_thumb" alt="Thumbnail" src="<%="http://cdn.virtualvizzit.com/"+ tours[i].videoID+
+                            "-thumb-00001.png"%>">
+                        </a>
+                        <% } %>
+                    </td>
+                    <td><a href="/video/<%= tours[i]._id %>"><%= tours[i].address %></a></td>
+                    <td><div class="tour_note"><%= tours[i].note%></div></td>
+                    <td><div class="tour_note"><%= tours[i].group || ''%></div></td>
+                    <td><a class="btn btn-primary" href="/tour/<%= tours[i]._id %>">open guided</a></td>
+                    <td><a class="btn btn-primary" href="/tour/<%= tours[i]._id %>/edit">edit</a></td>
+                    <td><a class="btn btn-danger"
+                           onclick='vvzzt.ui.followURLAfterConfirm("Are you sure you want to delete " + "<%= tours[i].address %>" + "?",
+                                   "/tour/<%= tours[i]._id %>/del")'>delete</a></td>
+                    <td>
+                        <% if (tours[i].uploadToken) { %>
+                        <a class="btn btn-primary" href="/tour/<%= tours[i]._id %>/upload_via_token/<%= tours[i].uploadToken %>">upload link</a>
+                        <% } %>
+                    </td>
+                </tr>
+                <% } %>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-4">
+            <a href="/upload"><img src="/img/upload_button.gif" /></a>
+        </div>
+    </div>
+
 </div>
 <% include foot.ejs %>
