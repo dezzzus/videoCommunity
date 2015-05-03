@@ -120,7 +120,7 @@ exports.addTourRoutes = function (app) {
 
             });
 
-            res.redirect('/tour');
+            res.send({'status':'OK'});
         });
 
         return req.pipe(busboy);
@@ -291,6 +291,11 @@ exports.addTourRoutes = function (app) {
                 res.redirect('/tour');
             }
         });
+    });
+
+    app.get('/upload', lib.ensureAuthenticated, function(req, res, next){
+        res.render('upload');
+
     });
 
     app.get('/tour/:pid/upload_via_token/:token', function (req, res, next) {
