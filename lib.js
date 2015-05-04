@@ -40,14 +40,14 @@ module.exports = {
         return Object.keys(obj).length === 0;
     },
 
-    reportError: function (err) {
+    reportError: function (err, mailer) {
         // Always dump for logging:
         console.log("Error found: " + err);
         console.log("Eurrent time: " + new Date());
         console.log("Stack\n" + err.stack);
 
-        /*if (process.env.VCAP_APP_PORT) {
-            app.awsMailer.sendMail({
+        if (process.env.VCAP_APP_PORT) {
+            mailer.sendMail({
                 from: 'info@virtualvizzit.com',
                 to: 'shikolay@gmail.com',
                 subject: 'Virtualvizzit errors',
@@ -57,7 +57,7 @@ module.exports = {
                     console.log("Can't email due to " + email_err);
                 }
             });
-        }*/
+        }
     },
 
     randomInt: function (low, high) {
@@ -80,12 +80,12 @@ module.exports = {
 
     },
 
-    compareIds: function(a, b){
-        if (a.toHexString && b.toHexString){
+    compareIds: function (a, b) {
+        if (a.toHexString && b.toHexString) {
             return a.equals(b);
         }
-        else{
-            return a==b;
+        else {
+            return a == b;
         }
     }
 

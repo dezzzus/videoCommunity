@@ -219,7 +219,7 @@ var createBusboyForAgent = function (req, res, next) {
 
     busboy.on('file', function (fieldname, file, filename) {
         if (fieldname !== 'photoFile' && fieldname !== 'logoFile') {
-            lib.reportError('unknown file field in agent: ' + fieldname);
+            next(new Error('unknown file field in agent: ' + fieldname));
             return;
         }
 
@@ -235,7 +235,7 @@ var createBusboyForAgent = function (req, res, next) {
 
         upload.on('error', function (err) {
             if (err) {
-                lib.reportError(err);
+                next(err);
             }
         });
 
@@ -359,7 +359,7 @@ app.get('*', function (req, res) {
 });
 
 app.use(function (err, req, res, next) {
-    lib.reportError(err);
+    lib.reportError(err, app.awsMailer);
     res.status(500).render('500');
 });
 

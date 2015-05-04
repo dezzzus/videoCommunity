@@ -71,14 +71,14 @@ exports.addTourRoutes = function (app) {
                     app.transcoder.transcode(req.session.lastVideoId,
                         function (err) {
                             if (err) {
-                                lib.reportError(err);
+                                next(err);
                             }
                         }, next);
                 });
 
                 upload.on('error', function (err) {
                     if (err) {
-                        lib.reportError(err);
+                        next(err);
                     }
                 });
 
@@ -324,14 +324,14 @@ exports.addTourRoutes = function (app) {
                 app.transcoder.transcode(req.session.lastVideoId,
                     function (err) {
                         if (err) {
-                            lib.reportError(err);
+                            next(err);
                         }
                     }, next);
             });
 
             upload.on('error', function (err) {
                 if (err) {
-                    lib.reportError(err);
+                    next(err);
                 }
             });
 
