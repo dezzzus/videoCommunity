@@ -26,6 +26,26 @@
     max-width: 40px;
 }
 
+.tour_table_header {
+    border-bottom: 1px solid #666666;
+    padding-bottom: 9px;
+}
+
+.tour_table_row {
+    margin-top: 12px;
+}
+
+.tour_table_h1 {
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.tour_table_subh{
+    position: relative;
+    top: 6px;
+    font-weight: 200;
+}
+
 .agent_info {
     min-height: 90px;
 }
@@ -66,7 +86,7 @@
     padding-left: 34px;
 }
 
-.contact_submit{
+.contact_submit {
     background: #d64521;
     color: white;
     width: 277px;
@@ -74,7 +94,7 @@
     background: url("/img/contact_button.gif");
 }
 
-.icon_box{
+.icon_box {
     width: 24px;
     height: 26px;
     border-right: 1px solid #d9d9d9;
@@ -85,7 +105,7 @@
 
 }
 
-.icon_phone{
+.icon_phone {
     padding-left: 7px;
     padding-top: 4px;
 }
@@ -228,4 +248,8 @@
 .textbox {
     margin-top: 10px;
     margin-bottom: 10px;
+}
+
+.ptl {
+    padding-top: 26px;
 }
