@@ -29,11 +29,9 @@
             <div class="row tour_table_row">
                 <div class="col-md-2">
                     <% if (tours[i].hasThumb) { %>
-                    <a href="<%= "http://cdn.virtualvizzit.com/" + tours[i].videoID + "-thumb-00001.png" %>">
-                        <img class="tour_thumb" alt="Thumbnail"
-                             src="<%= "http://cdn.virtualvizzit.com/" + tours[i].videoID +
-                             "-thumb-00001.png" %>">
-                    </a>
+                    <img class="tour_thumb" alt="Thumbnail"
+                         src="<%= "http://cdn.virtualvizzit.com/" + tours[i].videoID +
+                         "-thumb-00001.png" %>">
                     <% } %>
                 </div>
                 <div class="col-md-4">
