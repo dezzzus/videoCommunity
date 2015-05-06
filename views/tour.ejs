@@ -29,9 +29,12 @@
             <div class="row tour_table_row">
                 <div class="col-md-2">
                     <% if (tours[i].hasThumb) { %>
-                    <img class="tour_thumb" alt="Thumbnail"
-                         src="<%= "http://cdn.virtualvizzit.com/" + tours[i].videoID +
-                         "-thumb-00001.png" %>">
+                    <a href="/video/<%= tours[i]._id %>">
+                        <img class="tour_thumb" alt="Thumbnail"
+                             src="<%= "http://cdn.virtualvizzit.com/" + tours[i].videoID +
+                             "-thumb-00001.png" %>">
+                    </a>
+
                     <% } %>
                 </div>
                 <div class="col-md-4">
@@ -61,21 +64,23 @@
                     <% } %>
                 </div>
                 <div class="col-md-2">
-                    <% if (tours[i].creationDate) { %>
-                    <%= tours[i].creationDate %>
-                    <% } %>
+                    <div class="tour_date">
+                        <% if (tours[i].creationDate) { %>
+                        <%= tours[i].creationDate.toDateString() %>
+                        <% } %>
+                    </div>
                 </div>
                 <div class="col-md-2">
-                    <a class="btn btn-primary" href="/tour/<%= tours[i]._id %>/edit">edit</a>
-                    <% if (tours[i].uploadToken) { %>
-                    <a class="btn btn-primary"
-                       href="/tour/<%= tours[i]._id %>/upload_via_token/<%= tours[i].uploadToken %>">upload link</a>
-                    <% } %>
+                    <div class="tour_action">
+                        <a class="btn btn-primary" href="/tour/<%= tours[i]._id %>/edit">edit</a>
+                    </div>
                 </div>
                 <div class="col-md-2">
-                    <a class="btn btn-danger"
-                       onclick='vvzzt.ui.followURLAfterConfirm("Are you sure you want to delete " + "<%= tours[i].address %>" + "?",
-                               "/tour/<%= tours[i]._id %>/del")'>delete</a>
+                    <div class="tour_action">
+                        <a class="btn btn-danger"
+                           onclick='vvzzt.ui.followURLAfterConfirm("Are you sure you want to delete " + "<%= tours[i].address %>" + "?",
+                                   "/tour/<%= tours[i]._id %>/del")'>delete</a>
+                    </div>
                 </div>
             </div>
             <% } %>

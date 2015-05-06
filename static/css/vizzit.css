@@ -33,6 +33,14 @@
     font-size: 16px;
 }
 
+.tour_date{
+    padding-top: 22px;
+}
+
+.tour_action{
+    padding-top: 16px;
+}
+
 .tour_table_header {
     border-bottom: 1px solid #666666;
     padding-bottom: 9px;
