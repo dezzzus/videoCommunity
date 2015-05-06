@@ -35,10 +35,30 @@
                     <% } %>
                 </div>
                 <div class="col-md-4">
-                    <a href="/video/<%= tours[i]._id %>"><%= tours[i].address %></a>
-
-                    <div class="tour_note"><%= tours[i].note %></div>
-                    <div class="tour_note"><%= tours[i].group || '' %></div>
+                    <div class="tour_address">
+                        <a href="/video/<%= tours[i]._id %>"><%= tours[i].address %></a>
+                    </div>
+                    <% if(tours[i].beds || tours[i].baths || tours[i].price){ %>
+                    <div class="tour_info">
+                        <% if(tours[i].beds) { %>
+                        <%= tours[i].beds %> bd
+                        <% } %>
+                        <% if(tours[i].beds && tours[i].baths) { %>
+                        &bull;
+                        <% } %>
+                        <% if(tours[i].baths) { %>
+                        <%= tours[i].baths %> ba
+                        <% } %>
+                        <% if(tours[i].price) { %>
+                        <%= tours[i].price %>$
+                        <% } %>
+                    </div>
+                    <% } %>
+                    <% if (tours[i].landlord) { %>
+                    <div class="tour_landlord">
+                        Landlord: <%= tours[i].landlord %>
+                    </div>
+                    <% } %>
                 </div>
                 <div class="col-md-2">
                     <% if (tours[i].creationDate) { %>
