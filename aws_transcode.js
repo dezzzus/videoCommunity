@@ -1,20 +1,28 @@
 /**
- * This module is for handling AWS transcoding
+ * This module is for handling AWS transcoding, which has some complexity due to watermarks.
  */
 var lib = require('./lib');
-
+var mongodb = require('mongodb');
+var ObjectID = mongodb.ObjectID;
 
 module.exports = {
     getTranscoderFunctions: function (app) {
+        var watermarkId = 'vv_watermark_id';
         var transcoder = new app.AWS.ElasticTranscoder();
+
+        var getAgentWatermarkName = function(agentId, callback, next) {
+            lib.safeFindOne(app.collection.agent, {'_id': ObjectID(agentId)}, function (agent) {
+                callback(agent.logoFileId);
+            }, next);
+        };
 
         /**
          * Find most recent preset with a given name.
          */
-        var findPresetByName = function (presetName, callback) {
+        var findPresetByName = function(presetName, callback) {
             transcoder.listPresets({
                 Ascending: 'false'
-            }, function (err, data) {
+            }, function(err, data) {
                 if (data) {
                     var presets = data.Presets;
                     for (var ii = 0; ii < presets.length; ii++) {
@@ -29,14 +37,33 @@ module.exports = {
             });
         };
 
+        var getPresetForWatermark = function(callback, onError) {
+            var presetName = 'vv-current-preset';
+            findPresetByName(presetName, function(presetId) {
+                if (!presetId) {
+                    onError('no preset found: ' + presetName);
+                }
+                else {
+                    callback(presetId);
+                }
+            });
+        };
+
         return {
-            transcode: function (videoId, onError, next) {
-                var presetName = 'vv-current-preset';
-                findPresetByName(presetName, function (presetId) {
-                    if (!presetId) {
-                        onError('no preset found: ' + presetName);
-                    }
-                    else {
+            transcode: function(agentId, videoId, onError, next) {
+                getAgentWatermarkName(agentId, function(watermarkName) {
+
+                    var forcePresetRecreation = false; // Set to true if playing with watermark settings
+
+                    getPresetForWatermark(function(presetName) {
+                        watermarks = [];
+                        if (watermarkName && watermarkName !== '') {
+                            watermarks.push({
+                                InputKey: watermarkName,
+                                PresetWatermarkId: watermarkId
+                            });
+                        }
+
                         transcoder.createJob(
                             {
                                 PipelineId: '1419791970323-1aherg',
@@ -45,14 +72,15 @@ module.exports = {
                                 },
                                 Output: {
                                     Key: videoId + '.mp4',
-                                    PresetId: presetId,
-                                    ThumbnailPattern: videoId + "-thumb-{count}"
+                                    PresetId: presetName,
+                                    Watermarks: watermarks,
+                                    ThumbnailPattern : videoId + "-thumb-{count}"
                                 }
                             },
                             onError
                         );
-                    }
-                });
+                    }, onError);
+                }, next);
             }
         };
     }

@@ -11,6 +11,7 @@ var fs = require('fs');
 
 
 var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
+var agentID = 'asdasd';
 var app = {};
 app.collection = {};
 
@@ -59,7 +60,7 @@ function uploadYouTube(youTubeLink, address, agent, beds, area) {
 
     upload.on('uploaded', function () {
         console.log('File uploaded: ' + property.videoID);
-        app.transcoder.transcode(property.videoID,
+        app.transcoder.transcode(agentID, property.videoID,
             function (err) {
                 if (err) {
                     console.log('Transcoding error(' + property.videoID + '): ' + err);

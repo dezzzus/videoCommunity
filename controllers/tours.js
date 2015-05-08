@@ -68,7 +68,7 @@ exports.addTourRoutes = function (app) {
                 });
 
                 upload.on('uploaded', function () {
-                    app.transcoder.transcode(req.session.lastVideoId,
+                    app.transcoder.transcode(userId, req.session.lastVideoId,
                         function (err) {
                             if (err) {
                                 next(err);
@@ -321,7 +321,7 @@ exports.addTourRoutes = function (app) {
             });
 
             upload.on('uploaded', function () {
-                app.transcoder.transcode(req.session.lastVideoId,
+                app.transcoder.transcode(userId, req.session.lastVideoId,
                     function (err) {
                         if (err) {
                             next(err);
