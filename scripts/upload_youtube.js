@@ -11,7 +11,6 @@ var fs = require('fs');
 
 
 var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
-var agentID = 'asdasd';
 var app = {};
 app.collection = {};
 
@@ -25,7 +24,7 @@ app.s3Stream = require('s3-upload-stream')(new app.AWS.S3());
 
 app.transcoder = aws_transcoder.getTranscoderFunctions(app);
 
-function uploadYouTube(youTubeLink, address, agent, beds, area) {
+function uploadYouTube(youTubeLink, address, landlord, agent, beds, area) {
     var video = youtubedl(youTubeLink);
 
     video.on('info', function (info) {
@@ -45,7 +44,7 @@ function uploadYouTube(youTubeLink, address, agent, beds, area) {
         beds: beds,
         baths: '',
         description: '',
-        landlord: '',
+        landlord: landlord,
         area: area,
         videoID: shortid.generate(),
         uploadToken: null,
@@ -60,7 +59,7 @@ function uploadYouTube(youTubeLink, address, agent, beds, area) {
 
     upload.on('uploaded', function () {
         console.log('File uploaded: ' + property.videoID);
-        app.transcoder.transcode(agentID, property.videoID,
+        app.transcoder.transcode(agent, property.videoID,
             function (err) {
                 if (err) {
                     console.log('Transcoding error(' + property.videoID + '): ' + err);
@@ -92,7 +91,7 @@ function uploadYouTube(youTubeLink, address, agent, beds, area) {
 
 function timedOutUpload(youTubeLink, address, beds, area, timeout){
     setTimeout(function(){
-        uploadYouTube(youTubeLink, address, '549b7d49ec6da9a6da7f2baa', beds, area);
+        uploadYouTube(youTubeLink, address, '554c19f323c88e1f0010d114', beds, area);
     }, timeout);
 }
 
@@ -108,7 +107,7 @@ MongoClient.connect(mongoURI, function (dbErr, db) {
         for (var i = 0; i < output.length; i++) {
             var cvs_entry = output[i];
             console.log('Start uploading: '+cvs_entry[0]);
-            timedOutUpload(cvs_entry[3], cvs_entry[0], cvs_entry[2], cvs_entry[1],i*60000);
+            timedOutUpload(cvs_entry[4], cvs_entry[0], cvs_entry[1], cvs_entry[3], cvs_entry[2],i*60000);
         }
     });
 });
