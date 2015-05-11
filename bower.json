@@ -1,0 +1,23 @@
+{
+  "name": "vizzit",
+  "main": "index.js",
+  "version": "0.1.0",
+  "authors": [
+    "Anatoly Shikolay <shikolay@gmail.com>"
+  ],
+  "moduleType": [
+    "es6"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "backbone": "~1.1.2",
+    "underscore": "~1.8.3"
+  }
+}

@@ -1,6 +1,9 @@
 <% include head_begin.ejs %>
+<script src="/underscore/underscore-min.js"></script>
+<script src="/backbone/backbone.js"></script>
 <% include head_end.ejs %>
 <script src="/js/vv_misc_ui.js"></script>
+<script src="/js/tour_table.js"></script>
 
 <div class="container ptl">
     <div class="row">
@@ -24,7 +27,7 @@
                 <div class="col-md-2"></div>
                 <div class="col-md-2"></div>
             </div>
-
+            <div class="tempTable"></div>
             <% for (var i = 0; i < tours.length;i++){ %>
             <div class="row tour_table_row">
                 <div class="col-md-2">
@@ -92,4 +95,14 @@
     </div>
 
 </div>
+
+<script type="application/javascript">
+    $(function () {
+        var tourTable = new TourTable({
+            el: $('.tempTable')
+        });
+        tourTable.render();
+    });
+
+</script>
 <% include foot.ejs %>

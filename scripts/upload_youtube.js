@@ -89,9 +89,9 @@ function uploadYouTube(youTubeLink, address, landlord, agent, beds, area) {
     });
 }
 
-function timedOutUpload(youTubeLink, address, beds, area, timeout){
+function timedOutUpload(youTubeLink, address, landlord, beds, area, timeout){
     setTimeout(function(){
-        uploadYouTube(youTubeLink, address, '554c19f323c88e1f0010d114', beds, area);
+        uploadYouTube(youTubeLink, address, landlord, '554c19f323c88e1f0010d114', beds, area);
     }, timeout);
 }
 
@@ -101,6 +101,7 @@ MongoClient.connect(mongoURI, function (dbErr, db) {
     }
 
     app.collection.property = db.collection('property');
+    app.collection.agent = db.collection('agent');
     var file = fs.readFileSync(process.argv[2], "utf8");
 
     parse(file, function (err, output) {

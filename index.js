@@ -96,6 +96,7 @@ passport.use(new LocalStrategy({
 
 
 app.use(express.static(__dirname + '/static'));
+app.use(express.static(__dirname + '/bower_components'));
 
 app.use(function (req, res, next) {
     if (req.user) {
