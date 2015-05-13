@@ -73,8 +73,8 @@ var TourRow = Backbone.View.extend({
         if (!this.model.get('creationDate')) {
             this.model.set('creationDate', false);
         }
-        else{
-            this.model.set('creationDate',new Date(this.model.get('creationDate')))
+        else {
+            this.model.set('creationDate', new Date(this.model.get('creationDate')))
         }
 
         this.$el.html(this.rowTemplate(this.model.attributes));
@@ -84,6 +84,8 @@ var TourRow = Backbone.View.extend({
 var TourTable = Backbone.View.extend({
     render: function () {
         var self = this;
+        self.$el.empty();
+
         this.collection.each(
             function (model) {
                 var currentRow = new TourRow({

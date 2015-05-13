@@ -62,6 +62,10 @@
     font-weight: 200;
 }
 
+.tour_date_sort{
+    cursor: pointer;
+}
+
 .agent_info {
     min-height: 90px;
 }

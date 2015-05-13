@@ -20,8 +20,8 @@
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <div class="tour_table_subh">
-                        Date
+                    <div class="tour_table_subh tour_date_sort">
+                        Date <i class="fa fa-angle-up"></i>
                     </div>
                 </div>
                 <div class="col-md-2"></div>
@@ -44,7 +44,41 @@
             collection: toursCollection,
             el: $('.tour_table_content')
         });
-        tourTable.render();
+
+        var knob = $('.tour_date_sort .fa');
+
+        toursCollection.on('sort', function () {
+            tourTable.render();
+
+            knob.toggleClass('fa-angle-down');
+            knob.toggleClass('fa-angle-up');
+
+        });
+
+        var orderSign = -1;
+        toursCollection.comparator = function (tour) {
+            var tourDate = tour.get('creationDate')
+            if (tourDate) {
+                return orderSign * (new Date(tourDate)).getTime()
+            }
+            else {
+                if (orderSign > 0) {
+                    return Infinity;
+                }
+                else {
+                    return 0;
+                }
+
+            }
+
+        };
+
+        toursCollection.sort();
+
+        $('.tour_date_sort').on('click', function () {
+            orderSign = -1 * orderSign;
+            toursCollection.sort();
+        });
     });
 
 </script>
