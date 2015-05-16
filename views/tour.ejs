@@ -30,6 +30,12 @@
             <div class="tour_table_content"></div>
         </div>
         <div class="col-md-4">
+            <div class="action_box search_box">
+                <div class="search_header">Search</div>
+                <div>
+                    <span class="search_label">Bedrooms</span><input type="text" class="bedroomSearch short_input"/>
+                </div>
+            </div>
             <a href="/upload"><img src="/img/upload_button.gif"/></a>
         </div>
     </div>
@@ -39,7 +45,8 @@
 <script type="application/javascript">
     $(function () {
         var toursCollection = new Backbone.Collection;
-        toursCollection.reset(<%- JSON.stringify(tours) %>);
+        var originalTours = <%- JSON.stringify(tours) %>;
+        toursCollection.reset(originalTours);
         var tourTable = new TourTable({
             collection: toursCollection,
             el: $('.tour_table_content')
@@ -79,6 +86,20 @@
             orderSign = -1 * orderSign;
             toursCollection.sort();
         });
+
+        var bedroomInput = $('.bedroomSearch');
+        var bedroomFilter = function () {
+            var bedNum = bedroomInput.val();
+            toursCollection.reset(originalTours);
+            if(bedNum){
+                var filtered = toursCollection.filter(function(tour){
+                    return tour.get('beds') == bedNum;
+                });
+                toursCollection.reset(filtered);
+            }
+            tourTable.render();
+        };
+        bedroomInput.on('keyup', _.throttle(bedroomFilter, 100, {leading: false}));
     });
 
 </script>
