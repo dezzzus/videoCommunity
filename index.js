@@ -1,3 +1,8 @@
+require('nodetime').profile({
+    accountKey: '3ebce86385896c802f31fb7efba59bc13ee1f3ba',
+    appName: 'vizzit web'
+});
+
 var express = require('express');
 var mongodb = require('mongodb');
 var bodyParser = require('body-parser');
