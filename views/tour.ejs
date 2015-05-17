@@ -32,8 +32,11 @@
         <div class="col-md-4">
             <div class="action_box search_box">
                 <div class="search_header">Search</div>
-                <div>
+                <div class="inline">
                     <span class="search_label">Bedrooms</span><input type="text" class="bedroomSearch short_input"/>
+                </div>
+                <div class="inline">
+                    <span class="search_label">Bathrooms</span><input type="text" class="bathroomSearch short_input"/>
                 </div>
             </div>
             <a href="/upload"><img src="/img/upload_button.gif"/></a>
@@ -88,18 +91,35 @@
         });
 
         var bedroomInput = $('.bedroomSearch');
-        var bedroomFilter = function () {
+        var bathroomInput = $('.bathroomSearch');
+
+        var searchFunc = function () {
             var bedNum = bedroomInput.val();
+            var bathNum = bathroomInput.val();
+
             toursCollection.reset(originalTours);
-            if(bedNum){
-                var filtered = toursCollection.filter(function(tour){
-                    return tour.get('beds') == bedNum;
-                });
-                toursCollection.reset(filtered);
-            }
+
+            var filtered = toursCollection.filter(function (tour) {
+                if (bedNum) {
+                    if (tour.get('beds') != bedNum) {
+                        return false;
+                    }
+                }
+                if (bathNum) {
+                    if (tour.get('baths') != bathNum) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+
+            toursCollection.reset(filtered);
             tourTable.render();
         };
-        bedroomInput.on('keyup', _.throttle(bedroomFilter, 100, {leading: false}));
+
+        bedroomInput.on('keyup', _.throttle(searchFunc, 100, {leading: false}));
+        bathroomInput.on('keyup', _.throttle(searchFunc, 100, {leading: false}));
     });
 
 </script>
