@@ -32,11 +32,24 @@
         <div class="col-md-4">
             <div class="action_box search_box">
                 <div class="search_header">Search</div>
-                <div class="inline">
-                    <span class="search_label">Bedrooms</span><input type="text" class="bedroomSearch short_input"/>
+                <div>
+                    <div class="inline">
+                        <span class="search_label">Bedrooms</span><input type="text" class="bedroomSearch short_input"/>
+                    </div>
+                    <div class="inline">
+                        <span class="search_label">Bathrooms</span><input type="text"
+                                                                          class="bathroomSearch short_input"/>
+                    </div>
                 </div>
-                <div class="inline">
-                    <span class="search_label">Bathrooms</span><input type="text" class="bathroomSearch short_input"/>
+                <div class="mtm">
+                    <div class="inline">
+                        <span class="search_label">Min price</span><input type="text"
+                                                                          class="minPriceSearch medium_input"/>
+                    </div>
+                    <div class="inline">
+                        <span class="search_label">Max price</span><input type="text"
+                                                                          class="maxPriceSearch medium_input"/>
+                    </div>
                 </div>
             </div>
             <a href="/upload"><img src="/img/upload_button.gif"/></a>
@@ -92,10 +105,14 @@
 
         var bedroomInput = $('.bedroomSearch');
         var bathroomInput = $('.bathroomSearch');
+        var minPriceInput = $('.minPriceSearch');
+        var maxPriceInput = $('.maxPriceSearch');
 
         var searchFunc = function () {
             var bedNum = bedroomInput.val();
             var bathNum = bathroomInput.val();
+            var minPrice = minPriceInput.val();
+            var maxPrice = maxPriceInput.val();
 
             toursCollection.reset(originalTours);
 
@@ -110,6 +127,18 @@
                         return false;
                     }
                 }
+                var currentPrice = parseInt(tour.get('price'));
+
+                if (minPrice) {
+                    if (!((currentPrice) && (currentPrice >= minPrice))) {
+                        return false;
+                    }
+                }
+                if (maxPrice) {
+                    if (!((currentPrice) && (currentPrice <= maxPrice))) {
+                        return false;
+                    }
+                }
                 return true;
             });
 
@@ -120,6 +149,8 @@
 
         bedroomInput.on('keyup', _.throttle(searchFunc, 100, {leading: false}));
         bathroomInput.on('keyup', _.throttle(searchFunc, 100, {leading: false}));
+        minPriceInput.on('keyup', _.throttle(searchFunc, 100, {leading: false}));
+        maxPriceInput.on('keyup', _.throttle(searchFunc, 100, {leading: false}));
     });
 
 </script>

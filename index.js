@@ -1,7 +1,9 @@
-require('nodetime').profile({
-    accountKey: '3ebce86385896c802f31fb7efba59bc13ee1f3ba',
-    appName: 'vizzit web'
-});
+if (process.env.VCAP_APP_PORT) {
+    require('nodetime').profile({
+        accountKey: '3ebce86385896c802f31fb7efba59bc13ee1f3ba',
+        appName: 'vizzit web'
+    });
+}
 
 var express = require('express');
 var mongodb = require('mongodb');
@@ -61,10 +63,10 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     store: new RedisStore({
-        host:'pub-redis-17390.us-east-1-3.4.ec2.garantiadata.com',
-        port:17390,
-        ttl:3600,
-        pass:'tizziv'
+        host: 'pub-redis-17390.us-east-1-3.4.ec2.garantiadata.com',
+        port: 17390,
+        ttl: 3600,
+        pass: 'tizziv'
     })
 }));
 app.use(passport.initialize());
