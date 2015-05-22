@@ -63,7 +63,7 @@
     font-weight: 200;
 }
 
-.tour_date_sort {
+.tour_date_sort, .tour_landlord_sort {
     cursor: pointer;
 }
 

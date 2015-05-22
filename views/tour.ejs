@@ -20,8 +20,8 @@
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <div class="tour_table_subh">
-                        Landlord
+                    <div class="tour_table_subh tour_landlord_sort">
+                        Landlord <i class="fa fa-angle-down"></i>
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -77,17 +77,14 @@
         });
 
         var knob = $('.tour_date_sort .fa');
+        var land_knob = $('.tour_landlord_sort .fa');
 
         toursCollection.on('sort', function () {
             tourTable.render();
-
-            knob.toggleClass('fa-angle-down');
-            knob.toggleClass('fa-angle-up');
-
         });
 
         var orderSign = -1;
-        toursCollection.comparator = function (tour) {
+        var dateComparator = function (tour) {
             var tourDate = tour.get('creationDate')
             if (tourDate) {
                 return orderSign * (new Date(tourDate)).getTime()
@@ -104,10 +101,42 @@
 
         };
 
-        toursCollection.sort();
+        var landlordComparator = function (tour) {
+            var currentLandlord = tour.get('landlord');
+            if (currentLandlord) {
+                currentLandlord = currentLandlord.toLowerCase();
+                currentLandlord = currentLandlord.split("");
+                currentLandlord = _.reduce(currentLandlord, function (summ, letter) {
+                    return summ+orderSign * (letter.charCodeAt(0));
+                }, 0);
+                return currentLandlord;
+            }
+            else {
+                if (orderSign > 0) {
+                    return Infinity;
+                }
+                else {
+                    return 0;
+                }
+            }
+
+        }
+
+        tourTable.render();
 
         $('.tour_date_sort').on('click', function () {
             orderSign = -1 * orderSign;
+            toursCollection.comparator = dateComparator;
+            knob.toggleClass('fa-angle-down');
+            knob.toggleClass('fa-angle-up');
+            toursCollection.sort();
+        });
+
+        $('.tour_landlord_sort').on('click', function () {
+            orderSign = -1 * orderSign;
+            toursCollection.comparator = landlordComparator;
+            land_knob.toggleClass('fa-angle-down');
+            land_knob.toggleClass('fa-angle-up');
             toursCollection.sort();
         });
 
