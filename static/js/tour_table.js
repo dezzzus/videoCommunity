@@ -9,7 +9,7 @@ var TourRow = Backbone.View.extend({
                     '</a>' +
                 '<% } %>' +
             '</div>' +
-            '<div class="col-md-4">' +
+            '<div class="col-md-3">' +
                 '<div class="tour_address">' +
                     '<a href="/video/<%= _id %>"><%= address %></a>' +
                 '</div>' +
@@ -27,6 +27,8 @@ var TourRow = Backbone.View.extend({
                         '<%= price %>$' +
                     '<% } %>' +
                 '</div>' +
+            '</div>' +
+            '<div class="col-md-2">' +
                 '<% if (landlord) { %>' +
                     '<div class="tour_landlord">' +
                         'Landlord: <%= landlord %>' +
@@ -40,7 +42,7 @@ var TourRow = Backbone.View.extend({
                     '<% } %>' +
                 '</div>' +
             '</div>' +
-            '<div class="col-md-2">' +
+            '<div class="col-md-1">' +
                 '<div class="tour_action">' +
                     '<a class="btn btn-primary" href="/tour/<%= _id %>/edit">edit</a>' +
                 '</div>' +
