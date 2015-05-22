@@ -33,6 +33,9 @@
             <div class="action_box search_box">
                 <div class="search_header">Search</div>
                 <div>
+                    <span class="search_label">Address</span><input type="text" class="addressSearch"/>
+                </div>
+                <div class="mtm">
                     <div class="inline">
                         <span class="search_label">Bedrooms</span><input type="text" class="bedroomSearch short_input"/>
                     </div>
@@ -107,12 +110,14 @@
         var bathroomInput = $('.bathroomSearch');
         var minPriceInput = $('.minPriceSearch');
         var maxPriceInput = $('.maxPriceSearch');
+        var addressInput = $('.addressSearch');
 
         var searchFunc = function () {
             var bedNum = bedroomInput.val();
             var bathNum = bathroomInput.val();
             var minPrice = minPriceInput.val();
             var maxPrice = maxPriceInput.val();
+            var address = addressInput.val();
 
             toursCollection.reset(originalTours);
 
@@ -139,6 +144,14 @@
                         return false;
                     }
                 }
+
+                if (address) {
+                    var addressRe = new RegExp(address, 'i');
+                    if (!addressRe.test(tour.get('address'))) {
+                        return false;
+                    }
+                }
+
                 return true;
             });
 
@@ -151,6 +164,7 @@
         bathroomInput.on('keyup', _.throttle(searchFunc, 100, {leading: false}));
         minPriceInput.on('keyup', _.throttle(searchFunc, 100, {leading: false}));
         maxPriceInput.on('keyup', _.throttle(searchFunc, 100, {leading: false}));
+        addressInput.on('keyup', _.throttle(searchFunc, 100, {leading: false}));
     });
 
 </script>
