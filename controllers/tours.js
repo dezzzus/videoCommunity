@@ -38,9 +38,9 @@ exports.addTourRoutes = function (app) {
 
     app.get('/tour', lib.ensureAuthenticated, function (req, res, next) {
         lib.safeFindOne(app.collection.agent, {'_id': ObjectID(req.user._id.toHexString())}, function (agent) {
-            if (agent.superuser && req.params.userid) {
+            if (agent.superuser && req.query.userid) {
                 // super-user is asking for another agent's contents
-                lib.safeFindOne(app.collection.agent, {'_id': ObjectID(req.param('userid'))}, function (agent_override) {
+                lib.safeFindOne(app.collection.agent, {'_id': lib.getRightId(req.query.userid)}, function (agent_override) {
                     processAgentTours(req, res, next, agent_override);
                 }, next);
             }
