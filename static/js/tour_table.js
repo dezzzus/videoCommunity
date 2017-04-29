@@ -5,7 +5,7 @@ var TourRow = Backbone.View.extend({
                 '<% if (hasThumb) { %>' +
                     '<a href="/video/<%= _id %>">' +
                     '<img class="tour_thumb" alt="Thumbnail"' +
-                        'src="http://cdn.virtualvizzit.com/<%= videoID %>-thumb-00001.png">' +
+                        'src="http://s3.amazonaws.com/vizzitvideo/<%= videoID %>-thumb-00001.png">' +
                     '</a>' +
                 '<% } %>' +
             '</div>' +

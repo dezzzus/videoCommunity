@@ -66,14 +66,14 @@ module.exports = {
 
                         transcoder.createJob(
                             {
-                                PipelineId: '1419791970323-1aherg',
+                                PipelineId: '1490069281841-3vzlky',
                                 Input: {
                                     Key: videoId
                                 },
                                 Output: {
                                     Key: videoId + '.mp4',
                                     PresetId: presetName,
-                                    Watermarks: watermarks,
+                                    //Watermarks: watermarks,
                                     ThumbnailPattern : videoId + "-thumb-{count}"
                                 }
                             },

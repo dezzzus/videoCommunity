@@ -16,8 +16,8 @@ app.collection = {};
 
 app.AWS = require('aws-sdk');
 app.AWS.config.update({
-    accessKeyId: 'AKIAJZUHGBIVMAN6BKSA',
-    secretAccessKey: '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',
+    accessKeyId: 'AKIAJBIBF4XSPP2F7OQQ',
+    secretAccessKey: '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',
     region: 'us-east-1'
 });
 app.s3Stream = require('s3-upload-stream')(new app.AWS.S3());

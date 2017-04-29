@@ -66,7 +66,7 @@ module.exports = {
 
     fixupAgentPhotoURL: function (agent) {
         if (!agent.photoURL || agent.photoURL === '') {
-            agent.photoURL = 'http://cdn.virtualvizzit.com/' + agent.photoFileId;
+            agent.photoURL = 'http://s3.amazonaws.com/vizzitvideo/' + agent.photoFileId;
         }
     },
 

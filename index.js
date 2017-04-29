@@ -26,15 +26,15 @@ app.fs = require('fs');
 
 app.AWS = require('aws-sdk');
 app.AWS.config.update({
-    accessKeyId: 'AKIAJZUHGBIVMAN6BKSA',
-    secretAccessKey: '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',
+    accessKeyId: 'AKIAJBIBF4XSPP2F7OQQ',
+    secretAccessKey: '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',
     region: 'us-east-1'
 });
 app.awsMailer = nodemailer.createTransport({
     service: 'SES',
     auth: {
-        user: 'AKIAIZSWZHH37TQL4JSQ',
-        pass: 'Al622BfthhR2gRePM54XjwpXS6mnDaf45SdbjOQJ+k7s'
+        user: 'AKIAJOTCJD56LQPNX5EA',
+        pass: 'AnubT6ISxxXBv2fGMpXrmUOzgbFy9fZkPqplle9UgadE'
     }
 });
 app.s3Stream = require('s3-upload-stream')(new app.AWS.S3());
