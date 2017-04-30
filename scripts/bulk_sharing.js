@@ -2,7 +2,7 @@ var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
 var lib = require('../lib.js');
 
-var mongoURI = 'mongodb://vizzit123:321tizziv@proximus.modulusmongo.net:27017/i8Jypyzy';
+var mongoURI = 'mongodb://admin:66pM9A398qY9UdxL@cluster0-shard-00-00-tmrfr.mongodb.net:27017,cluster0-shard-00-01-tmrfr.mongodb.net:27017,cluster0-shard-00-02-tmrfr.mongodb.net:27017/tour?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin';
 
 MongoClient.connect(mongoURI, function (dbErr, db) {
     if (dbErr) {
