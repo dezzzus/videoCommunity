@@ -14,6 +14,7 @@ var tourController = require('./controllers/tours');
 var nodemailer = require('nodemailer');
 var aws_transcoder = require('./aws_transcode.js');
 var Busboy = require('busboy');
+var backup = require('mongodb-backup');
 
 var mongoURI = 'mongodb://admin:66pM9A398qY9UdxL@cluster0-shard-00-00-tmrfr.mongodb.net:27017,cluster0-shard-00-01-tmrfr.mongodb.net:27017,cluster0-shard-00-02-tmrfr.mongodb.net:27017/tour?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin';
 var port = process.env.VCAP_APP_PORT || 3000;
@@ -364,6 +365,15 @@ app.use(function (err, req, res, next) {
     res.status(500).render('500');
 });
 
+function backup_db() {
+    backup({
+        uri: 'mongodb://admin:66pM9A398qY9UdxL@cluster0-shard-00-00-tmrfr.mongodb.net:27017,cluster0-shard-00-01-tmrfr.mongodb.net:27017,cluster0-shard-00-02-tmrfr.mongodb.net:27017/tour?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin',
+        root: '/home/admint/backup',
+        tar: new Date().toISOString()+'.tar'
+    });
+    setTimeout (backup_db, 24*3600*1000);
+}
+
 MongoClient.connect(mongoURI, function (dbErr, db) {
     if (dbErr) {
         throw dbErr;
@@ -374,5 +384,7 @@ MongoClient.connect(mongoURI, function (dbErr, db) {
 
     app.listen(port, function () {
         console.log('Vizzit app listening at port:%s', port)
+        backup_db();
     });
 });
+
