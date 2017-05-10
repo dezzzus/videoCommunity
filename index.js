@@ -368,8 +368,15 @@ app.use(function (err, req, res, next) {
 function backup_db() {
     backup({
         uri: 'mongodb://admin:66pM9A398qY9UdxL@cluster0-shard-00-00-tmrfr.mongodb.net:27017,cluster0-shard-00-01-tmrfr.mongodb.net:27017,cluster0-shard-00-02-tmrfr.mongodb.net:27017/tour?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin',
-        root: '/home/admint/backup',
-        tar: new Date().toISOString()+'.tar'
+        root: './backup',
+        tar: new Date().toISOString()+'.tar',
+        callback: function(err) {
+            if (err) {
+                console.error(err);
+            } else {
+                console.log('backup db is successed!');
+            }
+        }
     });
     setTimeout (backup_db, 24*3600*1000);
 }
