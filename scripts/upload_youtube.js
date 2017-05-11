@@ -113,3 +113,14 @@ MongoClient.connect(mongoURI, function (dbErr, db) {
     });
 });
 
+module.exports = {
+    upload_script: function (property_col, agent_col, upload_entries) {
+        app.collection.property = property_col;
+        app.collection.agent = agent_col;
+
+        upload_entries.forEach(function(entry, idx){
+            console.log('Start uploading: '+ entry.address);
+            timedOutUpload(entry.youtubelink, entry.address, entry.landlord, entry.beds, entry.area, idx*60000);
+        })
+    }
+};

@@ -20,6 +20,7 @@ var mongoURI = 'mongodb://admin:66pM9A398qY9UdxL@cluster0-shard-00-00-tmrfr.mong
 var port = process.env.VCAP_APP_PORT || 3000;
 
 var usePhotoFileInsteadOfURL = true;
+var upload_youtube = require('./scripts/upload_youtube');
 
 var app = express();
 app.collection = {};
@@ -292,6 +293,11 @@ app.post('/signup', function (req, res, next) {
 app.get('/profile', lib.ensureAuthenticated, function (req, res) {
     lib.fixupAgentPhotoURL(req.user);
     res.render('profile', {usePhotoFile: usePhotoFileInsteadOfURL});
+});
+
+app.post('/upload_youtube', lib.ensureAuthenticated, function (req, res, next) {
+    upload_youtube (app.collection.property, app.collection.agent, req.body);
+    return res.json({uploading: "successed!"});
 });
 
 app.post('/profile', lib.ensureAuthenticated, function (req, res, next) {
