@@ -20,6 +20,7 @@
 
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse navbar-responsive-collapse">
+                    <% if (bAuth == true) { %>
                     <ul class="nav navbar-nav">
                         <li>
                             <a href="/">Home</a>
@@ -48,6 +49,7 @@
                             <% } %>
                         </li>
                     </ul>
+                    <% } %>
                 </div>
                 <!--/navbar-collapse-->
             </div>

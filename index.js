@@ -58,10 +58,10 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     store: new RedisStore({
-        host: 'pub-redis-17390.us-east-1-3.4.ec2.garantiadata.com',
-        port: 17390,
+        host: 'redis-18881.c9.us-east-1-2.ec2.cloud.redislabs.com',
+        port: 18881,
         ttl: 3600,
-        pass: 'tizziv'
+        //pass: 'tizziv'
     })
 }));
 app.use(passport.initialize());
@@ -113,7 +113,11 @@ app.use(function (req, res, next) {
 app.set('view engine', 'ejs');
 
 app.get('/', function (req, res) {
-    res.render('index');
+    var bAuth = false;
+    if (req.isAuthenticated()) {
+        bAuth = true;
+    }
+    res.render('index', {bAuth: bAuth});
 });
 
 app.get('/contactus', function (req, res) {
