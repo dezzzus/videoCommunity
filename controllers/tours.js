@@ -127,7 +127,7 @@ exports.addTourRoutes = function (app) {
         return req.pipe(busboy);
     });
 
-    function renderDetails(templateName, res, property, agent,
+    function renderDetails(templateName, req, res, property, agent,
                            isAgent, allAgentProperties, leadID, agentInteractive, otherGroupProperties) {
         lib.fixupAgentPhotoURL(agent);
         var mapQuery = '';
@@ -165,7 +165,7 @@ exports.addTourRoutes = function (app) {
                                 if (allprop_err) {
                                     next(allprop_err);
                                 }
-                                renderDetails(templateName, res, property, agent,
+                                renderDetails(templateName, req, res, property, agent,
                                     isAgent, tours, leadID, agentInteractive);
                             });
                     }
@@ -178,7 +178,7 @@ exports.addTourRoutes = function (app) {
                                 }
                                 else {
 
-                                    renderDetails(templateName, res, property, agent,
+                                    renderDetails(templateName, req, res, property, agent,
                                         isAgent, null, leadID, agentInteractive,
                                         tours.filter(function (t) {
                                             return !lib.compareIds(t._id, property._id);
@@ -189,7 +189,7 @@ exports.addTourRoutes = function (app) {
 
                     }
                     else {
-                        renderDetails(templateName, res, property, agent, isAgent, null, leadID,
+                        renderDetails(templateName, req, res, property, agent, isAgent, null, leadID,
                             agentInteractive);
                     }
                 }, next);
