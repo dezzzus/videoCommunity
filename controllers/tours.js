@@ -28,7 +28,8 @@ exports.addTourRoutes = function (app) {
                         res.render('tour', {
                             tours: tours.sort(tourAlphaComp),
                             agent: agent,
-                            agents: agent.superuser ? agents : [agent]
+                            agents: agent.superuser ? agents : [agent],
+                            bAuth: req.bAuth
                         });
                     }
                 );
@@ -143,7 +144,8 @@ exports.addTourRoutes = function (app) {
             leadID: leadID || null,
             leadHeartbeatInterval: app.leadHeartbeatInterval || null,
             agentInteractive: agentInteractive,
-            otherGroupProperties: otherGroupProperties || []
+            otherGroupProperties: otherGroupProperties || [],
+            bAuth: req.bAuth
         });
     }
 
@@ -261,7 +263,7 @@ exports.addTourRoutes = function (app) {
 
     app.get('/tour/:pid/edit', lib.ensureAuthenticated, function (req, res, next) {
         tourManageAction(req, res, next, function (property, pid) {
-            res.render('tour_edit', {tour: property});
+            res.render('tour_edit', {tour: property, bAuth: req.bAuth});
         });
     });
 
@@ -294,13 +296,13 @@ exports.addTourRoutes = function (app) {
     });
 
     app.get('/upload', lib.ensureAuthenticated, function(req, res, next){
-        res.render('upload');
+        res.render('upload', {bAuth: req.bAuth});
 
     });
 
     app.get('/tour/:pid/upload_via_token/:token', function (req, res, next) {
         tourManageAction(req, res, next, function (property, pid) {
-            res.render('tour_upload_via_token', {tour: property});
+            res.render('tour_upload_via_token', {tour: property, bAuth: req.bAuth});
         }, req.param('token'));
     });
 
@@ -470,7 +472,8 @@ exports.addTourRoutes = function (app) {
                 res.render('original', {
                     property: property,
                     videoID: property.videoID,
-                    isAgent: false
+                    isAgent: false,
+                    bAuth: req.bAuth
                 });
             }
             else {
@@ -487,7 +490,8 @@ exports.addTourRoutes = function (app) {
                 res.render('original', {
                     property: property,
                     videoID: property.videoID,
-                    isAgent: true
+                    isAgent: true,
+                    bAuth: req.bAuth
                 });
             }
             else {

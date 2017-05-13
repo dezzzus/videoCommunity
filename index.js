@@ -113,27 +113,43 @@ app.use(function (req, res, next) {
 app.set('view engine', 'ejs');
 
 app.get('/', function (req, res) {
-    var bAuth = false;
+    req.bAuth = false;
     if (req.isAuthenticated()) {
-        bAuth = true;
+        req.bAuth = true;
     }
-    res.render('index', {bAuth: bAuth});
+    res.render('index', {bAuth: req.bAuth});
 });
 
 app.get('/contactus', function (req, res) {
-    res.render('contactus');
+    req.bAuth = false;
+    if (req.isAuthenticated()) {
+        req.bAuth = true;
+    }
+    res.render('contactus', {bAuth: req.bAuth});
 });
 
 app.get('/team', function (req, res) {
-    res.render('team', {noindex: true});
+    req.bAuth = false;
+    if (req.isAuthenticated()) {
+        req.bAuth = true;
+    }
+    res.render('team', {noindex: true, bAuth: req.bAuth});
 });
 
 app.get('/useterms', function (req, res) {
-    res.render('useterms');
+    req.bAuth = false;
+    if (req.isAuthenticated()) {
+        req.bAuth = true;
+    }
+    res.render('useterms', {bAuth: req.bAuth});
 });
 
 app.get('/early_adopter', function (req, res) {
-    res.render('early_adopter');
+    req.bAuth = false;
+    if (req.isAuthenticated()) {
+        req.bAuth = true;
+    }
+    res.render('early_adopter', {bAuth: req.bAuth});
 });
 
 
@@ -145,7 +161,11 @@ app.get('/logout', function (req, res) {
 tourController.addTourRoutes(app);
 
 app.get('/login', function (req, res) {
-    res.render('login');
+    req.bAuth = false;
+    if (req.isAuthenticated()) {
+        req.bAuth = true;
+    }
+    res.render('login', {bAuth: req.bAuth});
 });
 
 app.post('/login', function (req, res, next) {
@@ -170,7 +190,11 @@ app.post('/login', function (req, res, next) {
 
 
 app.get('/resetpass', function (req, res) {
-    res.render('resetpass');
+    req.bAuth = false;
+    if (req.isAuthenticated()) {
+        req.bAuth = true;
+    }
+    res.render('resetpass', {bAuth: req.bAuth});
 });
 
 app.post('/resetpass', function (req, res, next) {
@@ -217,7 +241,11 @@ app.post('/resetpass', function (req, res, next) {
 });
 
 app.get('/signup', function (req, res) {
-    res.render('signup', {usePhotoFile: usePhotoFileInsteadOfURL});
+    req.bAuth = false;
+    if (req.isAuthenticated()) {
+        req.bAuth = true;
+    }
+    res.render('signup', {usePhotoFile: usePhotoFileInsteadOfURL, bAuth: req.bAuth});
 });
 
 var createBusboyForAgent = function (req, res, next) {
@@ -296,7 +324,7 @@ app.post('/signup', function (req, res, next) {
 
 app.get('/profile', lib.ensureAuthenticated, function (req, res) {
     lib.fixupAgentPhotoURL(req.user);
-    res.render('profile', {usePhotoFile: usePhotoFileInsteadOfURL});
+    res.render('profile', {usePhotoFile: usePhotoFileInsteadOfURL, bAuth: req.bAuth});
 });
 
 app.post('/upload_youtube', lib.ensureAuthenticated, function (req, res, next) {
@@ -354,7 +382,7 @@ app.get('/approve', lib.ensureAuthenticated, function (req, res, next) { //Will 
                 }
 
                 res.render('approve', {
-                    agents: agents
+                    agents: agents, bAuth: req.bAuth
                 });
             }
         );

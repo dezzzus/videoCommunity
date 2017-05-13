@@ -5,6 +5,7 @@ module.exports = {
     ensureAuthenticated: function (req, res, next) {
         req.session.returnTo = req.url;
         if (req.isAuthenticated()) {
+            req.bAuth = true;
             return next();
         }
         res.redirect('/login');
