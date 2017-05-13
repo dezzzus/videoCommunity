@@ -129,6 +129,11 @@ exports.addTourRoutes = function (app) {
 
     function renderDetails(templateName, req, res, property, agent,
                            isAgent, allAgentProperties, leadID, agentInteractive, otherGroupProperties) {
+        req.bAuth = false;
+        if (req.isAuthenticated()) {
+            req.bAuth = true;
+            return next();
+        }
         lib.fixupAgentPhotoURL(agent);
         var mapQuery = '';
         if (property.area) {
@@ -301,6 +306,11 @@ exports.addTourRoutes = function (app) {
     });
 
     app.get('/tour/:pid/upload_via_token/:token', function (req, res, next) {
+        req.bAuth = false;
+        if (req.isAuthenticated()) {
+            req.bAuth = true;
+            return next();
+        }
         tourManageAction(req, res, next, function (property, pid) {
             res.render('tour_upload_via_token', {tour: property, bAuth: req.bAuth});
         }, req.param('token'));
@@ -466,6 +476,11 @@ exports.addTourRoutes = function (app) {
 
     app.get('/original/:vid', function (req, res, next) {
         var vid = req.param('vid');
+        req.bAuth = false;
+        if (req.isAuthenticated()) {
+            req.bAuth = true;
+            return next();
+        }
 
         lib.safeFindOne(app.collection.property, {'videoID': vid}, function (property) {
             if (property) {
@@ -485,6 +500,12 @@ exports.addTourRoutes = function (app) {
 
     app.get('/original/:vid/agent', function (req, res, next) {
         var vid = req.param('vid');
+        req.bAuth = false;
+        if (req.isAuthenticated()) {
+            req.bAuth = true;
+            return next();
+        }
+
         lib.safeFindOne(app.collection.property, {'videoID': vid}, function (property) {
             if (property) {
                 res.render('original', {
@@ -501,6 +522,11 @@ exports.addTourRoutes = function (app) {
     });
 
     app.get('/original/:vid/claim', lib.ensureAuthenticated, function (req, res, next) {
+        req.bAuth = false;
+        if (req.isAuthenticated()) {
+            req.bAuth = true;
+            return next();
+        }
         var vid = req.params['vid'];
         claimVideo(vid, req.user._id.toHexString(), function () {
             keenClient.addEvent('agent_claim', {
