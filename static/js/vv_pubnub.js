@@ -19,8 +19,8 @@ vvzzt.pubnub.init = function() {
     if (!vvzzt.pubnub.roomId) {
         vvzzt.pubnub.roomId = vv_pubnub_room_id;
         vvzzt.pubnub.pubnub = PUBNUB.init({
-            publish_key: 'pub-c-4dd374dc-c46a-40ee-9bbf-488f4f7449ef',
-            subscribe_key: 'sub-c-170d058e-8726-11e4-a400-02ee2ddab7fe',
+            publish_key: 'pub-c-12a6b0b0-a153-4f54-acb1-f275eace11a2',
+            subscribe_key: 'sub-c-07093d7c-368a-11e7-9843-0619f8945a4f',
             uuid: vvzzt.pubnub.userId
         });
     }

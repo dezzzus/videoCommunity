@@ -95,21 +95,34 @@ function timedOutUpload(youTubeLink, address, landlord, beds, area, timeout){
     }, timeout);
 }
 
-MongoClient.connect(mongoURI, function (dbErr, db) {
-    if (dbErr) {
-        throw dbErr;
-    }
-
-    app.collection.property = db.collection('property');
-    app.collection.agent = db.collection('agent');
-    var file = fs.readFileSync(process.argv[2], "utf8");
-
-    parse(file, function (err, output) {
-        for (var i = 0; i < output.length; i++) {
-            var cvs_entry = output[i];
-            console.log('Start uploading: '+cvs_entry[0]);
-            timedOutUpload(cvs_entry[4], cvs_entry[0], cvs_entry[1], cvs_entry[3], cvs_entry[2],i*60000);
+if (process.argv[2]) {
+    MongoClient.connect(mongoURI, function (dbErr, db) {
+        if (dbErr) {
+            throw dbErr;
         }
-    });
-});
 
+        app.collection.property = db.collection('property');
+        app.collection.agent = db.collection('agent');
+        var file = fs.readFileSync(process.argv[2], "utf8");
+
+        parse(file, function (err, output) {
+            for (var i = 0; i < output.length; i++) {
+                var cvs_entry = output[i];
+                console.log('Start uploading: ' + cvs_entry[0]);
+                timedOutUpload(cvs_entry[4], cvs_entry[0], cvs_entry[1], cvs_entry[3], cvs_entry[2], i * 60000);
+            }
+        });
+    });
+}
+
+module.exports = {
+    upload_script: function (property_col, agent_col, upload_entries) {
+        app.collection.property = property_col;
+        app.collection.agent = agent_col;
+
+        upload_entries.forEach(function(entry, idx){
+            console.log('Start uploading: '+ entry.address);
+            timedOutUpload(entry.youtubelink, entry.address, entry.landlord, entry.beds, entry.area, idx*60000);
+        })
+    }
+};

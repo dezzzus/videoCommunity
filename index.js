@@ -14,11 +14,13 @@ var tourController = require('./controllers/tours');
 var nodemailer = require('nodemailer');
 var aws_transcoder = require('./aws_transcode.js');
 var Busboy = require('busboy');
+var backup = require('mongodb-backup');
 
 var mongoURI = 'mongodb://admin:66pM9A398qY9UdxL@cluster0-shard-00-00-tmrfr.mongodb.net:27017,cluster0-shard-00-01-tmrfr.mongodb.net:27017,cluster0-shard-00-02-tmrfr.mongodb.net:27017/tour?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin';
 var port = process.env.VCAP_APP_PORT || 3000;
 
 var usePhotoFileInsteadOfURL = true;
+var upload_youtube = require('./scripts/upload_youtube');
 
 var app = express();
 app.collection = {};
@@ -56,10 +58,10 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     store: new RedisStore({
-        host: 'pub-redis-17390.us-east-1-3.4.ec2.garantiadata.com',
-        port: 17390,
+        host: 'redis-18881.c9.us-east-1-2.ec2.cloud.redislabs.com',
+        port: 18881,
         ttl: 3600,
-        pass: 'tizziv'
+        //pass: 'tizziv'
     })
 }));
 app.use(passport.initialize());
@@ -111,7 +113,11 @@ app.use(function (req, res, next) {
 app.set('view engine', 'ejs');
 
 app.get('/', function (req, res) {
-    res.render('index');
+    var bAuth = false;
+    if (req.isAuthenticated()) {
+        bAuth = true;
+    }
+    res.render('index', {bAuth: bAuth});
 });
 
 app.get('/contactus', function (req, res) {
@@ -293,6 +299,11 @@ app.get('/profile', lib.ensureAuthenticated, function (req, res) {
     res.render('profile', {usePhotoFile: usePhotoFileInsteadOfURL});
 });
 
+app.post('/upload_youtube', lib.ensureAuthenticated, function (req, res, next) {
+    upload_youtube (app.collection.property, app.collection.agent, req.body);
+    return res.json({uploading: "successed!"});
+});
+
 app.post('/profile', lib.ensureAuthenticated, function (req, res, next) {
     var busboy = createBusboyForAgent(req, res, next);
     busboy.on('finish', function () {
@@ -364,6 +375,22 @@ app.use(function (err, req, res, next) {
     res.status(500).render('500');
 });
 
+function backup_db() {
+    backup({
+        uri: 'mongodb://admin:66pM9A398qY9UdxL@cluster0-shard-00-00-tmrfr.mongodb.net:27017,cluster0-shard-00-01-tmrfr.mongodb.net:27017,cluster0-shard-00-02-tmrfr.mongodb.net:27017/tour?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin',
+        root: './backup',
+        tar: new Date().toISOString()+'.tar',
+        callback: function(err) {
+            if (err) {
+                console.error(err);
+            } else {
+                console.log('backup db is successed!');
+            }
+        }
+    });
+    setTimeout (backup_db, 24*3600*1000);
+}
+
 MongoClient.connect(mongoURI, function (dbErr, db) {
     if (dbErr) {
         throw dbErr;
@@ -374,5 +401,7 @@ MongoClient.connect(mongoURI, function (dbErr, db) {
 
     app.listen(port, function () {
         console.log('Vizzit app listening at port:%s', port)
+        backup_db();
     });
 });
+
