@@ -132,7 +132,6 @@ exports.addTourRoutes = function (app) {
         req.bAuth = false;
         if (req.isAuthenticated()) {
             req.bAuth = true;
-            return next();
         }
         lib.fixupAgentPhotoURL(agent);
         var mapQuery = '';
@@ -309,7 +308,6 @@ exports.addTourRoutes = function (app) {
         req.bAuth = false;
         if (req.isAuthenticated()) {
             req.bAuth = true;
-            return next();
         }
         tourManageAction(req, res, next, function (property, pid) {
             res.render('tour_upload_via_token', {tour: property, bAuth: req.bAuth});
@@ -479,7 +477,6 @@ exports.addTourRoutes = function (app) {
         req.bAuth = false;
         if (req.isAuthenticated()) {
             req.bAuth = true;
-            return next();
         }
 
         lib.safeFindOne(app.collection.property, {'videoID': vid}, function (property) {
@@ -503,7 +500,6 @@ exports.addTourRoutes = function (app) {
         req.bAuth = false;
         if (req.isAuthenticated()) {
             req.bAuth = true;
-            return next();
         }
 
         lib.safeFindOne(app.collection.property, {'videoID': vid}, function (property) {
@@ -525,7 +521,6 @@ exports.addTourRoutes = function (app) {
         req.bAuth = false;
         if (req.isAuthenticated()) {
             req.bAuth = true;
-            return next();
         }
         var vid = req.params['vid'];
         claimVideo(vid, req.user._id.toHexString(), function () {
