@@ -1,6 +1,7 @@
 <% include head_begin.ejs %>
 <!-- CSS Implementing Plugins -->
 <link rel="stylesheet" href="/unify/plugins/parallax-slider/css/parallax-slider.css">
+
 <% include head_end.ejs %>
 
 <div class="slider-inner">
@@ -14,6 +15,62 @@
 <div class="content-section-a">
     <div class="container">
         <div class="row">
+            <a data-target="#video" class="btn btn-lg btn-primary" data-toggle="modal">show video</a>
+            <!-- Modal HTML -->
+              <div id="video" class="modal fade">
+                  <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                              <h4 class="modal-title">Video</h4>
+                          </div>
+                          <div class="modal-body">
+                              <iframe id="cartoonVideo" width="560" height="315" src="//www.youtube.com/embed/YE7VzlLtp-4" frameborder="0" allowfullscreen></iframe>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+            <a data-target="#myform" class="btn btn-lg btn-primary" data-toggle="modal">show form</a>
+            <!-- Modal HTML -->
+            <div id="myform" class="modal fade">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                            <h4 class="modal-title">Form</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mtm">
+                                <div class="name_input">
+                                    <input type="text" placeholder="Name"/>
+
+                                    <div class="icon_box">
+                                        <i class="fa fa-user"></i>
+                                    </div>
+                                </div>
+                                <div class="email_input">
+                                    <input type="text" placeholder="Email"/>
+
+                                    <div class="icon_box">
+                                        <i class="fa fa-envelope-o"></i>
+                                    </div>
+                                </div>
+                                <div class="phone_input">
+                                    <input type="text" placeholder="Phone"/>
+
+                                    <div class="icon_box icon_phone">
+                                        <i class="fa fa-phone"></i>
+                                    </div>
+                                </div>
+                                <textarea class="message_input"
+                                          placeholder="Your message for agent"></textarea>
+                                <div class="contact_submit"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="col-lg-5 col-sm-6">
                 <hr class="section-heading-spacer">
                 <div class="clearfix"></div>
