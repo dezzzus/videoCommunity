@@ -389,18 +389,18 @@ app.get('/approve', lib.ensureAuthenticated, function (req, res, next) { //Will 
     }
 
     else {
-        res.status(404).render('404');
+        res.status(404).render('404', {bAuth: req.bAuth});
     }
 });
 
 //404 route should be always be last route
 app.get('*', function (req, res) {
-    res.status(404).render('404');
+    res.status(404).render('404', {bAuth: req.bAuth});
 });
 
 app.use(function (err, req, res, next) {
     lib.reportError(err, app.awsMailer);
-    res.status(500).render('500');
+    res.status(500).render('500', {bAuth: req.bAuth});
 });
 
 function backup_db() {

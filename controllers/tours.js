@@ -199,7 +199,7 @@ exports.addTourRoutes = function (app) {
                 }, next);
             }
             else {
-                res.status(404).render('404');
+                res.status(404).render('404', {bAuth: req.bAuth});
             }
         }, next);
 
@@ -489,7 +489,7 @@ exports.addTourRoutes = function (app) {
                 });
             }
             else {
-                res.status(404).render('404');
+                res.status(404).render('404', {bAuth: req.bAuth});
             }
         }, next);
 
@@ -512,7 +512,7 @@ exports.addTourRoutes = function (app) {
                 });
             }
             else {
-                res.status(404).render('404');
+                res.status(404).render('404', {bAuth: req.bAuth});
             }
         }, next);
     });
