@@ -217,7 +217,7 @@ exports.addTourRoutes = function (app) {
         var pid = req.params.pid;
         app.awsMailer.sendMail({
             from: 'info@virtualvizzit.com',
-            to: req.body['agent_email'],
+            to: 'aj@virtualvizzit.com',
             subject: 'VirtualVizzit client message',
             text: 'Name: ' + req.body['name'] + '\n' +
             'Email: ' + req.body['email'] + '\n' +
