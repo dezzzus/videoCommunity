@@ -20,20 +20,23 @@ $(document).ready(function(){
     });
 });
 </script>
-<% include head_end.ejs %>
 
 <div class="slider-inner">
     <div id="da-slider" class="da-slider">
-        <div class="da-slide da-slide-current">
-            <h2><i>Virtual Vizzit</i></h2>
-            <p><i>Create guided virtual apartment tours</i></p>
+        <div class="da-slide da-slide-current">  
+        <div class="login_link"><a href="/login">AGENT LOGIN</a></div> 
+   
+            <div class="hero_box center_hor_ver">
+                <div class="logo_box"><img src="/img/checkmark-120x109.png" /></div>
+                <div class="hero_title"><i>Virtual Vizzit</i></div>
+                <div class="tagline"><i>See your apartment before you see your agent</i></div>
+            </div>
         </div>
     </div>
 </div>
 <div class="content-section-a">
     <div class="container">
         <div class="row">
-            <a data-target="#video" class="btn btn-lg btn-primary" data-toggle="modal">show video</a>
             <!-- Modal HTML -->
               <div id="video" class="modal fade">
                   <div class="modal-dialog" role="document">
@@ -48,14 +51,14 @@ $(document).ready(function(){
                       </div>
                   </div>
               </div>
-            <a data-target="#myform" class="btn btn-lg btn-primary" data-toggle="modal">show form</a>
+           
             <!-- Modal HTML -->
             <div id="myform" class="modal fade">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                            <h4 class="modal-title">Form</h4>
+                            <h4 class="modal-title">Contact a Vizzit approved agent</h4>
                         </div>
                         <div class="modal-body">
                             <div class="mtm">
@@ -88,14 +91,17 @@ $(document).ready(function(){
                     </div>
                 </div>
             </div>
-
+            <hr class="section-heading-spacer">
             <div class="col-lg-5 col-sm-6">
-                <hr class="section-heading-spacer">
                 <div class="clearfix"></div>
-                <h2 class="section-heading">What we're building</h2>
-                <p class="lead">A simple, intuitive set of tools that listing agents and property owners can use to save themselves and their prospective renters time by avoiding futile visits.</p>
-                <h2 class="section-heading">Our goal</h2>
-                <p class="lead">To save agents and their clients time by enabling them to create and conduct quick and inexpensive virtual tours of residential rental properties.</p>
+                <h2 class="section-heading">The rental process simplified.</h2>
+                <p class="lead">Connect with a Vizzit approved office to receive, up-to-date and accurate, agent-guided video tours from the comfort of your home. </p>
+            </div>
+            <div class="pos_relative col-lg-5 col-sm-6">
+                <div class="cta_btn">
+                    <a data-target="#myform" class="btn btn-lg btn-primary" data-toggle="modal">Schedule a Vizzit!</a>
+                    <!--<a data-target="#video" class="btn btn-lg btn-primary" data-toggle="modal">show video</a>-->
+                </div>
             </div>
         </div>
     </div>
