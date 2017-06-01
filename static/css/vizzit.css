@@ -119,7 +119,8 @@
 }
 
 .mtm {
-    margin-top: 15px;
+    margin: auto;
+    width: 300px;
 }
 
 .email_input, .phone_input, .message_input {
@@ -298,4 +299,64 @@
 
 .ptl {
     padding-top: 26px;
+}
+
+.center_hor_ver {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.hero_box {
+  color: #fff;
+  line-height: 1.3;
+  text-shadow: #000 1px 1px;
+  width: 565px;
+  margin: 10px;
+}
+
+.hero_title {
+    font-size: 55px;
+}
+
+.tagline {
+    font-size: 25px;
+}
+
+.logo_box {
+    float: left;
+}
+
+.login_link {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    background-color:rgba(0, 0, 0, 0.7);
+    font-size: 14px;
+    color: #fff;
+    padding: 10px;
+
+}
+.login_link a {
+    color: #fff;
+}
+
+.pos_relative {
+    position: relative;
+}
+
+.cta_btn {
+    margin-top: 10%;
+    margin-left: 25%;
+}
+
+@media (max-width: 480px) {
+    .hero_box {
+        width: inherit;
+        text-align: center;
+    }
+    .logo_box {
+        float: none;
+    }
 }
