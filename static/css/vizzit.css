@@ -225,7 +225,7 @@
     font-weight: 400;
 }
 
-.send_tour i {
+.send_tour i, .buddy_tour i {
     margin-right: 5px;
 }
 
