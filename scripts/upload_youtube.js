@@ -8,6 +8,7 @@ var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
 var parse = require('csv-parse');
 var fs = require('fs');
+var request = require('request');
 
 
 var mongoURI = 'mongodb://admin:66pM9A398qY9UdxL@cluster0-shard-00-00-tmrfr.mongodb.net:27017,cluster0-shard-00-01-tmrfr.mongodb.net:27017,cluster0-shard-00-02-tmrfr.mongodb.net:27017/tour?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin';
@@ -25,68 +26,81 @@ app.s3Stream = require('s3-upload-stream')(new app.AWS.S3());
 app.transcoder = aws_transcoder.getTranscoderFunctions(app);
 
 function uploadYouTube(youTubeLink, address, landlord, agent, beds, area) {
-    var video = youtubedl(youTubeLink);
+    try {
+        request.get({url: youTubeLink}, function (err, httpResponse, body) {
+            if (body.includes('<div id="unavailable-submessage" class="submessage">\nSorry about that.')) {
+                console.log ('Error occured in uploading ' + youTubeLink);
+                console.log ('There is no video file.');
+                return;
+            }
+            var video = youtubedl(youTubeLink, ['--format=18'], {cwd: __dirname, maxBuffer: 1000 * 1024},
+                function (err, info) {
+                    if (err) throw err;
+                });
 
-    video.on('info', function (info) {
-        console.log('Download started');
-        console.log('filename: ' + info.filename);
-        console.log('size: ' + info.size);
-    });
+            video.on('info', function (info) {
+                console.log('Download started');
+                console.log('filename: ' + info.filename);
+                console.log('size: ' + info.size);
+            });
 
-    var property = {
-        _id: shortid.generate(),
-        playerType: 'flowplayer',
-        address: address,
-        agent: agent,
-        note: '',
-        group: '',
-        price: '',
-        beds: beds,
-        baths: '',
-        description: '',
-        landlord: landlord,
-        area: area,
-        videoID: shortid.generate(),
-        uploadToken: null,
-        hasThumb: true, // from this point on, all videos have thumbnails
-        creationDate: new Date()
-    };
+            var property = {
+                _id: shortid.generate(),
+                playerType: 'flowplayer',
+                address: address,
+                agent: agent,
+                note: '',
+                group: '',
+                price: '',
+                beds: beds,
+                baths: '',
+                description: '',
+                landlord: landlord,
+                area: area,
+                videoID: shortid.generate(),
+                uploadToken: null,
+                hasThumb: true, // from this point on, all videos have thumbnails
+                creationDate: new Date()
+            };
 
-    var upload = app.s3Stream.upload({
-        Bucket: 'vizzitupload',
-        Key: property.videoID
-    });
+            var upload = app.s3Stream.upload({
+                Bucket: 'vizzitupload',
+                Key: property.videoID
+            });
 
-    upload.on('uploaded', function () {
-        console.log('File uploaded: ' + property.videoID);
-        app.transcoder.transcode(agent, property.videoID,
-            function (err) {
+            upload.on('uploaded', function () {
+                console.log('File uploaded: ' + property.videoID);
+                app.transcoder.transcode(agent, property.videoID,
+                    function (err) {
+                        if (err) {
+                            console.log('Transcoding error(' + property.videoID + '): ' + err);
+                        }
+                        else {
+                            console.log('File transcoded: ' + property.videoID);
+                        }
+                    });
+            });
+
+            upload.on('error', function (err) {
                 if (err) {
-                    console.log('Transcoding error(' + property.videoID + '): ' + err);
-                }
-                else {
-                    console.log('File transcoded: ' + property.videoID);
+                    console.log('Upload error ' + err);
                 }
             });
-    });
 
-    upload.on('error', function (err) {
-        if (err) {
-            console.log('Upload error ' + err);
-        }
-    });
+            video.pipe(upload);
 
-    video.pipe(upload);
-
-    app.collection.property.insert(property, function (err, dbProp) {
-        if (err) {
-            console.log('Db error ' + err);
-        }
-        else {
-            console.log('Property writed to db: ' + property._id);
-        }
-
-    });
+            app.collection.property.insert(property, function (err, dbProp) {
+                if (err) {
+                    console.log('Db error ' + err);
+                }
+                else {
+                    console.log('Property writed to db: ' + property._id);
+                }
+            });
+        });
+    } catch (e) {
+        console.log('Error occured in uploading ' + youTubeLink);
+    }
 }
 
 function timedOutUpload(youTubeLink, address, landlord, beds, area, timeout){
