@@ -1,7 +1,7 @@
 /**
  * Created by anatoly on 25.04.15.
  */
-var youtubedl = require('youtube-dl');
+var youtubedl = require('./lib/youtube-dl.js');
 var shortid = require('shortid');
 var aws_transcoder = require('../aws_transcode.js');
 var mongodb = require('mongodb');
@@ -28,7 +28,7 @@ app.transcoder = aws_transcoder.getTranscoderFunctions(app);
 function uploadYouTube(youTubeLink, address, landlord, agent, beds, area) {
     try {
         request.get({url: youTubeLink}, function (err, httpResponse, body) {
-            if (body.includes('<div id="unavailable-submessage" class="submessage">\nSorry about that.')) {
+            if (!body || body.includes('<div id="unavailable-submessage" class="submessage">\nSorry about that.')) {
                 console.log ('Error occured in uploading ' + youTubeLink);
                 console.log ('There is no video file.');
                 return;
