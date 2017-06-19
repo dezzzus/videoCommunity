@@ -131,6 +131,10 @@ if (process.argv[2]) {
     });
 }
 
+process.on('uncaughtException', (err) => {
+    fs.writeSync(1, `Caught exception: ${err}\n`);
+});
+
 module.exports = {
     upload_script: function (property_col, agent_col, upload_entries) {
         app.collection.property = property_col;

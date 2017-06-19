@@ -1,4 +1,4 @@
-var execFile  = require('child_process').execFile;
+var execFileSync  = require('child_process').execFileSync;
 var fs        = require('fs');
 var path      = require('path');
 var url       = require('url');
@@ -158,7 +158,7 @@ function call(urls, args1, args2, options, callback) {
   }
 
   // Call youtube-dl.
-  execFile(ytdlBinary, args, options, function done(err, stdout, stderr) {
+  execFileSync(ytdlBinary, args, options, function done(err, stdout, stderr) {
     if (err) {
       if (videoNotAvailable.test(err.message)) { passOver = true; }
       if (!passOver) { return callback(err); }
