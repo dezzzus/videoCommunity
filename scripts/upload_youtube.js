@@ -13,6 +13,7 @@ var request = require('request');
 
 var mongoURI = 'mongodb://admin:66pM9A398qY9UdxL@cluster0-shard-00-00-tmrfr.mongodb.net:27017,cluster0-shard-00-01-tmrfr.mongodb.net:27017,cluster0-shard-00-02-tmrfr.mongodb.net:27017/tour?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin';
 var app = {};
+var callbacks = 0;
 app.collection = {};
 
 app.AWS = require('aws-sdk');
@@ -80,6 +81,10 @@ function uploadYouTube(youTubeLink, address, landlord, agent, beds, area) {
                         else {
                             console.log('File transcoded: ' + property.videoID);
                         }
+                        callbacks --;
+                        console.log (callbacks);
+                        if (callbacks == 0)
+                            process.exit();
                     });
             });
 
@@ -102,6 +107,10 @@ function uploadYouTube(youTubeLink, address, landlord, agent, beds, area) {
         });
     } catch (e) {
         console.log('Error occured in uploading ' + youTubeLink);
+        callbacks --;
+        console.log (callbacks);
+        if (callbacks == 0)
+            process.exit();
     }
 }
 
@@ -122,6 +131,8 @@ if (process.argv[2]) {
         var file = fs.readFileSync(process.argv[2], "utf8");
 
         parse(file, function (err, output) {
+            callbacks = output.length;
+            console.log ("callbacks : " +callbacks);
             for (var i = 0; i < output.length; i++) {
                 var cvs_entry = output[i];
                 console.log('Start uploading: ' + cvs_entry[0]);
@@ -132,6 +143,7 @@ if (process.argv[2]) {
 }
 
 process.on('uncaughtException', (err) => {
+    console.log (err);
     fs.writeSync(1, `Caught exception: ${err}\n`);
 });
 

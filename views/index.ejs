@@ -22,7 +22,7 @@ $(document).ready(function(){
 $('.contact_submit').on('click', function () {
     var data = {
         'name': $('.name_input input').val(),
-        'agent_email': '<%= agent.email %>',
+        'agent_email': 'aj@virtualvizzit.com',
         'email': $('.email_input input').val(),
         'phone': $('.phone_input input').val(),
         'message': $('.message_input').val()
@@ -30,7 +30,7 @@ $('.contact_submit').on('click', function () {
     };
     $.ajax({
         type: 'POST',
-        url: '/video/<%= property._id %>',
+        url: '/post_msg',
         data: data,
         success: function () {
             alert('Your message send');

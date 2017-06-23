@@ -213,6 +213,25 @@ exports.addTourRoutes = function (app) {
         handlePropertyDetails(req, res, next, 'video', false);
     });
 
+    app.post('/post_msg', function (req, res, next) {
+        app.awsMailer.sendMail({
+            from: 'info@virtualvizzit.com',
+            to: 'aj@virtualvizzit.com',
+            subject: 'VirtualVizzit client message',
+            text: 'Name: ' + req.body['name'] + '\n' +
+            'Email: ' + req.body['email'] + '\n' +
+            'Phone: ' + req.body['phone'] + '\n' +
+            'Message: ' + req.body['message']
+        }, function (err, info) {
+            if (err) {
+                next(err);
+            }
+            else {
+                res.send({'status': 'OK'});
+            }
+        });
+    });
+
     app.post('/video/:pid', function (req, res, next) {
         var pid = req.params.pid;
         app.awsMailer.sendMail({

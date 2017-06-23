@@ -1,4 +1,4 @@
-var execFileSync  = require('child_process').execFileSync;
+var execFileSync  = require('child_process').execFile;
 var fs        = require('fs');
 var path      = require('path');
 var url       = require('url');
