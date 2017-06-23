@@ -36,14 +36,9 @@
     "s3-upload-stream": "^1.0.7",
     "shortid": "^2.2.2",
     "streamify": "~0.2.3",
-    "supervisor": "^0.6.0",
-    "youtube-dl": "^1.11.1"
+    "supervisor": "^0.6.0"
   },
   "devDependencies": {
     "csv": "^0.4.2"
-  },
-  "scripts": {
-    "postinstall": "node ./scripts/scripts/download.js",
-    "update": "node ./scripts/scripts/download.js"
   }
 }
