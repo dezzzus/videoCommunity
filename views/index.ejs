@@ -18,26 +18,27 @@ $(document).ready(function(){
     $("#video").on('show.bs.modal', function(){
         $("#cartoonVideo").attr('src', url);
     });
-});
-$('.contact_submit').on('click', function () {
-    var data = {
-        'name': $('.name_input input').val(),
-        'agent_email': 'aj@virtualvizzit.com',
-        'email': $('.email_input input').val(),
-        'phone': $('.phone_input input').val(),
-        'message': $('.message_input').val()
+    $('.contact_submit').on('click', function () {
+        var data = {
+            'name': $('.name_input input').val(),
+            'agent_email': 'aj@virtualvizzit.com',
+            'email': $('.email_input input').val(),
+            'phone': $('.phone_input input').val(),
+            'message': $('.message_input').val()
 
-    };
-    $.ajax({
-        type: 'POST',
-        url: '/post_msg',
-        data: data,
-        success: function () {
-            alert('Your message send');
-        },
-        error: function () {
-            alert('Error occurred');
-        }
+        };
+        console.log (data);
+        $.ajax({
+            type: 'POST',
+            url: '/post_msg',
+            data: data,
+            success: function () {
+                alert('Your message send');
+            },
+            error: function () {
+                alert('Error occurred');
+            }
+        });
     });
 });
 </script>
