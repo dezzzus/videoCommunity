@@ -1,7 +1,7 @@
 /**
  * Created by anatoly on 25.04.15.
  */
-var youtubedl = require('./lib/youtube-dl.js');
+var youtubedl = require('youtube-dl');
 var shortid = require('shortid');
 var aws_transcoder = require('../aws_transcode.js');
 var mongodb = require('mongodb');
