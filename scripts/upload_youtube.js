@@ -28,18 +28,13 @@ app.transcoder = aws_transcoder.getTranscoderFunctions(app);
 
 function uploadYouTube(youTubeLink, address, landlord, agent, beds, area) {
     try {
-        request.get({url: youTubeLink}, function (err, httpResponse, body) {
+        //request.get({url: youTubeLink}, function (err, httpResponse, body) {
             /*if (!body || body.includes('<div id="unavailable-submessage" class="submessage">\nSorry about that.')) {
                 console.log ('Error occured in uploading ' + youTubeLink);
                 console.log ('There is no video file.');
                 return;
             }*/
-            console.log (youTubeLink);
-            var video = youtubedl(youTubeLink, ['--format=18'], {cwd: __dirname, maxBuffer: 1000 * 1024},
-                function (err, info) {
-                console.log (err);
-                    if (err) throw err;
-                });
+            var video = youtubedl(youTubeLink);
 
             video.on('info', function (info) {
                 console.log('Download started');
@@ -104,7 +99,7 @@ function uploadYouTube(youTubeLink, address, landlord, agent, beds, area) {
                     console.log('Property writed to db: ' + property._id);
                 }
             });
-        });
+        //});
     } catch (e) {
         console.log('Error occured in uploading ' + youTubeLink);
         callbacks --;
