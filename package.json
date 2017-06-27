@@ -24,6 +24,7 @@
     "ejs": "^1.0.0",
     "express": "^4.12.3",
     "express-session": "^1.9.3",
+    "extend":"",
     "http-auth": "^2.2.5",
     "keen-js": "^3.2.4",
     "mkdirp": "^0.5.1",
