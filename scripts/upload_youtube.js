@@ -14,6 +14,7 @@ var request = require('request');
 var mongoURI = 'mongodb://admin:66pM9A398qY9UdxL@cluster0-shard-00-00-tmrfr.mongodb.net:27017,cluster0-shard-00-01-tmrfr.mongodb.net:27017,cluster0-shard-00-02-tmrfr.mongodb.net:27017/tour?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin';
 var app = {};
 var callbacks = 0;
+var timecheck = null;
 app.collection = {};
 
 app.AWS = require('aws-sdk');
@@ -77,7 +78,6 @@ function uploadYouTube(youTubeLink, address, landlord, agent, beds, area) {
                             console.log('File transcoded: ' + property.videoID);
                         }
                         callbacks --;
-                        console.log (callbacks);
                         if (callbacks == 0)
                             process.exit();
                     });
@@ -103,9 +103,11 @@ function uploadYouTube(youTubeLink, address, landlord, agent, beds, area) {
     } catch (e) {
         console.log('Error occured in uploading ' + youTubeLink);
         callbacks --;
-        console.log (callbacks);
         if (callbacks == 0)
             process.exit();
+        if (timecheck)
+          clearTimeout(timecheck);
+        timecheck = setTimeout(() => {process.exit();}, 1000*60*30);
     }
 }
 
