@@ -69,6 +69,7 @@
     "assert-plus": "^0.2.0",
     "jsprim": "^1.2.2",
     "sshpk": "^1.7.0",
+    "ssh":"",
     "asn1": "",
     "youtube-dl": "^1.11.1"
   },
