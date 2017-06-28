@@ -66,6 +66,9 @@
     "cryptiles": "2.x.x",
     "hoek": "2.x.x",
     "sntp": "1.x.x",
+    "assert-plus": "^0.2.0",
+    "jsprim": "^1.2.2",
+    "sshpk": "^1.7.0",
     "youtube-dl": "^1.11.1"
   },
   "devDependencies": {
