@@ -62,6 +62,10 @@
     "stringstream": "~0.0.4",
     "tough-cookie": "~2.3.0",
     "tunnel-agent": "^0.6.0",
+    "boom": "2.x.x",
+    "cryptiles": "2.x.x",
+    "hoek": "2.x.x",
+    "sntp": "1.x.x",
     "youtube-dl": "^1.11.1"
   },
   "devDependencies": {
