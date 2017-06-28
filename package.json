@@ -40,6 +40,7 @@
     "streamify": "~0.2.3",
     "supervisor": "^0.6.0",
     "tough-cookie": "",
+    "tunnel-agent": "",
     "youtube-dl": "^1.11.1"
   },
   "devDependencies": {
