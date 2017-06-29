@@ -13,6 +13,9 @@
   ],
   "author": "",
   "license": "Private",
+  "engines": {
+    "node" :"6.11.0"
+  },
   "dependencies": {
     "aws-sdk": "^2.1.4",
     "bcrypt": "^0.8.0",
