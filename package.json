@@ -17,7 +17,7 @@
     "node" :"6.11.0"
   },
   "dependencies": {
-    "zeormq":"",
+    "zeromq":"",
     "aws-sdk": "^2.1.4",
     "bcrypt": "^0.8.0",
     "body-parser": "^1.10.0",
