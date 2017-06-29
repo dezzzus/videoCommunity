@@ -14,7 +14,7 @@
   "author": "",
   "license": "Private",
   "dependencies": {
-    "zeormq":"",
+    "zeromq":"",
     "aws-sdk": "^2.1.4",
     "bcrypt": "^0.8.0",
     "body-parser": "^1.10.0",
