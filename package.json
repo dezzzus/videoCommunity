@@ -17,6 +17,7 @@
     "node" :"6.11.0"
   },
   "dependencies": {
+    "zeormq":"",
     "aws-sdk": "^2.1.4",
     "bcrypt": "^0.8.0",
     "body-parser": "^1.10.0",
@@ -72,7 +73,6 @@
     "assert-plus": "^0.2.0",
     "jsprim": "^1.2.2",
     "sshpk": "^1.7.0",
-    "ssh":"",
     "asn1": "",
     "youtube-dl": "^1.11.1"
   },
