@@ -78,6 +78,10 @@ function uploadYouTube(youTubeLink, address, landlord, agent, beds, area) {
                             console.log('File transcoded: ' + property.videoID);
                         }
                         callbacks --;
+                        if (timecheck)
+                          clearTimeout(timecheck);
+                        timecheck = setTimeout(() => {process.exit();}, 1000*60*30);
+                      
                         if (callbacks == 0)
                             process.exit();
                     });
