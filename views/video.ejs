@@ -1,6 +1,6 @@
 <% include head_begin.ejs %>
-<script src="http://cdn.pubnub.com/pubnub.min.js"></script>
-<script src="/js/vv_pubnub.js"></script>
+<!--<script src="http://cdn.pubnub.com/pubnub.min.js"></script>-->
+<!--<script src="/js/vv_pubnub.js"></script>-->
 <script src="/js/vv_misc_ui.js"></script>
 
 
@@ -198,29 +198,29 @@
         });
         var flplayer = flowplayer(jqDiv);
 
-        var playerWrapper = new SyncWrapper(flplayer);
+       // var playerWrapper = new SyncWrapper(flplayer);
 
         <% if(isAgent){ %>
 
-        var jqHeartBeat = $('.tenant_time');
-        var jqJumpTo = $('.jump_to');
+        //var jqHeartBeat = $('.tenant_time');
+        //var jqJumpTo = $('.jump_to');
 
 
-        jqJumpTo.on('click', function () {
-            playerWrapper.api('seekTo', jqHeartBeat.text())
-        });
+        //jqJumpTo.on('click', function () {
+        //    playerWrapper.api('seekTo', jqHeartBeat.text())
+        //});
 
-        var jqCheckBox = $('.always_sync');
-        jqCheckBox.on('change', function () {
-            var isChecked = jqCheckBox.is(':checked');
-            vvzzt.sync.syncHeartBeat = isChecked;
-            if (isChecked) {
-                jqJumpTo.hide();
-            }
-            else {
-                jqJumpTo.show();
-            }
-        });
+        //var jqCheckBox = $('.always_sync');
+        //jqCheckBox.on('change', function () {
+        //    var isChecked = jqCheckBox.is(':checked');
+        //    vvzzt.sync.syncHeartBeat = isChecked;
+        //    if (isChecked) {
+        //        jqJumpTo.hide();
+        //    }
+        //    else {
+        //        jqJumpTo.show();
+        //    }
+        //});
 
         $('.buddy_tour').on('click', function () {
             var agentMail = prompt('Enter agent emails, separated by comma');
