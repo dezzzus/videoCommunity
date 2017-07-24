@@ -281,7 +281,7 @@
         });
 
 
-        setTimeout(function () {
+       setTimeout(function () {
             keenClient.addEvent('video_engaged_pageview', {
                 'tourID': '<%=property._id %>',
                 'sourceAgent': '<%=property.agent %>',
@@ -289,7 +289,6 @@
             }, function () {
             });
         }, 1600);
-
 
     });
 </script>
