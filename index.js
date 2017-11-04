@@ -429,7 +429,7 @@ MongoClient.connect(mongoURI, function (dbErr, db) {
 
     app.listen(port, function () {
         console.log('Vizzit app listening at port:%s', port)
-        backup_db();
+        //backup_db();
     });
 });
 
