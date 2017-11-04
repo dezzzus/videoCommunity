@@ -38,7 +38,7 @@ module.exports = {
         };
 
         var getPresetForWatermark = function(callback, onError) {
-            var presetName = 'vv-current-preset';
+            var presetName = 'vv-preset-med-logo';
             findPresetByName(presetName, function(presetId) {
                 if (!presetId) {
                     onError('no preset found: ' + presetName);
