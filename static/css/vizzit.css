@@ -70,7 +70,6 @@
 .search_box {
     margin-top: 38px;
     margin-bottom: 22px;
-    width: 308px;
     padding-top: 17px;
 }
 
@@ -351,6 +350,15 @@
     margin: auto;
 }
 
+@media (max-width: 991px) {
+    .search_box {
+        margin-top: 0px;
+    }
+    .tour_table {
+        margin-top: 30px;
+    }
+}
+
 @media (max-width: 480px) {
     .hero_box {
         width: inherit;
@@ -359,4 +367,8 @@
     .logo_box {
         float: none;
     }
+}
+
+.full-width {
+    width: 100%;
 }
