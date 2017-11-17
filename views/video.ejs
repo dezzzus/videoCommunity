@@ -60,6 +60,33 @@
                 </div>
                 <% } %>
             </div>
+            <% if (mapQuery){ %>
+            <div class="property_map video_box">
+                <iframe width="309" height="270" frameborder="0" style="border:0"
+                        src="https://www.google.com/maps/embed/v1/place?q=<%= mapQuery %>&key=AIzaSyDxE2Y_1DjF7alNc_xW9SVjWJsBn_7DdCc"></iframe>
+            </div>
+            <% } %>
+            <br>
+            <% if(isAgent){ %>
+            <div>
+                <%= property.note %>
+            </div>
+            <% } %>
+            <div class="row">
+                <% if (otherGroupProperties.length > 0) { %>
+
+                <div class="col-md-6">
+                    Tours of other similar properties:
+                    <% for (var i = 0; i < otherGroupProperties.length;i++) { %>
+                    <div>
+
+
+                        <a href="<%= "/video/" + otherGroupProperties[i]._id %>"> <%= otherGroupProperties[i].address %></a>
+                    </div>
+                    <% } %>
+                </div>
+                <% } %>
+            </div>
 
         </div>
         <div class="col-md-4">
@@ -110,72 +137,38 @@
                 </div>
 
             </div>
-            <% if (mapQuery){ %>
-            <div class="property_map video_box">
-                <iframe width="309" height="270" frameborder="0" style="border:0"
-                        src="https://www.google.com/maps/embed/v1/place?q=<%= mapQuery %>&key=AIzaSyDxE2Y_1DjF7alNc_xW9SVjWJsBn_7DdCc"></iframe>
-            </div>
-            <% } %>
-            <br>
-            <% if(isAgent){ %>
-            <div>
-                <%= property.note %>
-            </div>
-            <% } %>
+            <% if (isAgent) { %>
+            <div class="row">
+                <div class="col-md-12 ptl">
+                    <div class="btn  btn-primary send_tour">
+                        <i class="fa fa-envelope-o"></i>Send to client
+                    </div>
+                    <div class="btn  btn-primary buddy_tour">
+                        <i class="fa fa-envelope-o"></i>Copy to another agent
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <% if (agentInteractive) { %>
+                    <div class="form-group">
+                        <label for="tour_select">Switch to another tour:</label>
+                        <select class="form-control" id="tour_select" name="tour">
+                            <% for (var i = 0; i < allProperties.length;i++) { %>
+                            <option value="<%= allProperties[i]._id %>"
 
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-offset-1 col-md-11 box-low-padding">
-            This video was produced by a budding, yet still an amateur videographer as a courtesy before your visit
-        </div>
-    </div>
-    <% if (isAgent) { %>
-    <div class="row">
-        <div class="col-md-6">
-            <div class="btn  btn-primary send_tour">
-                <i class="fa fa-envelope-o"></i>Send tour to client
-            </div>
-            <div class="btn  btn-primary buddy_tour">
-                <i class="fa fa-envelope-o"></i>Copy tour to other agent
-            </div>
-        </div>
-        <div class="col-md-6">
-            <% if (agentInteractive) { %>
-            <div class="form-group">
-                <label for="tour_select">Switch to another tour:</label>
-                <select class="form-control" id="tour_select" name="tour">
-                    <% for (var i = 0; i < allProperties.length;i++) { %>
-                    <option value="<%= allProperties[i]._id %>"
+                                    <% if (property._id.toHexString() === allProperties[i]._id.toHexString()) { %>
+                                    selected="selected"
+                                    <% } %>
 
-                            <% if (property._id.toHexString() === allProperties[i]._id.toHexString()) { %>
-                            selected="selected"
+                                    > <%= allProperties[i].address %> </option>
                             <% } %>
-
-                            > <%= allProperties[i].address %> </option>
+                        </select>
+                    </div>
                     <% } %>
-                </select>
-            </div>
-            <% } %>
 
-        </div>
-    </div>
-    <% } %>
-
-    <div class="row">
-        <% if (otherGroupProperties.length > 0) { %>
-
-        <div class="col-md-6">
-            Tours of other similar properties:
-            <% for (var i = 0; i < otherGroupProperties.length;i++) { %>
-            <div>
-
-
-                <a href="<%= "/video/" + otherGroupProperties[i]._id %>"> <%= otherGroupProperties[i].address %></a>
+                </div>
             </div>
             <% } %>
         </div>
-        <% } %>
     </div>
 
 </div>
